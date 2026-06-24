@@ -1,1 +1,7 @@
-bunx lint-staged
+if command -v bunx >/dev/null 2>&1; then
+	bunx lint-staged
+elif [ -x ./node_modules/.bin/lint-staged ]; then
+	./node_modules/.bin/lint-staged
+else
+	npx --no-install lint-staged
+fi
