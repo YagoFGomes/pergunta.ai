@@ -1,7 +1,7 @@
 if command -v bunx >/dev/null 2>&1; then
 	bunx lint-staged
-elif [ -x ./node_modules/.bin/lint-staged ]; then
-	./node_modules/.bin/lint-staged
+elif command -v node >/dev/null 2>&1 && [ -f ./node_modules/lint-staged/bin/lint-staged.js ]; then
+	node ./node_modules/lint-staged/bin/lint-staged.js
 else
 	npx --no-install lint-staged
 fi

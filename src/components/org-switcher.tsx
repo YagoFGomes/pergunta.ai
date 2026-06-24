@@ -136,7 +136,7 @@ export function OrgSwitcher() {
               const isActive = membership.tenant === user.current_tenant;
               return (
                 <DropdownMenuItem
-                  key={membership.id}
+                  key={membership.tenant_slug}
                   onClick={() => router.push('/dashboard/workspaces')}
                   className='gap-2 p-2'
                 >

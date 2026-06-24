@@ -11,7 +11,8 @@ import type {
   ErrorResponse,
   Login,
   TokenBlacklistRequest,
-  TokenPairResponse
+  TokenPairResponse,
+  TokenRefreshResponse
 } from '@/lib/api/generated/model';
 import {
   clearStoredAuthTokens,
@@ -29,7 +30,7 @@ function parseErrorMessage(error: unknown): string {
 }
 
 export async function loginWithCredentials(credentials: Login): Promise<CurrentUser> {
-  const tokenPair = (await loginCreate(credentials)) as TokenPairResponse;
+  const tokenPair = (await loginCreate(credentials)) as unknown as TokenPairResponse;
 
   if (!tokenPair?.access || !tokenPair?.refresh) {
     throw new Error('Unable to sign in.');
@@ -44,7 +45,7 @@ export async function loginWithCredentials(credentials: Login): Promise<CurrentU
 }
 
 export async function fetchCurrentUser(): Promise<CurrentUser> {
-  const currentUser = (await meRetrieve()) as CurrentUser;
+  const currentUser = (await meRetrieve()) as unknown as CurrentUser;
 
   if (!currentUser) {
     throw new Error('Unable to load the current user.');
@@ -63,7 +64,7 @@ export async function refreshSession(): Promise<string> {
   try {
     const refreshedTokenPair = (await refreshCreate({
       refresh: refreshToken
-    })) as TokenRefreshResponse;
+    })) as unknown as TokenRefreshResponse;
     const refreshedToken = refreshedTokenPair.access;
 
     if (!refreshedToken) {
