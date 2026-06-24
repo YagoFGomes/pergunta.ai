@@ -1,0 +1,100 @@
+'use client';
+
+import {
+  loginCreate,
+  logoutCreate,
+  refreshCreate,
+  meRetrieve
+} from '@/lib/api/generated/endpoints';
+import type {
+  CurrentUser,
+  ErrorResponse,
+  Login,
+  TokenBlacklistRequest,
+  TokenPairResponse
+} from '@/lib/api/generated/model';
+import {
+  clearStoredAuthTokens,
+  getRefreshToken,
+  refreshAccessTokenDirect,
+  setStoredAuthTokens
+} from '@/lib/auth/session';
+
+function parseErrorMessage(error: unknown): string {
+  if (error instanceof Error) {
+    return error.message;
+  }
+
+  return 'Authentication request failed.';
+}
+
+export async function loginWithCredentials(credentials: Login): Promise<CurrentUser> {
+  const tokenPair = (await loginCreate(credentials)) as TokenPairResponse;
+
+  if (!tokenPair?.access || !tokenPair?.refresh) {
+    throw new Error('Unable to sign in.');
+  }
+
+  setStoredAuthTokens({
+    accessToken: tokenPair.access,
+    refreshToken: tokenPair.refresh
+  });
+
+  return await fetchCurrentUser();
+}
+
+export async function fetchCurrentUser(): Promise<CurrentUser> {
+  const currentUser = (await meRetrieve()) as CurrentUser;
+
+  if (!currentUser) {
+    throw new Error('Unable to load the current user.');
+  }
+
+  return currentUser;
+}
+
+export async function refreshSession(): Promise<string> {
+  const refreshToken = getRefreshToken();
+
+  if (!refreshToken) {
+    throw new Error('No refresh token available.');
+  }
+
+  try {
+    const refreshedTokenPair = (await refreshCreate({
+      refresh: refreshToken
+    })) as TokenRefreshResponse;
+    const refreshedToken = refreshedTokenPair.access;
+
+    if (!refreshedToken) {
+      throw new Error('Unable to refresh session.');
+    }
+
+    setStoredAuthTokens({
+      accessToken: refreshedToken,
+      refreshToken
+    });
+    return refreshedToken;
+  } catch (error) {
+    const refreshed = await refreshAccessTokenDirect(refreshToken);
+    setStoredAuthTokens({
+      accessToken: refreshed.access,
+      refreshToken
+    });
+    return refreshed.access;
+  }
+}
+
+export async function logoutFromApi(): Promise<void> {
+  const refreshToken = getRefreshToken();
+
+  if (refreshToken) {
+    try {
+      await logoutCreate({ refresh: refreshToken } satisfies TokenBlacklistRequest);
+    } catch (error) {
+      console.warn(parseErrorMessage(error));
+    }
+  }
+
+  clearStoredAuthTokens();
+}

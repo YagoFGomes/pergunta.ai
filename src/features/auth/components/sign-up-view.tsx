@@ -1,6 +1,5 @@
 import { buttonVariants } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
-import { SignUp as ClerkSignUpForm } from '@clerk/nextjs';
 import { GitHubLogoIcon } from '@radix-ui/react-icons';
 import { Icons } from '@/components/icons';
 import { Metadata } from 'next';
@@ -77,18 +76,26 @@ export default function SignUpViewPage({ stars }: { stars: number }) {
               <span className='font-display font-medium'>{stars}</span>
             </div>
           </Link>
-          <ClerkSignUpForm
-            initialValues={{
-              emailAddress: 'your_mail+clerk_test@example.com'
-            }}
-          />
+          <div className='w-full rounded-2xl border bg-card p-6 text-left shadow-sm'>
+            <div className='space-y-2'>
+              <h1 className='text-2xl font-semibold tracking-tight'>Account setup</h1>
+              <p className='text-muted-foreground text-sm'>
+                Signup is not wired yet. Use your existing API credentials to continue.
+              </p>
+            </div>
+            <div className='mt-6 flex flex-col gap-3'>
+              <Link className={cn(buttonVariants({ className: 'w-full' }))} href='/auth/sign-in'>
+                Go to sign in
+              </Link>
+            </div>
+          </div>
           <div className='text-muted-foreground space-y-2 px-8 text-center text-xs'>
             <p>
               This is an{' '}
               <Link href='/about' className='hover:text-primary underline underline-offset-4'>
                 open-source project
               </Link>{' '}
-              for demo purposes. Authentication is handled securely by Clerk.
+              for demo purposes. Authentication is handled by your API.
             </p>
             <p>
               <Link

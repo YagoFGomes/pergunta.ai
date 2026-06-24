@@ -1,10 +1,17 @@
+'use client';
+
+import { Icons } from '@/components/icons';
 import { buttonVariants } from '@/components/ui/button';
-import { GitHubStarsButton } from '@/components/github-stars-button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { cn } from '@/lib/utils';
-import { SignIn as ClerkSignInForm } from '@clerk/nextjs';
 import { Metadata } from 'next';
 import Link from 'next/link';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { type FormEvent, useState } from 'react';
 import { InteractiveGridPattern } from './interactive-grid';
+import { useAuth } from '@/features/auth/context';
+import type { Login } from '@/lib/api/generated/model';
 
 export const metadata: Metadata = {
   title: 'Authentication',
@@ -12,6 +19,31 @@ export const metadata: Metadata = {
 };
 
 export default function SignInViewPage() {
+  const { login } = useAuth();
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const redirectTo = searchParams.get('redirectTo') || '/dashboard/overview';
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setError(null);
+    setIsSubmitting(true);
+
+    try {
+      const credentials: Login = { email, password };
+      await login(credentials);
+      router.replace(redirectTo);
+    } catch (loginError) {
+      setError(loginError instanceof Error ? loginError.message : 'Unable to sign in.');
+    } finally {
+      setIsSubmitting(false);
+    }
+  }
+
   return (
     <div className='relative flex min-h-screen flex-col items-center justify-center overflow-hidden md:grid lg:max-w-none lg:grid-cols-2 lg:px-0'>
       <Link
@@ -58,26 +90,65 @@ export default function SignInViewPage() {
       </div>
       <div className='flex h-full items-center justify-center p-4 lg:p-8'>
         <div className='flex w-full max-w-md flex-col items-center justify-center space-y-6'>
-          {/* github link  */}
-          <GitHubStarsButton
-            owner='kiranism'
-            repo='next-shadcn-dashboard-starter'
-            showRepo
-            variant='outline'
-            size='default'
-          />
-          <ClerkSignInForm
-            initialValues={{
-              emailAddress: 'your_mail+clerk_test@example.com'
-            }}
-          />
+          <Link
+            className={cn(buttonVariants({ variant: 'outline' }), 'inline-flex items-center gap-2')}
+            target='_blank'
+            href='https://github.com/kiranism/next-shadcn-dashboard-starter'
+          >
+            <Icons.github className='size-4' />
+            <span>View on GitHub</span>
+          </Link>
+          <form
+            className='w-full space-y-4 rounded-2xl border bg-card p-6 shadow-sm'
+            onSubmit={handleSubmit}
+          >
+            <div className='space-y-2 text-left'>
+              <h1 className='text-2xl font-semibold tracking-tight'>Sign in</h1>
+              <p className='text-muted-foreground text-sm'>
+                Use your API credentials to access the dashboard.
+              </p>
+            </div>
+
+            <div className='space-y-2'>
+              <Label htmlFor='email'>Email</Label>
+              <Input
+                id='email'
+                type='email'
+                value={email}
+                onChange={(event) => setEmail(event.target.value)}
+                required
+              />
+            </div>
+
+            <div className='space-y-2'>
+              <Label htmlFor='password'>Password</Label>
+              <Input
+                id='password'
+                type='password'
+                value={password}
+                onChange={(event) => setPassword(event.target.value)}
+                required
+              />
+            </div>
+
+            {error ? <p className='text-sm text-red-500'>{error}</p> : null}
+
+            <button
+              className={cn(buttonVariants({ className: 'w-full' }))}
+              type='submit'
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? <Icons.spinner className='mr-2 size-4 animate-spin' /> : null}
+              {isSubmitting ? 'Signing in...' : 'Sign in'}
+            </button>
+          </form>
           <div className='text-muted-foreground space-y-2 px-8 text-center text-xs'>
             <p>
               This is an{' '}
               <Link href='/about' className='hover:text-primary underline underline-offset-4'>
                 open-source project
               </Link>{' '}
-              for demo purposes. Authentication is handled securely by Clerk.
+              for demo purposes. Authentication is handled by your API.
             </p>
             <p>
               <Link

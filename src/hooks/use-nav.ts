@@ -1,24 +1,8 @@
 'use client';
 
-/**
- * Fully client-side hook for filtering navigation items based on RBAC
- *
- * This hook uses Clerk's client-side hooks to check permissions, roles, and organization
- * without any server calls. This is perfect for navigation visibility (UX only).
- *
- * Performance:
- * - All checks are synchronous (no server calls)
- * - Instant filtering
- * - No loading states
- * - No UI flashing
- *
- * Note: For actual security (API routes, server actions), always use server-side checks.
- * This is only for UI visibility.
- */
-
 import { useMemo } from 'react';
-import { useOrganization, useUser } from '@clerk/nextjs';
 import type { NavItem, NavGroup } from '@/types';
+import { useAuth } from '@/features/auth/context';
 
 /**
  * Hook to filter navigation items based on RBAC (fully client-side)
@@ -27,23 +11,19 @@ import type { NavItem, NavGroup } from '@/types';
  * @returns Filtered items
  */
 export function useFilteredNavItems(items: NavItem[]) {
-  const { organization, membership } = useOrganization();
-  const { user } = useUser();
+  const { user } = useAuth();
+  const activeMembership = useMemo(
+    () => user?.memberships.find((membership) => membership.tenant === user.current_tenant),
+    [user]
+  );
 
-  // Memoize context and permissions
   const accessContext = useMemo(() => {
-    const permissions = membership?.permissions || [];
-    const role = membership?.role;
-
     return {
-      organization: organization ?? undefined,
       user: user ?? undefined,
-      permissions: permissions as string[],
-      role: role ?? undefined,
-      hasOrg: !!organization
+      role: activeMembership?.role,
+      hasOrg: !!user?.current_tenant
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- using stable primitives to avoid infinite re-renders from unstable Clerk object refs
-  }, [organization?.id, user?.id, membership?.permissions, membership?.role]);
+  }, [activeMembership?.role, user]);
 
   // Filter items synchronously (all client-side)
   const filteredItems = useMemo(() => {
@@ -61,12 +41,7 @@ export function useFilteredNavItems(items: NavItem[]) {
 
         // Check permission
         if (item.access.permission) {
-          if (!accessContext.hasOrg) {
-            return false;
-          }
-          if (!accessContext.permissions.includes(item.access.permission)) {
-            return false;
-          }
+          return false;
         }
 
         // Check role
@@ -74,7 +49,7 @@ export function useFilteredNavItems(items: NavItem[]) {
           if (!accessContext.hasOrg) {
             return false;
           }
-          if (accessContext.role !== item.access.role) {
+          if ((accessContext.role || '').toLowerCase() !== item.access.role.toLowerCase()) {
             return false;
           }
         }
@@ -114,12 +89,7 @@ export function useFilteredNavItems(items: NavItem[]) {
 
             // Check permission
             if (childItem.access.permission) {
-              if (!accessContext.hasOrg) {
-                return false;
-              }
-              if (!accessContext.permissions.includes(childItem.access.permission)) {
-                return false;
-              }
+              return false;
             }
 
             // Check role
@@ -127,7 +97,9 @@ export function useFilteredNavItems(items: NavItem[]) {
               if (!accessContext.hasOrg) {
                 return false;
               }
-              if (accessContext.role !== childItem.access.role) {
+              if (
+                (accessContext.role || '').toLowerCase() !== childItem.access.role.toLowerCase()
+              ) {
                 return false;
               }
             }
