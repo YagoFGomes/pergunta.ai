@@ -764,3 +764,27 @@ Resumo:
 Validacao:
 
 - `get_errors` retornou "No errors found" para os arquivos alterados
+
+### FE-203 - Criar/editar/remover contato
+
+Status: Implementado em 2026-06-27.
+
+Resumo:
+
+- expandida a tela `/dashboard/contacts/lists/[id]/contacts` para suportar CRUD de contatos
+- adicionadas acoes por linha (editar/excluir) na tabela de contatos
+- implementado dialog de formulario para criacao e edicao de contato
+- implementado `AlertDialog` de confirmacao para exclusao
+- conectadas mutacoes:
+  - `useContactsListsContactsCreate`
+  - `useContactsListsContactsPartialUpdate`
+  - `useContactsListsContactsDestroy`
+- invalidados caches de lista de contatos, detalhe da lista e listagem de listas apos mutacoes
+- criado schema `src/features/contacts/schemas/contact.ts` para validacoes de nome, email, telefone e status
+
+Validacao:
+
+- `get_errors` retornou "No errors found" para:
+  - `src/features/contacts/components/contacts-table/contact-list-contacts-manager.tsx`
+  - `src/features/contacts/components/contacts-table/columns.tsx`
+  - `src/features/contacts/schemas/contact.ts`

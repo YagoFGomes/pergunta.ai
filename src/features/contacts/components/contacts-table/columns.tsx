@@ -3,7 +3,9 @@
 import type { Column, ColumnDef } from '@tanstack/react-table';
 
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { DataTableColumnHeader } from '@/components/ui/table/data-table-column-header';
+import { Icons } from '@/components/icons';
 import type { EmailContact } from '@/lib/api/generated/model/emailContact';
 import { EmailContactStatusEnum } from '@/lib/api/generated/model/emailContactStatusEnum';
 import { cn } from '@/lib/utils';
@@ -41,7 +43,17 @@ function getStatusClassName(status?: EmailContact['status']) {
   return 'text-muted-foreground';
 }
 
-export function getContactsByListColumns(): ColumnDef<EmailContact>[] {
+type GetContactsByListColumnsConfig = {
+  onEdit?: (contact: EmailContact) => void;
+  onDelete?: (contact: EmailContact) => void;
+  disableActions?: boolean;
+};
+
+export function getContactsByListColumns({
+  onEdit,
+  onDelete,
+  disableActions = false
+}: GetContactsByListColumnsConfig = {}): ColumnDef<EmailContact>[] {
   return [
     {
       id: 'name',
@@ -87,6 +99,36 @@ export function getContactsByListColumns(): ColumnDef<EmailContact>[] {
         <DataTableColumnHeader column={column} title='Criado em' />
       ),
       cell: ({ row }) => <span className='text-sm'>{formatDate(row.original.created_at)}</span>
+    },
+    {
+      id: 'actions',
+      enableSorting: false,
+      enableHiding: false,
+      cell: ({ row }) => (
+        <div className='flex items-center justify-end gap-1'>
+          <Button
+            type='button'
+            variant='ghost'
+            size='icon'
+            aria-label='Editar contato'
+            disabled={disableActions || !onEdit}
+            onClick={() => onEdit?.(row.original)}
+          >
+            <Icons.edit className='h-4 w-4' />
+          </Button>
+          <Button
+            type='button'
+            variant='ghost'
+            size='icon'
+            aria-label='Excluir contato'
+            className='text-destructive hover:text-destructive'
+            disabled={disableActions || !onDelete}
+            onClick={() => onDelete?.(row.original)}
+          >
+            <Icons.trash className='h-4 w-4' />
+          </Button>
+        </div>
+      )
     }
   ];
 }
