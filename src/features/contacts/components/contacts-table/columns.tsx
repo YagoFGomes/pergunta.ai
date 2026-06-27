@@ -56,9 +56,15 @@ export function getContactsByListColumns({
 }: GetContactsByListColumnsConfig = {}): ColumnDef<EmailContact>[] {
   return [
     {
-      id: 'name',
-      accessorKey: 'name',
+      id: 'email',
+      accessorKey: 'email',
       enableSorting: false,
+      enableColumnFilter: true,
+      meta: {
+        label: 'Contato',
+        placeholder: 'Buscar email...',
+        variant: 'text'
+      },
       header: ({ column }: { column: Column<EmailContact, unknown> }) => (
         <DataTableColumnHeader column={column} title='Contato' />
       ),
@@ -82,6 +88,16 @@ export function getContactsByListColumns({
       id: 'status',
       accessorKey: 'status',
       enableSorting: false,
+      enableColumnFilter: true,
+      meta: {
+        label: 'Status',
+        variant: 'select',
+        options: [
+          { label: 'Ativo', value: EmailContactStatusEnum.ACTIVE },
+          { label: 'Descadastrado', value: EmailContactStatusEnum.UNSUBSCRIBED },
+          { label: 'Bounced', value: EmailContactStatusEnum.BOUNCED }
+        ]
+      },
       header: ({ column }: { column: Column<EmailContact, unknown> }) => (
         <DataTableColumnHeader column={column} title='Status' />
       ),

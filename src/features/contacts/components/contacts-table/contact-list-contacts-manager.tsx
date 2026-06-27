@@ -1,7 +1,7 @@
 'use client';
 
 import { useMemo, useState } from 'react';
-import { useQueryClient } from '@tanstack/react-query';
+import { keepPreviousData, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 
 import {
@@ -15,6 +15,7 @@ import {
   AlertDialogTitle
 } from '@/components/ui/alert-dialog';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { Icons } from '@/components/icons';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
@@ -29,6 +30,8 @@ import { useAppForm, useFormFields } from '@/components/ui/tanstack-form';
 import { ModuleDataTable } from '@/features/platform/components/module-data-table';
 import { ModuleDataTableSkeleton } from '@/features/platform/components/module-data-table-skeleton';
 import { ModuleErrorAlert } from '@/features/platform/components/module-error-alert';
+import { useModuleTableParams } from '@/features/platform/hooks/use-module-table-params';
+import { MODULE_TABLE_DEFAULT_DEBOUNCE_MS } from '@/features/platform/lib/module-table';
 import { getOrvalResponseData } from '@/features/platform/lib/orval-response';
 import { useDataTable } from '@/hooks/use-data-table';
 import {
@@ -44,6 +47,7 @@ import {
 import type { EmailContact } from '@/lib/api/generated/model/emailContact';
 import { EmailContactStatusEnum } from '@/lib/api/generated/model/emailContactStatusEnum';
 import type { EmailList } from '@/lib/api/generated/model/emailList';
+import type { ContactsListsContactsListParams } from '@/lib/api/generated/model/contactsListsContactsListParams';
 import type { Option } from '@/types/data-table';
 import { contactFieldSchemas, type ContactFormValues } from '../../schemas/contact';
 
@@ -68,6 +72,13 @@ const DEFAULT_VALUES: ContactFormValues = {
   status: EmailContactStatusEnum.ACTIVE
 };
 
+const CONTACT_FILTER_KEYS = ['email', 'status'] as const;
+
+function normalizeSingleFilter(value: unknown) {
+  if (Array.isArray(value)) return value[0];
+  return typeof value === 'string' && value.length > 0 ? value : undefined;
+}
+
 function normalizeValues(values: ContactFormValues): ContactFormValues {
   return {
     name: values.name.trim(),
@@ -89,7 +100,6 @@ export function ContactListContactsManager({ listId }: ContactListContactsManage
       staleTime: 30_000
     }
   });
-  const contactsQuery = useContactsListsContactsList(listId);
 
   const createMutation = useContactsListsContactsCreate({
     mutation: {
@@ -146,7 +156,6 @@ export function ContactListContactsManager({ listId }: ContactListContactsManage
     createMutation.isPending || updateMutation.isPending || destroyMutation.isPending;
 
   const listData = getOrvalResponseData<EmailList>(listQuery.data);
-  const contacts = getOrvalResponseData<EmailContact[]>(contactsQuery.data) ?? [];
 
   const form = useAppForm({
     defaultValues: DEFAULT_VALUES,
@@ -215,13 +224,41 @@ export function ContactListContactsManager({ listId }: ContactListContactsManage
     [hasMutationInFlight]
   );
 
+  const { params } = useModuleTableParams<EmailContact, (typeof CONTACT_FILTER_KEYS)[number]>({
+    columns,
+    filterKeys: CONTACT_FILTER_KEYS
+  });
+
+  const apiParams = useMemo<ContactsListsContactsListParams>(
+    () => ({
+      ...(normalizeSingleFilter(params.email) && {
+        email: normalizeSingleFilter(params.email)
+      }),
+      ...(normalizeSingleFilter(params.status) && {
+        status: normalizeSingleFilter(params.status)
+      })
+    }),
+    [params.email, params.status]
+  );
+
+  const contactsQuery = useContactsListsContactsList(listId, apiParams, {
+    query: {
+      placeholderData: keepPreviousData
+    }
+  });
+
+  const contacts = getOrvalResponseData<EmailContact[]>(contactsQuery.data) ?? [];
+  const hasFilters = Boolean(params.email || params.status);
+
   const { table } = useDataTable({
     data: contacts,
     columns,
     pageCount: 1,
     shallow: false,
+    debounceMs: MODULE_TABLE_DEFAULT_DEBOUNCE_MS,
     initialState: {
-      sorting: []
+      sorting: [],
+      columnPinning: { right: ['actions'] }
     }
   });
 
@@ -255,7 +292,7 @@ export function ContactListContactsManager({ listId }: ContactListContactsManage
         <Button onClick={openCreateDialog}>Novo contato</Button>
       </div>
 
-      {contacts.length === 0 ? (
+      {contacts.length === 0 && !hasFilters ? (
         <Alert>
           <AlertTitle>Nenhum contato cadastrado</AlertTitle>
           <AlertDescription>
@@ -266,8 +303,17 @@ export function ContactListContactsManager({ listId }: ContactListContactsManage
 
       <ModuleDataTable
         table={table}
-        showToolbar={false}
-        toolbarChildren={<Badge variant='outline'>{contacts.length} contatos</Badge>}
+        toolbarChildren={
+          <>
+            {contactsQuery.isFetching ? (
+              <Badge variant='outline' className='gap-1'>
+                <Icons.spinner className='h-3 w-3 animate-spin' />
+                Atualizando
+              </Badge>
+            ) : null}
+            <Badge variant='outline'>{contacts.length} contatos</Badge>
+          </>
+        }
       />
 
       <Dialog
@@ -334,6 +380,7 @@ export function ContactListContactsManager({ listId }: ContactListContactsManage
                 validators={{
                   onBlur: contactFieldSchemas.status
                 }}
+                disabled={hasMutationInFlight}
               />
 
               <DialogFooter>

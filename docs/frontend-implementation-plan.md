@@ -804,3 +804,22 @@ Validacao:
 
 - `bun run build` passou
 - `bun run lint` passou; permanecem warnings preexistentes que nao bloqueiam a execucao
+
+### FE-204 - Busca e filtros de contatos
+
+Status: Implementado em 2026-06-27.
+
+Resumo:
+
+- adicionada busca por email na tabela de contatos da lista
+- adicionado filtro por status (`ACTIVE`, `UNSUBSCRIBED`, `BOUNCED`) usando a toolbar padrao de tabelas
+- filtros ficam sincronizados na URL como `email` e `status`
+- `ContactListContactsManager` agora envia os filtros para `useContactsListsContactsList(listId, params)`
+- adicionada indicacao visual de atualizacao enquanto a consulta refaz fetch
+- mantido empty state apenas quando a lista realmente nao possui contatos; resultados vazios filtrados ficam na tabela filtrada
+- observacao de contrato: `GET /api/contacts/lists/{listId}/contacts/` expoe `email` e `status`, mas ainda nao expoe `page`/`page_size`; por isso a paginacao backend fica para uma evolucao de contrato
+
+Validacao:
+
+- `bun run lint` passou; permanecem warnings preexistentes que nao bloqueiam a execucao
+- `bun run build` passou
