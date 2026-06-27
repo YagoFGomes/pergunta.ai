@@ -19,9 +19,13 @@ import { getOrvalResponseData } from '@/features/platform/lib/orval-response';
 import { notifyError, notifySuccess } from '@/features/platform/lib/notifications';
 import {
   getSurveysFormsListQueryKey,
+  getSurveysFormsRetrieveQueryKey,
   useSurveysFormsCreate,
+  useSurveysFormsPartialUpdate,
+  useSurveysFormsRetrieve,
   useSurveysFrameworksList,
-  type SurveysFormsCreateMutationBody
+  type SurveysFormsCreateMutationBody,
+  type SurveysFormsPartialUpdateMutationBody
 } from '@/lib/api/generated/endpoints';
 import type { Form } from '@/lib/api/generated/model/form';
 import type { SurveyFramework } from '@/lib/api/generated/model/surveyFramework';
@@ -35,6 +39,7 @@ import {
 } from '../schemas/survey-form';
 
 const CREATE_SURVEY_FORM_ID = 'survey-form-create';
+const EDIT_SURVEY_FORM_ID = 'survey-form-edit';
 const EMPTY_FRAMEWORKS: SurveyFramework[] = [];
 
 function toCreatePayload(values: SurveyFormCreateValues): SurveysFormsCreateMutationBody {
@@ -47,9 +52,51 @@ function toCreatePayload(values: SurveyFormCreateValues): SurveysFormsCreateMuta
   } as SurveysFormsCreateMutationBody;
 }
 
-export function SurveyFormCreate() {
+function toUpdatePayload(values: SurveyFormCreateValues): SurveysFormsPartialUpdateMutationBody {
+  return {
+    framework: values.framework,
+    title: values.title.trim(),
+    description: values.description.trim()
+  };
+}
+
+function getFormDefaultValues(form?: Form): SurveyFormCreateValues {
+  if (!form) {
+    return resolveModuleFormDefaults(surveyFormCreateFormConfig.defaultValues);
+  }
+
+  return {
+    framework: form.framework,
+    title: form.title,
+    description: form.description ?? ''
+  };
+}
+
+function formatDateTime(value?: string) {
+  if (!value) return 'Data indisponivel';
+
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return 'Data indisponivel';
+
+  return new Intl.DateTimeFormat('pt-BR', {
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit'
+  }).format(date);
+}
+
+type SurveyFormEditorProps = {
+  mode: 'create' | 'edit';
+  initialForm?: Form;
+};
+
+function SurveyFormEditor({ mode, initialForm }: SurveyFormEditorProps) {
   const router = useRouter();
   const queryClient = useQueryClient();
+  const isEdit = mode === 'edit';
+  const formId = isEdit ? EDIT_SURVEY_FORM_ID : CREATE_SURVEY_FORM_ID;
 
   const frameworksQuery = useSurveysFrameworksList(
     { is_active: 'true' },
@@ -66,6 +113,28 @@ export function SurveyFormCreate() {
     () => buildSurveyFrameworkSelectOptions(frameworks),
     [frameworks]
   );
+
+  const updateMutation = useSurveysFormsPartialUpdate({
+    mutation: {
+      onSuccess: async (response) => {
+        const updatedForm = getOrvalResponseData<Form>(response);
+
+        await Promise.all([
+          queryClient.invalidateQueries({
+            queryKey: getSurveysFormsListQueryKey()
+          }),
+          queryClient.invalidateQueries({
+            queryKey: getSurveysFormsRetrieveQueryKey(updatedForm?.id ?? initialForm?.id)
+          })
+        ]);
+
+        notifySuccess('Formulario atualizado.');
+      },
+      onError: (error) => {
+        notifyError(error, 'Nao foi possivel atualizar o formulario.');
+      }
+    }
+  });
 
   const createMutation = useSurveysFormsCreate({
     mutation: {
@@ -89,15 +158,26 @@ export function SurveyFormCreate() {
     }
   });
 
+  const isPending = createMutation.isPending || updateMutation.isPending;
+
   const form = useAppForm({
-    defaultValues: resolveModuleFormDefaults(surveyFormCreateFormConfig.defaultValues),
+    defaultValues: getFormDefaultValues(initialForm),
     validators: {
       onSubmit: surveyFormCreateFormConfig.schema
     },
     onSubmit: async ({ value }) => {
-      await createMutation.mutateAsync({
-        data: toCreatePayload(value)
-      });
+      if (isEdit) {
+        if (!initialForm?.id) return;
+
+        await updateMutation.mutateAsync({
+          id: initialForm.id,
+          data: toUpdatePayload(value)
+        });
+      } else {
+        await createMutation.mutateAsync({
+          data: toCreatePayload(value)
+        });
+      }
     }
   });
 
@@ -148,19 +228,35 @@ export function SurveyFormCreate() {
 
   return (
     <ModuleFormCard
-      title='Dados do formulario'
-      description='Crie o rascunho inicial. As perguntas serao configuradas na proxima tela.'
+      title={isEdit ? 'Editar metadados' : 'Dados do formulario'}
+      description={
+        isEdit
+          ? 'Atualize as informacoes principais do formulario.'
+          : 'Crie o rascunho inicial. As perguntas serao configuradas na proxima tela.'
+      }
       footer={
         <ModuleFormActions
-          formId={CREATE_SURVEY_FORM_ID}
-          isPending={createMutation.isPending}
-          submitLabel='Criar formulario'
+          mode={isEdit ? 'edit' : 'create'}
+          formId={formId}
+          isPending={isPending}
+          submitLabel={isEdit ? 'Salvar alteracoes' : 'Criar formulario'}
           onCancel={() => router.push('/dashboard/surveys/forms')}
         />
       }
     >
+      {isEdit && initialForm ? (
+        <Alert>
+          <Icons.info className='h-4 w-4' />
+          <AlertTitle>Status atual: {initialForm.status ?? 'Sem status'}</AlertTitle>
+          <AlertDescription>
+            Criado em {formatDateTime(initialForm.created_at)}. Ultima atualizacao em{' '}
+            {formatDateTime(initialForm.updated_at)}.
+          </AlertDescription>
+        </Alert>
+      ) : null}
+
       <form.AppForm>
-        <form.Form id={CREATE_SURVEY_FORM_ID} className='space-y-8 p-0 md:p-0'>
+        <form.Form id={formId} className='space-y-8 p-0 md:p-0'>
           <ModuleFormSection
             title='Configuracao base'
             description='Escolha o framework e defina como este formulario aparecera no dashboard.'
@@ -209,4 +305,49 @@ export function SurveyFormCreate() {
       </form.AppForm>
     </ModuleFormCard>
   );
+}
+
+export function SurveyFormCreate() {
+  return <SurveyFormEditor mode='create' />;
+}
+
+type SurveyFormEditProps = {
+  formId: string;
+};
+
+export function SurveyFormEdit({ formId }: SurveyFormEditProps) {
+  const formQuery = useSurveysFormsRetrieve(formId);
+  const surveyForm = getOrvalResponseData<Form>(formQuery.data);
+
+  if (formQuery.isPending) {
+    return <ModuleFormSkeleton />;
+  }
+
+  if (formQuery.isError) {
+    return (
+      <div className='grid gap-4'>
+        <ModuleErrorAlert
+          error={formQuery.error}
+          title='Erro ao carregar formulario'
+          fallbackMessage='Nao foi possivel carregar os dados deste formulario.'
+        />
+        <div>
+          <Button variant='outline' onClick={() => formQuery.refetch()}>
+            Tentar novamente
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
+  if (!surveyForm) {
+    return (
+      <ModuleErrorAlert
+        title='Formulario nao encontrado'
+        message='Nao encontramos dados para este formulario.'
+      />
+    );
+  }
+
+  return <SurveyFormEditor key={surveyForm.id} mode='edit' initialForm={surveyForm} />;
 }

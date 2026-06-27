@@ -509,6 +509,27 @@ Validacao:
 - `bun run lint` passou; permanecem warnings preexistentes que nao bloqueiam a execucao
 - `bun run build` passou com rede liberada para download de fontes do Google usadas por `next/font`
 
+### FE-103 - Editar formulario
+
+Status: Implementado em 2026-06-27.
+
+Resumo:
+
+- substituido o placeholder de `/dashboard/surveys/forms/[id]` por uma tela real de edicao de metadados
+- o componente `SurveyFormCreate` foi generalizado internamente para suportar modo `create` e `edit`
+- criado export `SurveyFormEdit` em `src/features/surveys/components/survey-form-create.tsx`
+- a tela de edicao carrega o formulario com `useSurveysFormsRetrieve(id)` e normaliza a resposta com `getOrvalResponseData`
+- o submit de edicao usa `useSurveysFormsPartialUpdate` enviando `framework`, `title` e `description` para `PATCH /api/surveys/forms/{id}/`
+- apos salvar, a listagem e o detalhe do formulario sao invalidados no TanStack Query e um toast de sucesso e exibido
+- a tela exibe status atual, data de criacao e data da ultima atualizacao do formulario
+- a acao da tabela foi ajustada de `Detalhes` para `Editar`, apontando para a tela real
+- as acoes de publicar e arquivar permanecem para `FE-104` e `FE-105`
+
+Validacao:
+
+- `bun run lint` passou; permanecem warnings preexistentes que nao bloqueiam a execucao
+- `bun run build` passou com rede liberada para download de fontes do Google usadas por `next/font`
+
 ### FE-005 - Tratamento de erro e notificacoes
 
 Status: Implementado em 2026-06-27.

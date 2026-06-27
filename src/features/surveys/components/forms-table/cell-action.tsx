@@ -32,7 +32,7 @@ export function SurveyFormCellAction({ data }: SurveyFormCellActionProps) {
         <DropdownMenuLabel>Acoes</DropdownMenuLabel>
         <DropdownMenuItem onClick={() => router.push(`/dashboard/surveys/forms/${data.id}`)}>
           <Icons.edit className='mr-2 h-4 w-4' />
-          Detalhes
+          Editar
         </DropdownMenuItem>
         <DropdownMenuItem
           onClick={() => router.push(`/dashboard/surveys/forms/${data.id}/questions`)}
