@@ -4,7 +4,9 @@ import {
   loginCreate,
   logoutCreate,
   refreshCreate,
-  meRetrieve
+  meRetrieve,
+  onboardingTrialTenantCreate,
+  registerCreate
 } from '@/lib/api/generated/endpoints';
 import type {
   CurrentUser,
@@ -12,7 +14,8 @@ import type {
   Login,
   TokenBlacklistRequest,
   TokenPairResponse,
-  TokenRefreshResponse
+  TokenRefreshResponse,
+  TrialTenantOnboarding
 } from '@/lib/api/generated/model';
 import {
   clearStoredAuthTokens,
@@ -98,4 +101,24 @@ export async function logoutFromApi(): Promise<void> {
   }
 
   clearStoredAuthTokens();
+}
+
+export async function registerUser(data: {
+  email: string;
+  first_name?: string;
+  last_name?: string;
+  password: string;
+}): Promise<void> {
+  const payload: Parameters<typeof registerCreate>[0] = {
+    email: data.email,
+    first_name: data.first_name,
+    last_name: data.last_name,
+    password: data.password
+  } as never;
+
+  await registerCreate(payload);
+}
+
+export async function onboardTenant(data: TrialTenantOnboarding): Promise<void> {
+  await onboardingTrialTenantCreate(data);
 }

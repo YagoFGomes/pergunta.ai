@@ -12,6 +12,9 @@ import { type FormEvent, useState } from 'react';
 import { InteractiveGridPattern } from './interactive-grid';
 import { useAuth } from '@/features/auth/context';
 import type { Login } from '@/lib/api/generated/model';
+import { useLoginCreate } from '@/lib/api/generated/endpoints';
+import { setStoredAuthTokens } from '@/lib/auth/session';
+import { fetchCurrentUser } from '@/features/auth/api/service';
 
 export const metadata: Metadata = {
   title: 'Authentication',
@@ -19,7 +22,8 @@ export const metadata: Metadata = {
 };
 
 export default function SignInViewPage() {
-  const { login } = useAuth();
+  const { setUser } = useAuth();
+  const loginMutation = useLoginCreate();
   const router = useRouter();
   const searchParams = useSearchParams();
   const redirectTo = searchParams.get('redirectTo') || '/dashboard/overview';
@@ -35,7 +39,30 @@ export default function SignInViewPage() {
 
     try {
       const credentials: Login = { email, password };
-      await login(credentials);
+      const tokenPair = await loginMutation.mutateAsync({ data: credentials });
+
+      const hasTokenPair =
+        tokenPair &&
+        typeof tokenPair === 'object' &&
+        'access' in tokenPair &&
+        'refresh' in tokenPair;
+
+      const accessToken = hasTokenPair ? (tokenPair as Record<string, unknown>).access : undefined;
+      const refreshToken = hasTokenPair
+        ? (tokenPair as Record<string, unknown>).refresh
+        : undefined;
+
+      if (!hasTokenPair || typeof accessToken !== 'string' || typeof refreshToken !== 'string') {
+        throw new Error('Unable to sign in.');
+      }
+
+      setStoredAuthTokens({
+        accessToken,
+        refreshToken
+      });
+
+      const currentUser = await fetchCurrentUser();
+      setUser(currentUser);
       router.replace(redirectTo);
     } catch (loginError) {
       setError(loginError instanceof Error ? loginError.message : 'Unable to sign in.');
@@ -142,6 +169,13 @@ export default function SignInViewPage() {
               {isSubmitting ? 'Signing in...' : 'Sign in'}
             </button>
           </form>
+
+          <p className='text-muted-foreground text-center text-sm'>
+            Don&apos;t have an account?{' '}
+            <Link href='/auth/sign-up' className='hover:text-primary underline underline-offset-4'>
+              Sign up
+            </Link>
+          </p>
 
           <p className='text-muted-foreground px-8 text-center text-sm'>
             By clicking continue, you agree to our{' '}

@@ -22,7 +22,7 @@ export async function customFetch<T>(url: string, options: RequestInit = {}): Pr
   const headers = new Headers(options.headers ?? {});
   const accessToken = getAccessToken();
   const refreshToken = getRefreshToken();
-  const isAuthEndpoint = /\/api\/(login|refresh|logout)\/?$/.test(requestUrl);
+  const isAuthEndpoint = /\/api\/(login|register|refresh|logout)\/?$/.test(requestUrl);
 
   if (accessToken && !headers.has('Authorization') && !isAuthEndpoint) {
     headers.set('Authorization', `Bearer ${accessToken}`);

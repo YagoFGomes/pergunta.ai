@@ -37,7 +37,7 @@ const initialColumns: Record<string, Task[]> = {
     },
     {
       id: '3',
-      title: 'Update onboarding flow copy',
+      title: 'Update onboarding flow',
       priority: 'low',
       assignee: 'Priya Sharma',
       dueDate: '2026-04-15'
@@ -48,6 +48,20 @@ const initialColumns: Record<string, Task[]> = {
       priority: 'medium',
       assignee: 'Jordan Kim',
       dueDate: '2026-04-10'
+    },
+    {
+      id: '11',
+      title: 'Draft privacy terms and data handling policy',
+      priority: 'high',
+      assignee: 'Priya Sharma',
+      dueDate: '2026-04-11'
+    },
+    {
+      id: '12',
+      title: 'Write software usage policy and acceptance terms',
+      priority: 'high',
+      assignee: 'Marcus Rivera',
+      dueDate: '2026-04-13'
     }
   ],
   inProgress: [
