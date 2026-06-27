@@ -1,27 +1,31 @@
-import ModuleShellPage from '@/features/platform/components/module-shell-page';
+import Link from 'next/link';
+
+import { Icons } from '@/components/icons';
+import PageContainer from '@/components/layout/page-container';
+import { buttonVariants } from '@/components/ui/button';
+import { SurveyFormsTable } from '@/features/surveys/components/forms-table/survey-forms-table';
+import { cn } from '@/lib/utils';
 
 export const metadata = {
-  title: 'Dashboard: Survey Forms'
+  title: 'Dashboard: Formularios'
 };
 
 export default function SurveyFormsPage() {
   return (
-    <ModuleShellPage
-      pageTitle='Survey Forms'
-      pageDescription='Criacao e manutencao de formularios de pesquisa.'
-      scope='FE-101..FE-109'
-      nextSteps={[
-        'Implementar tabela de formularios (status, data, framework).',
-        'Criar fluxo de formulario novo em /dashboard/surveys/forms/new.',
-        'Conectar CRUD de perguntas e reorder por drag-and-drop.'
-      ]}
-      endpointReferences={[
-        'GET /api/surveys/forms/',
-        'POST /api/surveys/forms/',
-        'POST /api/surveys/forms/{id}/publish/',
-        'POST /api/surveys/forms/{id}/archive/',
-        'POST /api/surveys/forms/{id}/questions/reorder/'
-      ]}
-    />
+    <PageContainer
+      pageTitle='Formularios de pesquisa'
+      pageDescription='Listagem, status e filtros dos formularios do tenant.'
+      pageHeaderAction={
+        <Link
+          href='/dashboard/surveys/forms/new'
+          className={cn(buttonVariants(), 'text-xs md:text-sm')}
+        >
+          <Icons.add className='mr-2 h-4 w-4' />
+          Novo formulario
+        </Link>
+      }
+    >
+      <SurveyFormsTable />
+    </PageContainer>
   );
 }

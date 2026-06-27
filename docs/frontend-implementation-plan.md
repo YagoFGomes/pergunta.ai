@@ -426,6 +426,28 @@ Validacao:
 - `bun run lint` passou; permanecem warnings preexistentes que nao bloqueiam a execucao
 - `bun run build` passou com rede liberada para download de fontes do Google usadas por `next/font`
 
+### FE-101 - Listar formularios
+
+Status: Implementado em 2026-06-27.
+
+Resumo:
+
+- substituido o placeholder de `/dashboard/surveys/forms` por uma listagem real de formularios conectada ao hook Orval `useSurveysFormsList`
+- criada a feature `src/features/surveys/components/forms-table/` com tabela, colunas, opcoes de filtro e acoes por linha
+- a listagem usa `ModuleDataTable`, `ModuleDataTableSkeleton`, `ModuleErrorAlert`, `useModuleTableParams` e `getModuleTablePageCount` da fundacao criada em FE-003/FE-005
+- adicionados filtros reais por `status` e `framework`, sincronizados com a URL e convertidos para os parametros `status`, `framework`, `page` e `page_size` da API
+- adicionados estados de loading, erro e vazio para a rota de formularios
+- adicionadas acoes de linha para acessar os shells ja existentes de detalhes do formulario e perguntas
+- ajustado `useModuleTableParams` para tipar filtros dinamicos no retorno do hook, evitando casts locais nas features
+- apos smoke com backend real, criado `getOrvalResponseData` em `src/features/platform/lib/orval-response.ts` para normalizar respostas que chegam direto do backend (`count/results`) ou via wrapper tipado (`data`)
+- nenhum CRUD, publicacao, arquivamento ou edicao de perguntas foi implementado nesta etapa
+
+Validacao:
+
+- `bun run lint` passou; permanecem warnings preexistentes que nao bloqueiam a execucao
+- `bun run build` passou com rede liberada para download de fontes do Google usadas por `next/font`
+- smoke real da API confirmou que `GET /api/surveys/forms/?page=1&page_size=10` retorna `count`, `next`, `previous` e `results` no corpo raiz
+
 ### FE-005 - Tratamento de erro e notificacoes
 
 Status: Implementado em 2026-06-27.

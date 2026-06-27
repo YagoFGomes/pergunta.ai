@@ -10,18 +10,25 @@ import {
   MODULE_TABLE_DEFAULT_PER_PAGE,
   getModuleTableColumnIds
 } from '@/features/platform/lib/module-table';
+import type { ExtendedColumnSort } from '@/types/data-table';
 
-const EMPTY_FILTER_KEYS: readonly string[] = [];
+const EMPTY_FILTER_KEYS: readonly never[] = [];
 
-type UseModuleTableParamsProps<TData> = {
+type UseModuleTableParamsProps<TData, TFilterKey extends string> = {
   columns: readonly ColumnDef<TData>[];
-  filterKeys?: readonly string[];
+  filterKeys?: readonly TFilterKey[];
 };
 
-export function useModuleTableParams<TData>({
+type ModuleTableParams<TData, TFilterKey extends string> = {
+  page: number;
+  perPage: number;
+  sort: ExtendedColumnSort<TData>[];
+} & Record<TFilterKey, string | null>;
+
+export function useModuleTableParams<TData, TFilterKey extends string = never>({
   columns,
   filterKeys = EMPTY_FILTER_KEYS
-}: UseModuleTableParamsProps<TData>) {
+}: UseModuleTableParamsProps<TData, TFilterKey>) {
   const columnIds = React.useMemo(() => getModuleTableColumnIds(columns), [columns]);
 
   const parsers = React.useMemo(
@@ -37,7 +44,7 @@ export function useModuleTableParams<TData>({
   const [params, setParams] = useQueryStates(parsers);
 
   return {
-    params,
+    params: params as ModuleTableParams<TData, TFilterKey>,
     setParams,
     columnIds
   };
