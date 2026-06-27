@@ -235,6 +235,7 @@ Formato de colunas:
 ## Epic FE-02 - Surveys
 
 - FE-101 Listar formularios
+- FE-101A Melhorar filtros tenant-aware de formularios
 - FE-102 Criar formulario
 - FE-103 Editar formulario
 - FE-104 Publicar formulario
@@ -447,6 +448,45 @@ Validacao:
 - `bun run lint` passou; permanecem warnings preexistentes que nao bloqueiam a execucao
 - `bun run build` passou com rede liberada para download de fontes do Google usadas por `next/font`
 - smoke real da API confirmou que `GET /api/surveys/forms/?page=1&page_size=10` retorna `count`, `next`, `previous` e `results` no corpo raiz
+
+### FE-101A - Melhorar filtros tenant-aware de formularios
+
+Status: Implementado em 2026-06-27.
+
+Motivacao:
+
+- a listagem FE-101 usa filtros funcionais por `status` e `framework`, mas as opcoes de framework ainda estao estaticas em `src/features/surveys/components/forms-table/options.ts`
+- como a base e segmentada por tenant, os filtros devem refletir apenas frameworks, status e demais dimensoes disponiveis para o tenant atual
+
+Resumo:
+
+- removidas as opcoes estaticas de framework da listagem de formularios
+- criada `buildSurveyFrameworkOptions` em `src/features/surveys/components/forms-table/options.ts` para gerar opcoes de filtro a partir de `SurveyFramework[]`
+- a tabela de formularios agora chama `useSurveysFrameworksList({ is_active: 'true' })` e normaliza a resposta com `getOrvalResponseData`
+- `getSurveyFormsColumns` passou a receber `frameworkOptions`, mantendo o filtro de status como enum fixo de dominio
+- adicionados badges de fallback para carregamento, erro e ausencia de frameworks ativos no tenant
+- os filtros continuam sincronizados com a URL e compativeis com `GET /api/surveys/forms/`
+
+Validacao:
+
+- `bun run lint` passou; permanecem warnings preexistentes que nao bloqueiam a execucao
+- `bun run build` passou com rede liberada para download de fontes do Google usadas por `next/font`
+
+### Ajuste de qualidade - Corrigir botoes aninhados nos filtros
+
+Status: Implementado em 2026-06-27.
+
+Resumo:
+
+- corrigido erro de hidratacao `In HTML, <button> cannot be a descendant of <button>` nos filtros da tabela
+- `DataTableFacetedFilter`, `DataTableDateFilter` e `DataTableSliderFilter` deixaram de renderizar um `button` de limpar dentro do `Button` usado como `PopoverTrigger`
+- os icones de limpar agora usam `span` com `onPointerDown`, preservando o clique para limpar filtro sem criar HTML invalido
+- a acao acessivel de limpar permanece disponivel dentro do popover pelos comandos `Clear filters`/`Clear`
+
+Validacao:
+
+- `bun run lint` passou; permanecem warnings preexistentes que nao bloqueiam a execucao
+- `bun run build` passou com rede liberada para download de fontes do Google usadas por `next/font`
 
 ### FE-005 - Tratamento de erro e notificacoes
 

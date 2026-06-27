@@ -17,15 +17,18 @@ import {
 } from '@/features/platform/lib/module-table';
 import { getOrvalResponseData } from '@/features/platform/lib/orval-response';
 import { useDataTable } from '@/hooks/use-data-table';
-import { useSurveysFormsList } from '@/lib/api/generated/endpoints';
+import { useSurveysFormsList, useSurveysFrameworksList } from '@/lib/api/generated/endpoints';
 import type { Form } from '@/lib/api/generated/model/form';
 import type { PaginatedFormList } from '@/lib/api/generated/model/paginatedFormList';
+import type { SurveyFramework } from '@/lib/api/generated/model/surveyFramework';
 import type { SurveysFormsListParams } from '@/lib/api/generated/model/surveysFormsListParams';
 import { cn } from '@/lib/utils';
 
-import { surveyFormsColumns } from './columns';
+import { getSurveyFormsColumns } from './columns';
+import { buildSurveyFrameworkOptions } from './options';
 
 const FORM_FILTER_KEYS = ['status', 'framework'] as const;
+const EMPTY_FRAMEWORKS: SurveyFramework[] = [];
 
 function normalizeSingleFilter(value: unknown) {
   if (Array.isArray(value)) return value[0];
@@ -57,8 +60,28 @@ function SurveyFormsEmptyState() {
 }
 
 export function SurveyFormsTable() {
+  const frameworksQuery = useSurveysFrameworksList(
+    { is_active: 'true' },
+    {
+      query: {
+        staleTime: 60_000
+      }
+    }
+  );
+
+  const frameworks =
+    getOrvalResponseData<SurveyFramework[]>(frameworksQuery.data) ?? EMPTY_FRAMEWORKS;
+  const frameworkOptions = React.useMemo(
+    () => buildSurveyFrameworkOptions(frameworks),
+    [frameworks]
+  );
+  const columns = React.useMemo(
+    () => getSurveyFormsColumns({ frameworkOptions }),
+    [frameworkOptions]
+  );
+
   const { params } = useModuleTableParams<Form, (typeof FORM_FILTER_KEYS)[number]>({
-    columns: surveyFormsColumns,
+    columns,
     filterKeys: FORM_FILTER_KEYS
   });
 
@@ -87,10 +110,11 @@ export function SurveyFormsTable() {
   const totalItems = paginatedForms?.count ?? 0;
   const pageCount = getModuleTablePageCount(totalItems, params.perPage);
   const hasFilters = Boolean(params.status || params.framework);
+  const hasNoFrameworkFilterOptions = frameworksQuery.isSuccess && frameworkOptions.length === 0;
 
   const { table } = useDataTable({
     data: forms,
-    columns: surveyFormsColumns,
+    columns,
     pageCount,
     shallow: true,
     debounceMs: MODULE_TABLE_DEFAULT_DEBOUNCE_MS,
@@ -134,6 +158,18 @@ export function SurveyFormsTable() {
               <Icons.spinner className='h-3 w-3 animate-spin' />
               Atualizando
             </Badge>
+          ) : null}
+          {frameworksQuery.isFetching ? (
+            <Badge variant='outline' className='gap-1'>
+              <Icons.spinner className='h-3 w-3 animate-spin' />
+              Filtros
+            </Badge>
+          ) : null}
+          {frameworksQuery.isError ? (
+            <Badge variant='outline'>Filtro de frameworks indisponivel</Badge>
+          ) : null}
+          {hasNoFrameworkFilterOptions ? (
+            <Badge variant='outline'>Sem frameworks ativos</Badge>
           ) : null}
           <Badge variant='outline'>{totalItems} formularios</Badge>
         </>

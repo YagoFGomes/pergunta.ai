@@ -94,12 +94,17 @@ export function DataTableDateFilter<TData>({
     [column, multiple]
   );
 
-  const onReset = React.useCallback(
-    (event: React.MouseEvent) => {
+  const onReset = React.useCallback(() => {
+    column.setFilterValue(undefined);
+  }, [column]);
+
+  const onResetPointerDown = React.useCallback(
+    (event: React.PointerEvent<HTMLSpanElement>) => {
+      event.preventDefault();
       event.stopPropagation();
-      column.setFilterValue(undefined);
+      onReset();
     },
-    [column]
+    [onReset]
   );
 
   const hasValue = React.useMemo(() => {
@@ -165,14 +170,14 @@ export function DataTableDateFilter<TData>({
       <PopoverTrigger asChild>
         <Button variant='outline' size='sm' className='border-dashed'>
           {hasValue ? (
-            <button
-              type='button'
-              aria-label={`Clear ${title} filter`}
-              onClick={onReset}
+            <span
+              aria-hidden='true'
+              title={`Clear ${title} filter`}
+              onPointerDown={onResetPointerDown}
               className='focus-visible:ring-ring rounded-sm opacity-70 transition-opacity hover:opacity-100 focus-visible:ring-1 focus-visible:outline-none'
             >
               <Icons.xCircle />
-            </button>
+            </span>
           ) : (
             <Icons.calendar />
           )}
