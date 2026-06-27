@@ -573,19 +573,40 @@ Status: Implementado em 2026-06-27.
 
 Resumo:
 
-- implementado reorder por drag-and-drop com `@dnd-kit` na tela de perguntas
-- adicionada lista ordenavel com `DndContext`, `SortableContext`, `useSortable` e `arrayMove`
+- implementado reorder na propria tabela de perguntas, sem duplicar tabela/lista paralela
+- adicionados controles por linha para mover pergunta para cima/baixo
 - criada acao explicita de persistencia com botao "Salvar ordem"
 - conectada mutacao `useSurveysFormsQuestionsReorderCreate` para `POST /api/surveys/forms/{id}/questions/reorder/`
 - payload enviado no formato `{ question_ids: string[] }` conforme contrato `FormQuestionReorder`
 - adicionada acao "Descartar alteracoes" para restaurar a ordem atual do backend
 - ao salvar, a lista de perguntas e o formulario sao invalidados no TanStack Query
 - reorder fica bloqueado quando o formulario esta arquivado
+- TODO FE-108A: evoluir para uma experiencia de ordenacao mais fluida (drag-and-drop nativo nas linhas da tabela) sem perder acessibilidade por teclado
 
 Validacao:
 
 - `get_errors` retornou "No errors found" para `survey-question.ts` e `survey-form-questions.tsx`
 - corrigido erro de tipagem que bloqueava o pre-push removendo `.default(false)` do schema de `is_required`
+
+### FE-109 - Gerenciar opcoes de perguntas objetivas
+
+Status: Implementado em 2026-06-27.
+
+Resumo:
+
+- adicionada acao de "Gerenciar opcoes" por linha na tabela de perguntas
+- a acao e habilitada apenas para perguntas de `SINGLE_CHOICE` e `MULTIPLE_CHOICE`
+- implementado modal de opcoes com listagem, criacao, edicao e remocao
+- conectadas mutacoes:
+  - `useSurveysFormsQuestionsOptionsCreate`
+  - `useSurveysFormsQuestionsOptionsPartialUpdate`
+  - `useSurveysFormsQuestionsOptionsDestroy`
+- conectada consulta `useSurveysFormsQuestionsOptionsList` com invalidacao de cache especifica por pergunta apos mutacoes
+- operacoes de opcoes tambem ficam bloqueadas quando o formulario esta arquivado
+
+Validacao:
+
+- `get_errors` retornou "No errors found" nos arquivos de perguntas apos FE-109
 
 ### FE-104 e FE-105 - Publicar e Arquivar formulario
 

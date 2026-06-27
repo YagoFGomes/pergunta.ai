@@ -13,20 +13,24 @@ import { getQuestionTypeLabel } from '../../schemas/survey-question';
 type GetSurveyQuestionsColumnsConfig = {
   onEdit?: (question: FormQuestion) => void;
   onDelete?: (question: FormQuestion) => void;
+  onManageOptions?: (question: FormQuestion) => void;
   onMoveUp?: (question: FormQuestion) => void;
   onMoveDown?: (question: FormQuestion) => void;
   canMoveUp?: (question: FormQuestion) => boolean;
   canMoveDown?: (question: FormQuestion) => boolean;
+  canManageOptions?: (question: FormQuestion) => boolean;
   disableActions?: boolean;
 };
 
 export function getSurveyQuestionsColumns({
   onEdit,
   onDelete,
+  onManageOptions,
   onMoveUp,
   onMoveDown,
   canMoveUp,
   canMoveDown,
+  canManageOptions,
   disableActions = false
 }: GetSurveyQuestionsColumnsConfig = {}): ColumnDef<FormQuestion>[] {
   return [
@@ -104,6 +108,18 @@ export function getSurveyQuestionsColumns({
             aria-label='Mover pergunta para baixo'
           >
             <Icons.chevronDown className='h-4 w-4' />
+          </Button>
+          <Button
+            type='button'
+            variant='ghost'
+            size='icon'
+            onClick={() => onManageOptions?.(row.original)}
+            disabled={
+              disableActions || !onManageOptions || !(canManageOptions?.(row.original) ?? false)
+            }
+            aria-label='Gerenciar opcoes da pergunta'
+          >
+            <Icons.adjustments className='h-4 w-4' />
           </Button>
           <Button
             type='button'

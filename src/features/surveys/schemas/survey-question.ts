@@ -34,7 +34,7 @@ export const surveyQuestionTypeOptions = [
   { value: QuestionTypeEnum.MULTIPLE_CHOICE, label: 'Multiplas escolhas' },
   { value: QuestionTypeEnum.SCALE_1_5, label: 'Escala 1 a 5' },
   { value: QuestionTypeEnum.SCALE_0_10, label: 'Escala 0 a 10' }
-] as const;
+];
 
 export function getQuestionTypeLabel(type?: string): string {
   const found = surveyQuestionTypeOptions.find((option) => option.value === type);

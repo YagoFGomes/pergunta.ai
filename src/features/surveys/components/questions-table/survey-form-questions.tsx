@@ -25,6 +25,8 @@ import {
   DialogHeader,
   DialogTitle
 } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { useAppForm, useFormFields } from '@/components/ui/tanstack-form';
 import { ModuleDataTable } from '@/features/platform/components/module-data-table';
 import { ModuleDataTableSkeleton } from '@/features/platform/components/module-data-table-skeleton';
@@ -38,16 +40,23 @@ import { getOrvalResponseData } from '@/features/platform/lib/orval-response';
 import { useDataTable } from '@/hooks/use-data-table';
 import {
   getSurveysFormsQuestionsListQueryKey,
+  getSurveysFormsQuestionsOptionsListQueryKey,
   getSurveysFormsQuestionsRetrieveQueryKey,
   getSurveysFormsRetrieveQueryKey,
   useSurveysFormsQuestionsCreate,
   useSurveysFormsQuestionsDestroy,
   useSurveysFormsQuestionsList,
+  useSurveysFormsQuestionsOptionsCreate,
+  useSurveysFormsQuestionsOptionsDestroy,
+  useSurveysFormsQuestionsOptionsList,
+  useSurveysFormsQuestionsOptionsPartialUpdate,
   useSurveysFormsQuestionsPartialUpdate,
   useSurveysFormsQuestionsReorderCreate,
   useSurveysFormsRetrieve
 } from '@/lib/api/generated/endpoints';
 import type { FormQuestion } from '@/lib/api/generated/model/formQuestion';
+import type { FormQuestionOption } from '@/lib/api/generated/model/formQuestionOption';
+import { QuestionTypeEnum } from '@/lib/api/generated/model/questionTypeEnum';
 import { Status37cEnum } from '@/lib/api/generated/model/status37cEnum';
 
 import {
@@ -60,6 +69,15 @@ import { getSurveyQuestionsColumns } from './columns';
 
 const CREATE_QUESTION_FORM_ID = 'survey-question-create';
 const EDIT_QUESTION_FORM_ID = 'survey-question-edit';
+const QUESTION_OPTION_TYPES: ReadonlySet<QuestionTypeEnum> = new Set([
+  QuestionTypeEnum.SINGLE_CHOICE,
+  QuestionTypeEnum.MULTIPLE_CHOICE
+]);
+
+function supportsQuestionOptions(question?: FormQuestion | null): boolean {
+  if (!question?.question_type) return false;
+  return QUESTION_OPTION_TYPES.has(question.question_type);
+}
 
 type SurveyFormQuestionsProps = {
   formId: string;
@@ -85,6 +103,15 @@ export function SurveyFormQuestions({ formId }: SurveyFormQuestionsProps) {
   const queryClient = useQueryClient();
   const [editQuestion, setEditQuestion] = React.useState<FormQuestion | null>(null);
   const [deleteQuestion, setDeleteQuestion] = React.useState<FormQuestion | null>(null);
+  const [manageOptionsQuestion, setManageOptionsQuestion] = React.useState<FormQuestion | null>(
+    null
+  );
+  const [editingOption, setEditingOption] = React.useState<FormQuestionOption | null>(null);
+  const [deleteOption, setDeleteOption] = React.useState<FormQuestionOption | null>(null);
+  const [newOptionLabel, setNewOptionLabel] = React.useState('');
+  const [newOptionValue, setNewOptionValue] = React.useState('');
+  const [editOptionLabel, setEditOptionLabel] = React.useState('');
+  const [editOptionValue, setEditOptionValue] = React.useState('');
   const [orderedQuestionIds, setOrderedQuestionIds] = React.useState<string[]>([]);
 
   const formQuery = useSurveysFormsRetrieve(formId, {
@@ -94,6 +121,12 @@ export function SurveyFormQuestions({ formId }: SurveyFormQuestionsProps) {
   });
 
   const questionsQuery = useSurveysFormsQuestionsList(formId);
+  const selectedQuestionId = manageOptionsQuestion?.id ?? '';
+  const optionsQuery = useSurveysFormsQuestionsOptionsList(formId, selectedQuestionId, {
+    query: {
+      enabled: Boolean(selectedQuestionId)
+    }
+  });
 
   const createMutation = useSurveysFormsQuestionsCreate({
     mutation: {
@@ -161,8 +194,64 @@ export function SurveyFormQuestions({ formId }: SurveyFormQuestionsProps) {
     }
   });
 
+  const optionCreateMutation = useSurveysFormsQuestionsOptionsCreate({
+    mutation: {
+      onSuccess: async () => {
+        if (!selectedQuestionId) return;
+
+        await queryClient.invalidateQueries({
+          queryKey: getSurveysFormsQuestionsOptionsListQueryKey(formId, selectedQuestionId)
+        });
+        setNewOptionLabel('');
+        setNewOptionValue('');
+        notifySuccess('Opcao criada.');
+      },
+      onError: (error) => {
+        notifyError(error, 'Nao foi possivel criar a opcao.');
+      }
+    }
+  });
+
+  const optionUpdateMutation = useSurveysFormsQuestionsOptionsPartialUpdate({
+    mutation: {
+      onSuccess: async () => {
+        if (!selectedQuestionId) return;
+
+        await queryClient.invalidateQueries({
+          queryKey: getSurveysFormsQuestionsOptionsListQueryKey(formId, selectedQuestionId)
+        });
+        setEditingOption(null);
+        notifySuccess('Opcao atualizada.');
+      },
+      onError: (error) => {
+        notifyError(error, 'Nao foi possivel atualizar a opcao.');
+      }
+    }
+  });
+
+  const optionDeleteMutation = useSurveysFormsQuestionsOptionsDestroy({
+    mutation: {
+      onSuccess: async () => {
+        if (!selectedQuestionId) return;
+
+        await queryClient.invalidateQueries({
+          queryKey: getSurveysFormsQuestionsOptionsListQueryKey(formId, selectedQuestionId)
+        });
+        setDeleteOption(null);
+        notifySuccess('Opcao removida.');
+      },
+      onError: (error) => {
+        notifyError(error, 'Nao foi possivel remover a opcao.');
+      }
+    }
+  });
+
   const formDetails = getOrvalResponseData(formQuery.data);
   const questions = getOrvalResponseData<FormQuestion[]>(questionsQuery.data) ?? [];
+  const questionOptions = React.useMemo(() => {
+    const raw = getOrvalResponseData<FormQuestionOption[]>(optionsQuery.data) ?? [];
+    return [...raw].sort((a, b) => a.order - b.order);
+  }, [optionsQuery.data]);
 
   const form = useAppForm({
     defaultValues: {
@@ -218,7 +307,10 @@ export function SurveyFormQuestions({ formId }: SurveyFormQuestionsProps) {
     createMutation.isPending ||
     updateMutation.isPending ||
     destroyMutation.isPending ||
-    reorderMutation.isPending;
+    reorderMutation.isPending ||
+    optionCreateMutation.isPending ||
+    optionUpdateMutation.isPending ||
+    optionDeleteMutation.isPending;
 
   const currentOrderIds = React.useMemo(
     () => [...questions].sort((a, b) => a.order - b.order).map((question) => question.id),
@@ -264,6 +356,56 @@ export function SurveyFormQuestions({ formId }: SurveyFormQuestionsProps) {
     });
   }, [formId, hasOrderChanges, isFormArchived, orderedQuestionIds, reorderMutation]);
 
+  const handleCreateOption = React.useCallback(async () => {
+    if (!manageOptionsQuestion?.id) return;
+
+    const label = newOptionLabel.trim();
+    const value = newOptionValue.trim();
+
+    if (!label || !value) {
+      notifyError(new Error('Opcao invalida.'), 'Informe label e value da opcao.');
+      return;
+    }
+
+    await optionCreateMutation.mutateAsync({
+      formId,
+      questionId: manageOptionsQuestion.id,
+      data: {
+        label,
+        value
+      } as never
+    });
+  }, [formId, manageOptionsQuestion?.id, newOptionLabel, newOptionValue, optionCreateMutation]);
+
+  const handleUpdateOption = React.useCallback(async () => {
+    if (!manageOptionsQuestion?.id || !editingOption?.id) return;
+
+    const label = editOptionLabel.trim();
+    const value = editOptionValue.trim();
+
+    if (!label || !value) {
+      notifyError(new Error('Opcao invalida.'), 'Informe label e value da opcao.');
+      return;
+    }
+
+    await optionUpdateMutation.mutateAsync({
+      formId,
+      questionId: manageOptionsQuestion.id,
+      optionId: editingOption.id,
+      data: {
+        label,
+        value
+      }
+    });
+  }, [
+    editOptionLabel,
+    editOptionValue,
+    editingOption?.id,
+    formId,
+    manageOptionsQuestion?.id,
+    optionUpdateMutation
+  ]);
+
   const moveQuestionByOffset = React.useCallback((questionId: string, offset: -1 | 1) => {
     setOrderedQuestionIds((previous) => {
       const currentIndex = previous.indexOf(questionId);
@@ -291,6 +433,11 @@ export function SurveyFormQuestions({ formId }: SurveyFormQuestionsProps) {
         canMoveUp: (question) => (questionIndexMap[question.id] ?? 0) > 0,
         canMoveDown: (question) =>
           (questionIndexMap[question.id] ?? -1) < orderedQuestionIds.length - 1,
+        onManageOptions: (question) => {
+          setManageOptionsQuestion(question);
+          setEditingOption(null);
+        },
+        canManageOptions: (question) => supportsQuestionOptions(question),
         onEdit: (question) => setEditQuestion(question),
         onDelete: (question) => setDeleteQuestion(question),
         disableActions: isFormArchived || isMutating
@@ -307,6 +454,13 @@ export function SurveyFormQuestions({ formId }: SurveyFormQuestionsProps) {
       is_required: Boolean(editQuestion.is_required)
     });
   }, [editForm, editQuestion]);
+
+  React.useEffect(() => {
+    if (!editingOption) return;
+
+    setEditOptionLabel(editingOption.label);
+    setEditOptionValue(editingOption.value);
+  }, [editingOption]);
 
   const { table } = useDataTable({
     data: orderedQuestions,
@@ -390,7 +544,7 @@ export function SurveyFormQuestions({ formId }: SurveyFormQuestionsProps) {
                 name='question_type'
                 label='Tipo'
                 required
-                options={surveyQuestionTypeOptions}
+                options={[...surveyQuestionTypeOptions]}
                 placeholder='Selecione um tipo'
                 validators={{
                   onBlur: surveyQuestionCreateFieldSchemas.question_type
@@ -463,6 +617,191 @@ export function SurveyFormQuestions({ formId }: SurveyFormQuestionsProps) {
         />
       )}
 
+      <Dialog
+        open={Boolean(manageOptionsQuestion)}
+        onOpenChange={(open) => {
+          if (!open) {
+            setManageOptionsQuestion(null);
+            setEditingOption(null);
+            setDeleteOption(null);
+            setNewOptionLabel('');
+            setNewOptionValue('');
+          }
+        }}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Gerenciar opcoes da pergunta</DialogTitle>
+            <DialogDescription>
+              {manageOptionsQuestion
+                ? `Pergunta: ${manageOptionsQuestion.label}`
+                : 'Selecione uma pergunta para gerenciar opcoes.'}
+            </DialogDescription>
+          </DialogHeader>
+
+          {!supportsQuestionOptions(manageOptionsQuestion) ? (
+            <ModuleErrorAlert
+              title='Pergunta sem opcoes'
+              message='Somente perguntas de escolha unica ou multipla possuem opcoes.'
+            />
+          ) : (
+            <div className='grid gap-4'>
+              <div className='grid gap-3 rounded-md border p-3'>
+                <h4 className='text-sm font-semibold'>Nova opcao</h4>
+                <div className='grid gap-2'>
+                  <Label htmlFor='option-label'>Label</Label>
+                  <Input
+                    id='option-label'
+                    placeholder='Ex.: Muito satisfeito'
+                    value={newOptionLabel}
+                    onChange={(event) => setNewOptionLabel(event.target.value)}
+                    disabled={optionCreateMutation.isPending || isFormArchived}
+                  />
+                </div>
+                <div className='grid gap-2'>
+                  <Label htmlFor='option-value'>Value</Label>
+                  <Input
+                    id='option-value'
+                    placeholder='Ex.: very_satisfied'
+                    value={newOptionValue}
+                    onChange={(event) => setNewOptionValue(event.target.value)}
+                    disabled={optionCreateMutation.isPending || isFormArchived}
+                  />
+                </div>
+                <div className='flex justify-end'>
+                  <Button
+                    type='button'
+                    size='sm'
+                    onClick={() => void handleCreateOption()}
+                    isLoading={optionCreateMutation.isPending}
+                    disabled={isFormArchived}
+                  >
+                    Adicionar opcao
+                  </Button>
+                </div>
+              </div>
+
+              {editingOption ? (
+                <div className='grid gap-3 rounded-md border p-3'>
+                  <h4 className='text-sm font-semibold'>Editar opcao</h4>
+                  <div className='grid gap-2'>
+                    <Label htmlFor='edit-option-label'>Label</Label>
+                    <Input
+                      id='edit-option-label'
+                      value={editOptionLabel}
+                      onChange={(event) => setEditOptionLabel(event.target.value)}
+                      disabled={optionUpdateMutation.isPending}
+                    />
+                  </div>
+                  <div className='grid gap-2'>
+                    <Label htmlFor='edit-option-value'>Value</Label>
+                    <Input
+                      id='edit-option-value'
+                      value={editOptionValue}
+                      onChange={(event) => setEditOptionValue(event.target.value)}
+                      disabled={optionUpdateMutation.isPending}
+                    />
+                  </div>
+                  <div className='flex justify-end gap-2'>
+                    <Button
+                      type='button'
+                      variant='outline'
+                      size='sm'
+                      onClick={() => setEditingOption(null)}
+                      disabled={optionUpdateMutation.isPending}
+                    >
+                      Cancelar
+                    </Button>
+                    <Button
+                      type='button'
+                      size='sm'
+                      onClick={() => void handleUpdateOption()}
+                      isLoading={optionUpdateMutation.isPending}
+                    >
+                      Salvar opcao
+                    </Button>
+                  </div>
+                </div>
+              ) : null}
+
+              {optionsQuery.isPending ? (
+                <ModuleDataTableSkeleton columnCount={3} filterCount={0} />
+              ) : optionsQuery.isError ? (
+                <ModuleErrorAlert
+                  error={optionsQuery.error}
+                  title='Erro ao carregar opcoes'
+                  fallbackMessage='Nao foi possivel carregar as opcoes desta pergunta.'
+                />
+              ) : questionOptions.length === 0 ? (
+                <div className='text-muted-foreground rounded-md border border-dashed p-4 text-sm'>
+                  Nenhuma opcao cadastrada para esta pergunta.
+                </div>
+              ) : (
+                <ul className='space-y-2'>
+                  {questionOptions.map((option) => (
+                    <li
+                      key={option.id}
+                      className='bg-background flex items-center justify-between gap-3 rounded-md border px-3 py-2'
+                    >
+                      <div className='min-w-0'>
+                        <p className='truncate text-sm font-medium'>
+                          #{option.order} {option.label}
+                        </p>
+                        <p className='text-muted-foreground truncate text-xs'>{option.value}</p>
+                      </div>
+                      <div className='flex items-center gap-1'>
+                        <Button
+                          type='button'
+                          variant='ghost'
+                          size='icon'
+                          onClick={() => setEditingOption(option)}
+                          disabled={isFormArchived || optionDeleteMutation.isPending}
+                          aria-label='Editar opcao'
+                        >
+                          <Icons.edit className='h-4 w-4' />
+                        </Button>
+                        <Button
+                          type='button'
+                          variant='ghost'
+                          size='icon'
+                          className='text-destructive hover:text-destructive'
+                          onClick={() => setDeleteOption(option)}
+                          disabled={isFormArchived || optionDeleteMutation.isPending}
+                          aria-label='Remover opcao'
+                        >
+                          <Icons.trash className='h-4 w-4' />
+                        </Button>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              )}
+
+              {isFormArchived ? (
+                <ModuleErrorAlert
+                  title='Formulario arquivado'
+                  message='Nao e permitido criar, editar ou remover opcoes em formulario arquivado.'
+                />
+              ) : null}
+            </div>
+          )}
+
+          <DialogFooter>
+            <Button
+              type='button'
+              variant='outline'
+              onClick={() => {
+                setManageOptionsQuestion(null);
+                setEditingOption(null);
+                setDeleteOption(null);
+              }}
+            >
+              Fechar
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
       <Dialog open={Boolean(editQuestion)} onOpenChange={(open) => !open && setEditQuestion(null)}>
         <DialogContent>
           <DialogHeader>
@@ -488,7 +827,7 @@ export function SurveyFormQuestions({ formId }: SurveyFormQuestionsProps) {
                 name='question_type'
                 label='Tipo'
                 required
-                options={surveyQuestionTypeOptions}
+                options={[...surveyQuestionTypeOptions]}
                 validators={{
                   onBlur: surveyQuestionCreateFieldSchemas.question_type
                 }}
@@ -541,6 +880,42 @@ export function SurveyFormQuestions({ formId }: SurveyFormQuestionsProps) {
               disabled={destroyMutation.isPending}
             >
               {destroyMutation.isPending ? (
+                <Icons.spinner className='mr-2 h-4 w-4 animate-spin' />
+              ) : null}
+              Remover
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <AlertDialog
+        open={Boolean(deleteOption)}
+        onOpenChange={(open) => !open && setDeleteOption(null)}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Remover opcao?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Esta acao remove a opcao selecionada desta pergunta.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={optionDeleteMutation.isPending}>
+              Cancelar
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => {
+                if (!deleteOption || !manageOptionsQuestion) return;
+
+                void optionDeleteMutation.mutateAsync({
+                  formId,
+                  questionId: manageOptionsQuestion.id,
+                  optionId: deleteOption.id
+                });
+              }}
+              disabled={optionDeleteMutation.isPending}
+            >
+              {optionDeleteMutation.isPending ? (
                 <Icons.spinner className='mr-2 h-4 w-4 animate-spin' />
               ) : null}
               Remover
