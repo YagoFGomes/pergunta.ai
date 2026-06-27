@@ -1,4 +1,5 @@
-import ModuleShellPage from '@/features/platform/components/module-shell-page';
+import PageContainer from '@/components/layout/page-container';
+import { SurveyFrameworksManager } from '@/features/surveys/components/frameworks-table/survey-frameworks-manager';
 
 export const metadata = {
   title: 'Dashboard: Survey Frameworks'
@@ -6,20 +7,11 @@ export const metadata = {
 
 export default function SurveyFrameworksPage() {
   return (
-    <ModuleShellPage
+    <PageContainer
       pageTitle='Survey Frameworks'
-      pageDescription='Modelos NPS, CSAT, CES, CSI e customizacoes.'
-      scope='FE-110'
-      nextSteps={[
-        'Implementar listagem de frameworks disponiveis.',
-        'Implementar criacao e edicao de frameworks custom.',
-        'Adicionar validacao de escala e regras de calculo por tipo.'
-      ]}
-      endpointReferences={[
-        'GET /api/surveys/frameworks/',
-        'POST /api/surveys/frameworks/',
-        'PATCH /api/surveys/frameworks/{id}/'
-      ]}
-    />
+      pageDescription='Gerencie frameworks base e customizaveis para os formularios de pesquisa.'
+    >
+      <SurveyFrameworksManager />
+    </PageContainer>
   );
 }

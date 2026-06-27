@@ -608,6 +608,63 @@ Validacao:
 
 - `get_errors` retornou "No errors found" nos arquivos de perguntas apos FE-109
 
+### FE-110 - CRUD frameworks
+
+Status: Implementado em 2026-06-27.
+
+Resumo geral:
+
+- a rota `/dashboard/surveys/frameworks` deixou de ser shell e agora usa uma tela funcional conectada aos endpoints de frameworks
+- implementada feature dedicada em `src/features/surveys/components/frameworks-table/` com tabela, acoes e dialogs de formulario/confirmacao
+- criado schema de validacao em `src/features/surveys/schemas/survey-framework.ts`
+- observacao de contrato: a API atual expoe `GET`, `POST` e `PATCH` para frameworks; nao existe endpoint `DELETE`
+
+#### FE-110.1 - Listar frameworks
+
+Status: Concluida.
+
+- criada listagem real via `useSurveysFrameworksList`
+- adicionadas colunas de codigo, nome, descricao, origem (seed/custom) e status
+- adicionados estados de erro e vazio para a tela
+
+#### FE-110.2 - Criar framework
+
+Status: Concluida.
+
+- implementado dialog de criacao com validacao client-side (codigo, nome, descricao e status)
+- conectada mutacao `useSurveysFrameworksCreate` com invalidacao da listagem apos sucesso
+
+#### FE-110.3 - Editar framework
+
+Status: Concluida.
+
+- implementado dialog de edicao com pre-preenchimento dos dados selecionados
+- conectada mutacao `useSurveysFrameworksPartialUpdate`
+- protecao aplicada para impedir edicao de framework `seed` pelo fluxo de tela
+
+#### FE-110.4 - Ativar/desativar framework
+
+Status: Concluida.
+
+- adicionada acao rapida por linha para alternar `is_active`
+- alteracao persiste via `PATCH /api/surveys/frameworks/{id}/`
+
+#### FE-110.5 - Excluir framework
+
+Status: Concluida com adaptacao de contrato.
+
+- como nao existe `DELETE /api/surveys/frameworks/{id}/`, a UX de exclusao foi implementada como desativacao confirmada
+- a acao "Excluir" abre confirmacao e executa `PATCH` com `is_active: false`
+- documentado explicitamente para evitar divergencia entre expectativa de CRUD e contrato real da API
+
+Validacao:
+
+- `get_errors` retornou "No errors found" para:
+  - `src/app/dashboard/surveys/frameworks/page.tsx`
+  - `src/features/surveys/components/frameworks-table/columns.tsx`
+  - `src/features/surveys/components/frameworks-table/survey-frameworks-manager.tsx`
+  - `src/features/surveys/schemas/survey-framework.ts`
+
 ### FE-104 e FE-105 - Publicar e Arquivar formulario
 
 Status: Implementado em 2026-06-27.
