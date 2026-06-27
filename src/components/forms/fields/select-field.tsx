@@ -23,8 +23,9 @@ interface SelectFieldProps {
   label: string;
   description?: string;
   required?: boolean;
-  options: Option[];
+  options: readonly Option[];
   placeholder?: string;
+  disabled?: boolean;
 }
 
 export function SelectField({
@@ -32,7 +33,8 @@ export function SelectField({
   description,
   required,
   options,
-  placeholder = 'Select an option'
+  placeholder = 'Select an option',
+  disabled = false
 }: SelectFieldProps) {
   const field = useFieldContext();
   const isTouched = useStore(field.store, (s) => s.meta.isTouched);
@@ -48,12 +50,13 @@ export function SelectField({
         </FieldLabel>
         <Select
           value={value}
+          disabled={disabled}
           onValueChange={field.handleChange}
           onOpenChange={(open) => {
             if (!open) field.handleBlur();
           }}
         >
-          <SelectTrigger id={field.name} aria-invalid={isTouched && !isValid}>
+          <SelectTrigger id={field.name} aria-invalid={isTouched && !isValid} disabled={disabled}>
             <SelectValue placeholder={placeholder} />
           </SelectTrigger>
           <SelectContent>

@@ -788,3 +788,19 @@ Validacao:
   - `src/features/contacts/components/contacts-table/contact-list-contacts-manager.tsx`
   - `src/features/contacts/components/contacts-table/columns.tsx`
   - `src/features/contacts/schemas/contact.ts`
+
+### Ajuste de qualidade - Build frontend desbloqueado
+
+Status: Implementado em 2026-06-27.
+
+Resumo:
+
+- corrigida falha de build em `contact-lists-manager.tsx` causada por `STATUS_OPTIONS` tipado como `readonly`
+- `FormSelectField` agora aceita `options` somente-leitura, preservando constantes `as const` usadas pelos modulos
+- `FormSelectField` tambem passou a expor `disabled`, alinhando o select aos demais campos de formulario e permitindo bloquear o campo durante mutacoes
+- alteracao centralizada em `src/components/forms/fields/select-field.tsx`, sem mudar contratos de API ou comportamento de modulo
+
+Validacao:
+
+- `bun run build` passou
+- `bun run lint` passou; permanecem warnings preexistentes que nao bloqueiam a execucao
