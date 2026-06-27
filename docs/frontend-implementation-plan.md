@@ -530,7 +530,23 @@ Validacao:
 - `bun run lint` passou; permanecem warnings preexistentes que nao bloqueiam a execucao
 - `bun run build` passou com rede liberada para download de fontes do Google usadas por `next/font`
 
-### FE-005 - Tratamento de erro e notificacoes
+### FE-104 e FE-105 - Publicar e Arquivar formulario
+
+Status: Implementado em 2026-06-27.
+
+Resumo:
+
+- adicionadas acoes de Publicar (`POST /api/surveys/forms/{id}/publish/`) e Arquivar (`POST /api/surveys/forms/{id}/archive/`) em dois pontos da UI
+- `cell-action.tsx` recebeu novos itens condicionais no dropdown: "Publicar" exibido apenas para status `DRAFT`; "Arquivar" exibido apenas para status `ACTIVE`; separador visual antes das acoes de estado
+- `survey-form-create.tsx` recebeu botoes "Publicar" e "Arquivar" ao lado do alerta de status atual na tela de edicao, exibidos conforme o estado do formulario
+- ambos os pontos disparam um `AlertDialog` de confirmacao antes de executar a mutacao
+- apos sucesso, a listagem e o detalhe do formulario sao invalidados no TanStack Query e um toast de feedback e exibido
+- backend ignora o corpo da requisicao nessas rotas; `data` e enviado como `as never` para compatibilidade com o tipo gerado pelo Orval
+- transicoes suportadas: `DRAFT` -> `ACTIVE` (publicar) e `ACTIVE` -> `ARCHIVED` (arquivar)
+
+Validacao:
+
+- `get_errors` retornou "No errors found" em ambos os arquivos
 
 Status: Implementado em 2026-06-27.
 
