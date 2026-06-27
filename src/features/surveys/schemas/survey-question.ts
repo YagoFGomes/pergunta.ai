@@ -11,7 +11,7 @@ export const surveyQuestionCreateSchema = z.object({
   question_type: z.nativeEnum(QuestionTypeEnum, {
     error: 'Selecione um tipo de pergunta.'
   }),
-  is_required: z.boolean().default(false)
+  is_required: z.boolean()
 });
 
 export type SurveyQuestionCreateValues = z.infer<typeof surveyQuestionCreateSchema>;

@@ -567,6 +567,26 @@ Validacao:
 
 - `get_errors` retornou "No errors found" nos arquivos de perguntas apos a implementacao
 
+### FE-108 - Reordenar perguntas
+
+Status: Implementado em 2026-06-27.
+
+Resumo:
+
+- implementado reorder por drag-and-drop com `@dnd-kit` na tela de perguntas
+- adicionada lista ordenavel com `DndContext`, `SortableContext`, `useSortable` e `arrayMove`
+- criada acao explicita de persistencia com botao "Salvar ordem"
+- conectada mutacao `useSurveysFormsQuestionsReorderCreate` para `POST /api/surveys/forms/{id}/questions/reorder/`
+- payload enviado no formato `{ question_ids: string[] }` conforme contrato `FormQuestionReorder`
+- adicionada acao "Descartar alteracoes" para restaurar a ordem atual do backend
+- ao salvar, a lista de perguntas e o formulario sao invalidados no TanStack Query
+- reorder fica bloqueado quando o formulario esta arquivado
+
+Validacao:
+
+- `get_errors` retornou "No errors found" para `survey-question.ts` e `survey-form-questions.tsx`
+- corrigido erro de tipagem que bloqueava o pre-push removendo `.default(false)` do schema de `is_required`
+
 ### FE-104 e FE-105 - Publicar e Arquivar formulario
 
 Status: Implementado em 2026-06-27.

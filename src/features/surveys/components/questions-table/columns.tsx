@@ -13,12 +13,20 @@ import { getQuestionTypeLabel } from '../../schemas/survey-question';
 type GetSurveyQuestionsColumnsConfig = {
   onEdit?: (question: FormQuestion) => void;
   onDelete?: (question: FormQuestion) => void;
+  onMoveUp?: (question: FormQuestion) => void;
+  onMoveDown?: (question: FormQuestion) => void;
+  canMoveUp?: (question: FormQuestion) => boolean;
+  canMoveDown?: (question: FormQuestion) => boolean;
   disableActions?: boolean;
 };
 
 export function getSurveyQuestionsColumns({
   onEdit,
   onDelete,
+  onMoveUp,
+  onMoveDown,
+  canMoveUp,
+  canMoveDown,
   disableActions = false
 }: GetSurveyQuestionsColumnsConfig = {}): ColumnDef<FormQuestion>[] {
   return [
@@ -29,7 +37,7 @@ export function getSurveyQuestionsColumns({
       header: ({ column }: { column: Column<FormQuestion, unknown> }) => (
         <DataTableColumnHeader column={column} title='Ordem' />
       ),
-      cell: ({ row }) => <span className='text-sm font-medium'>#{row.original.order}</span>
+      cell: ({ row }) => <span className='text-sm font-medium'>#{row.index + 1}</span>
     },
     {
       id: 'label',
@@ -77,6 +85,26 @@ export function getSurveyQuestionsColumns({
       enableHiding: false,
       cell: ({ row }) => (
         <div className='flex items-center justify-end gap-1'>
+          <Button
+            type='button'
+            variant='ghost'
+            size='icon'
+            onClick={() => onMoveUp?.(row.original)}
+            disabled={disableActions || !onMoveUp || !(canMoveUp?.(row.original) ?? false)}
+            aria-label='Mover pergunta para cima'
+          >
+            <Icons.chevronUp className='h-4 w-4' />
+          </Button>
+          <Button
+            type='button'
+            variant='ghost'
+            size='icon'
+            onClick={() => onMoveDown?.(row.original)}
+            disabled={disableActions || !onMoveDown || !(canMoveDown?.(row.original) ?? false)}
+            aria-label='Mover pergunta para baixo'
+          >
+            <Icons.chevronDown className='h-4 w-4' />
+          </Button>
           <Button
             type='button'
             variant='ghost'

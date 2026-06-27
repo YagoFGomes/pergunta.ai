@@ -1,5 +1,6 @@
 'use client';
 
+import { arrayMove } from '@dnd-kit/sortable';
 import { useQueryClient } from '@tanstack/react-query';
 import * as React from 'react';
 
@@ -43,6 +44,7 @@ import {
   useSurveysFormsQuestionsDestroy,
   useSurveysFormsQuestionsList,
   useSurveysFormsQuestionsPartialUpdate,
+  useSurveysFormsQuestionsReorderCreate,
   useSurveysFormsRetrieve
 } from '@/lib/api/generated/endpoints';
 import type { FormQuestion } from '@/lib/api/generated/model/formQuestion';
@@ -83,6 +85,7 @@ export function SurveyFormQuestions({ formId }: SurveyFormQuestionsProps) {
   const queryClient = useQueryClient();
   const [editQuestion, setEditQuestion] = React.useState<FormQuestion | null>(null);
   const [deleteQuestion, setDeleteQuestion] = React.useState<FormQuestion | null>(null);
+  const [orderedQuestionIds, setOrderedQuestionIds] = React.useState<string[]>([]);
 
   const formQuery = useSurveysFormsRetrieve(formId, {
     query: {
@@ -143,6 +146,21 @@ export function SurveyFormQuestions({ formId }: SurveyFormQuestionsProps) {
     }
   });
 
+  const reorderMutation = useSurveysFormsQuestionsReorderCreate({
+    mutation: {
+      onSuccess: async () => {
+        await Promise.all([
+          queryClient.invalidateQueries({ queryKey: getSurveysFormsQuestionsListQueryKey(formId) }),
+          queryClient.invalidateQueries({ queryKey: getSurveysFormsRetrieveQueryKey(formId) })
+        ]);
+        notifySuccess('Ordem das perguntas atualizada.');
+      },
+      onError: (error) => {
+        notifyError(error, 'Nao foi possivel reordenar as perguntas.');
+      }
+    }
+  });
+
   const formDetails = getOrvalResponseData(formQuery.data);
   const questions = getOrvalResponseData<FormQuestion[]>(questionsQuery.data) ?? [];
 
@@ -197,16 +215,87 @@ export function SurveyFormQuestions({ formId }: SurveyFormQuestionsProps) {
 
   const isFormArchived = formDetails?.status === Status37cEnum.ARCHIVED;
   const isMutating =
-    createMutation.isPending || updateMutation.isPending || destroyMutation.isPending;
+    createMutation.isPending ||
+    updateMutation.isPending ||
+    destroyMutation.isPending ||
+    reorderMutation.isPending;
+
+  const currentOrderIds = React.useMemo(
+    () => [...questions].sort((a, b) => a.order - b.order).map((question) => question.id),
+    [questions]
+  );
+
+  React.useEffect(() => {
+    setOrderedQuestionIds((previous) => {
+      if (
+        previous.length === currentOrderIds.length &&
+        previous.every((id, index) => id === currentOrderIds[index])
+      ) {
+        return previous;
+      }
+
+      return currentOrderIds;
+    });
+  }, [currentOrderIds]);
+
+  const hasOrderChanges = React.useMemo(() => {
+    if (orderedQuestionIds.length !== currentOrderIds.length) return false;
+    return orderedQuestionIds.some((id, index) => id !== currentOrderIds[index]);
+  }, [orderedQuestionIds, currentOrderIds]);
+
+  const questionsById = React.useMemo(
+    () => new Map(questions.map((question) => [question.id, question])),
+    [questions]
+  );
+
+  const orderedQuestions = React.useMemo(
+    () => orderedQuestionIds.map((id) => questionsById.get(id)).filter(Boolean) as FormQuestion[],
+    [orderedQuestionIds, questionsById]
+  );
+
+  const handleSaveReorder = React.useCallback(async () => {
+    if (!hasOrderChanges || isFormArchived) return;
+
+    await reorderMutation.mutateAsync({
+      id: formId,
+      data: {
+        question_ids: orderedQuestionIds
+      }
+    });
+  }, [formId, hasOrderChanges, isFormArchived, orderedQuestionIds, reorderMutation]);
+
+  const moveQuestionByOffset = React.useCallback((questionId: string, offset: -1 | 1) => {
+    setOrderedQuestionIds((previous) => {
+      const currentIndex = previous.indexOf(questionId);
+      if (currentIndex === -1) return previous;
+
+      const targetIndex = currentIndex + offset;
+      if (targetIndex < 0 || targetIndex >= previous.length) return previous;
+
+      return arrayMove(previous, currentIndex, targetIndex);
+    });
+  }, []);
+
+  const questionIndexMap = React.useMemo(() => {
+    return orderedQuestionIds.reduce<Record<string, number>>((acc, id, index) => {
+      acc[id] = index;
+      return acc;
+    }, {});
+  }, [orderedQuestionIds]);
 
   const columns = React.useMemo(
     () =>
       getSurveyQuestionsColumns({
+        onMoveUp: (question) => moveQuestionByOffset(question.id, -1),
+        onMoveDown: (question) => moveQuestionByOffset(question.id, 1),
+        canMoveUp: (question) => (questionIndexMap[question.id] ?? 0) > 0,
+        canMoveDown: (question) =>
+          (questionIndexMap[question.id] ?? -1) < orderedQuestionIds.length - 1,
         onEdit: (question) => setEditQuestion(question),
         onDelete: (question) => setDeleteQuestion(question),
         disableActions: isFormArchived || isMutating
       }),
-    [isFormArchived, isMutating]
+    [isFormArchived, isMutating, moveQuestionByOffset, orderedQuestionIds.length, questionIndexMap]
   );
 
   React.useEffect(() => {
@@ -220,7 +309,7 @@ export function SurveyFormQuestions({ formId }: SurveyFormQuestionsProps) {
   }, [editForm, editQuestion]);
 
   const { table } = useDataTable({
-    data: questions,
+    data: orderedQuestions,
     columns,
     pageCount: 1,
     shallow: true,
@@ -342,13 +431,33 @@ export function SurveyFormQuestions({ formId }: SurveyFormQuestionsProps) {
           table={table}
           toolbarChildren={
             <>
-              {questionsQuery.isFetching ? (
+              {questionsQuery.isFetching || reorderMutation.isPending ? (
                 <Badge variant='outline' className='gap-1'>
                   <Icons.spinner className='h-3 w-3 animate-spin' />
                   Atualizando
                 </Badge>
               ) : null}
+              {hasOrderChanges ? <Badge variant='outline'>Ordem alterada</Badge> : null}
+              {isFormArchived ? <Badge variant='outline'>Reordenacao bloqueada</Badge> : null}
               <Badge variant='outline'>{questions.length} perguntas</Badge>
+              <Button
+                type='button'
+                variant='outline'
+                size='sm'
+                onClick={() => setOrderedQuestionIds(currentOrderIds)}
+                disabled={!hasOrderChanges || isMutating}
+              >
+                Descartar alteracoes
+              </Button>
+              <Button
+                type='button'
+                size='sm'
+                onClick={() => void handleSaveReorder()}
+                isLoading={reorderMutation.isPending}
+                disabled={!hasOrderChanges || isFormArchived}
+              >
+                Salvar ordem
+              </Button>
             </>
           }
         />
