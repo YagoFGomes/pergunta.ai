@@ -530,6 +530,24 @@ Validacao:
 - `bun run lint` passou; permanecem warnings preexistentes que nao bloqueiam a execucao
 - `bun run build` passou com rede liberada para download de fontes do Google usadas por `next/font`
 
+### FE-106 - Listar e criar perguntas
+
+Status: Implementado em 2026-06-27.
+
+Resumo:
+
+- substituido o placeholder de `/dashboard/surveys/forms/[id]/questions` por uma tela real com listagem e criacao de perguntas
+- criada a feature `src/features/surveys/components/questions-table/` com `SurveyFormQuestions` e colunas da tabela
+- criada validacao de formulario em `src/features/surveys/schemas/survey-question.ts` com campos `label`, `question_type` e `is_required`
+- conectada listagem real via `useSurveysFormsQuestionsList(formId)`
+- conectada criacao via `useSurveysFormsQuestionsCreate`, com invalidacao de cache da lista de perguntas e do formulario
+- adicionados estados de loading, erro e vazio da lista de perguntas
+- mantido escopo desta etapa apenas em listagem + criacao; editar/remover/reordenar e opcoes seguem para FE-107..FE-109
+
+Validacao:
+
+- `get_errors` retornou "No errors found" nos novos arquivos de FE-106 e na rota de perguntas
+
 ### FE-104 e FE-105 - Publicar e Arquivar formulario
 
 Status: Implementado em 2026-06-27.
@@ -547,6 +565,8 @@ Resumo:
 Validacao:
 
 - `get_errors` retornou "No errors found" em ambos os arquivos
+
+### FE-005 - Tratamento de erro e notificacoes
 
 Status: Implementado em 2026-06-27.
 

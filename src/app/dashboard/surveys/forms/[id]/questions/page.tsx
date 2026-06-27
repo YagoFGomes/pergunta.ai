@@ -1,4 +1,10 @@
-import ModuleShellPage from '@/features/platform/components/module-shell-page';
+import Link from 'next/link';
+
+import { Icons } from '@/components/icons';
+import PageContainer from '@/components/layout/page-container';
+import { buttonVariants } from '@/components/ui/button';
+import { SurveyFormQuestions } from '@/features/surveys/components/questions-table/survey-form-questions';
+import { cn } from '@/lib/utils';
 
 export const metadata = {
   title: 'Dashboard: Survey Questions'
@@ -12,21 +18,29 @@ export default async function SurveyQuestionsPage({ params }: SurveyQuestionsPag
   const { id } = await params;
 
   return (
-    <ModuleShellPage
-      pageTitle='Perguntas do Survey'
-      pageDescription={`Formulario ${id}: perguntas, opcoes e ordenacao.`}
-      scope='FE-106..FE-109'
-      nextSteps={[
-        'Listar e criar perguntas do formulario.',
-        'Editar, remover e reordenar perguntas por drag-and-drop.',
-        'Gerenciar opcoes de perguntas objetivas.'
-      ]}
-      endpointReferences={[
-        'GET /api/surveys/forms/{formId}/questions/',
-        'POST /api/surveys/forms/{formId}/questions/',
-        'POST /api/surveys/forms/{id}/questions/reorder/',
-        'GET /api/surveys/forms/{formId}/questions/{questionId}/options/'
-      ]}
-    />
+    <PageContainer
+      pageTitle='Perguntas do formulario'
+      pageDescription='Liste e crie perguntas associadas a este formulario.'
+      pageHeaderAction={
+        <div className='flex flex-wrap items-center justify-end gap-2'>
+          <Link
+            href={`/dashboard/surveys/forms/${id}`}
+            className={cn(buttonVariants({ variant: 'outline' }), 'text-xs md:text-sm')}
+          >
+            <Icons.edit className='mr-2 h-4 w-4' />
+            Editar formulario
+          </Link>
+          <Link
+            href='/dashboard/surveys/forms'
+            className={cn(buttonVariants({ variant: 'outline' }), 'text-xs md:text-sm')}
+          >
+            <Icons.chevronLeft className='mr-2 h-4 w-4' />
+            Voltar
+          </Link>
+        </div>
+      }
+    >
+      <SurveyFormQuestions formId={id} />
+    </PageContainer>
   );
 }
