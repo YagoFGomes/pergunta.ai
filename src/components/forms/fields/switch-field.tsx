@@ -13,9 +13,10 @@ import {
 interface SwitchFieldProps {
   label: string;
   description?: string;
+  disabled?: boolean;
 }
 
-export function SwitchField({ label, description }: SwitchFieldProps) {
+export function SwitchField({ label, description, disabled = false }: SwitchFieldProps) {
   const field = useFieldContext();
   const value = useStore(field.store, (s) => s.value) as boolean;
 
@@ -26,7 +27,12 @@ export function SwitchField({ label, description }: SwitchFieldProps) {
           <FieldLabel className='text-base'>{label}</FieldLabel>
           {description && <FieldDescription>{description}</FieldDescription>}
         </div>
-        <Switch checked={value} onCheckedChange={field.handleChange} onBlur={field.handleBlur} />
+        <Switch
+          checked={value}
+          onCheckedChange={field.handleChange}
+          onBlur={field.handleBlur}
+          disabled={disabled}
+        />
       </FormField>
     </FormFieldSet>
   );

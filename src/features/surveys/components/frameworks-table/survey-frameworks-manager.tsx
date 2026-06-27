@@ -324,7 +324,10 @@ export function SurveyFrameworksManager() {
                   disabled={hasMutationInFlight}
                 />
 
-                <div className='rounded-lg border p-3'>
+                <div
+                  className={`rounded-lg border p-3 ${hasMutationInFlight ? 'pointer-events-none opacity-60' : ''}`}
+                  aria-disabled={hasMutationInFlight}
+                >
                   <FormSwitchField
                     name='is_active'
                     label='Ativo'
@@ -332,7 +335,6 @@ export function SurveyFrameworksManager() {
                     validators={{
                       onBlur: surveyFrameworkFieldSchemas.is_active
                     }}
-                    disabled={hasMutationInFlight}
                   />
                 </div>
 
