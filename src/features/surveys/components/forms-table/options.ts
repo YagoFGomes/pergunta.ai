@@ -51,3 +51,20 @@ export function buildSurveyFrameworkOptions(frameworks: SurveyFramework[] = []):
     currentOption.label.localeCompare(nextOption.label)
   );
 }
+
+export function buildSurveyFrameworkSelectOptions(frameworks: SurveyFramework[] = []): Option[] {
+  const uniqueOptions = new Map<string, Option>();
+
+  for (const framework of frameworks) {
+    if (!framework.id || framework.is_active === false) continue;
+
+    uniqueOptions.set(framework.id, {
+      label: getFrameworkOptionLabel(framework),
+      value: framework.id
+    });
+  }
+
+  return Array.from(uniqueOptions.values()).toSorted((currentOption, nextOption) =>
+    currentOption.label.localeCompare(nextOption.label)
+  );
+}

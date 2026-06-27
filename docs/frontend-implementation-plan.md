@@ -488,6 +488,27 @@ Validacao:
 - `bun run lint` passou; permanecem warnings preexistentes que nao bloqueiam a execucao
 - `bun run build` passou com rede liberada para download de fontes do Google usadas por `next/font`
 
+### FE-102 - Criar formulario
+
+Status: Implementado em 2026-06-27.
+
+Resumo:
+
+- substituido o placeholder de `/dashboard/surveys/forms/new` por uma tela real de criacao de formulario
+- criado `SurveyFormCreate` em `src/features/surveys/components/survey-form-create.tsx`
+- criado schema `surveyFormCreateSchema` em `src/features/surveys/schemas/survey-form.ts` com validacoes de framework, titulo e descricao
+- reutilizados `ModuleFormCard`, `ModuleFormSection`, `ModuleFormActions`, `ModuleFormSkeleton` e o sistema `useAppForm`
+- o select de framework usa frameworks ativos do tenant via `useSurveysFrameworksList({ is_active: 'true' })`
+- criado `buildSurveyFrameworkSelectOptions` para usar `framework.id` no payload de criacao, mantendo `framework.code` apenas para filtros da listagem
+- conectado `useSurveysFormsCreate` para enviar `framework`, `title` e `description` para `POST /api/surveys/forms/`
+- apos sucesso, a listagem de formularios e invalidada e o usuario e redirecionado para `/dashboard/surveys/forms/{id}/questions`
+- adicionados estados de loading, erro e ausencia de frameworks ativos antes de renderizar o formulario
+
+Validacao:
+
+- `bun run lint` passou; permanecem warnings preexistentes que nao bloqueiam a execucao
+- `bun run build` passou com rede liberada para download de fontes do Google usadas por `next/font`
+
 ### FE-005 - Tratamento de erro e notificacoes
 
 Status: Implementado em 2026-06-27.
