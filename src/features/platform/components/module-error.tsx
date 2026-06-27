@@ -1,9 +1,8 @@
 'use client';
 
 import PageContainer from '@/components/layout/page-container';
-import { Icons } from '@/components/icons';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
+import { ModuleErrorAlert } from '@/features/platform/components/module-error-alert';
 
 type ModuleErrorProps = {
   error: Error & { digest?: string };
@@ -21,13 +20,7 @@ export default function ModuleError({
   return (
     <PageContainer pageTitle={pageTitle} pageDescription={pageDescription}>
       <div className='grid gap-4'>
-        <Alert variant='destructive'>
-          <Icons.alertCircle className='h-4 w-4' />
-          <AlertTitle>Erro ao carregar modulo</AlertTitle>
-          <AlertDescription>
-            {error.message || 'Ocorreu um erro inesperado ao carregar esta pagina.'}
-          </AlertDescription>
-        </Alert>
+        <ModuleErrorAlert error={error} />
         {reset ? (
           <div>
             <Button variant='outline' onClick={reset}>

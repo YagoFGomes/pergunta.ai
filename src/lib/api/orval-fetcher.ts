@@ -5,6 +5,7 @@ import {
   refreshAccessTokenDirect,
   setStoredAuthTokens
 } from '@/lib/auth/session';
+import { createApiErrorFromResponse } from '@/features/platform/lib/api-error';
 
 const BACKEND_BASE_URL = (process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8000').replace(
   /\/$/,
@@ -69,7 +70,7 @@ export async function customFetch<T>(url: string, options: RequestInit = {}): Pr
   }
 
   if (!response.ok) {
-    throw new Error(`API error: ${response.status} ${response.statusText}`);
+    throw await createApiErrorFromResponse(response, requestUrl);
   }
 
   // Some endpoints can respond without a JSON body (e.g. 204).

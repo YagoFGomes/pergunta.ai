@@ -406,3 +406,43 @@ Resumo:
 Validacao:
 
 - `bun run lint` passou; permanecem warnings preexistentes que nao bloqueiam a execucao
+
+### FE-004 - Padrao de formulario por feature
+
+Status: Implementado em 2026-06-27.
+
+Resumo:
+
+- criado `ModuleFormCard` em `src/features/platform/components/module-form-card.tsx` para padronizar o container visual de formularios de modulo
+- criado `ModuleFormSection` em `src/features/platform/components/module-form-section.tsx` para agrupar campos com titulo, descricao, separador e grid responsivo
+- criado `ModuleFormActions` em `src/features/platform/components/module-form-actions.tsx` para padronizar cancelar/salvar, estado pendente e submit externo via `formId`
+- criado `ModuleFormSkeleton` em `src/features/platform/components/module-form-skeleton.tsx` para loading state de formularios
+- criadas constantes em `src/features/platform/constants/module-form.ts` para labels de acao e grid padrao
+- criados tipos/utilitarios em `src/features/platform/lib/module-form.ts` para `ModuleFormMode`, handlers de submit, defaults e config schema/defaultValues
+- nenhum formulario de negocio foi conectado ainda; a base sera usada em `FE-102`, `FE-201`, `FE-302` e tarefas similares
+
+Validacao:
+
+- `bun run lint` passou; permanecem warnings preexistentes que nao bloqueiam a execucao
+- `bun run build` passou com rede liberada para download de fontes do Google usadas por `next/font`
+
+### FE-005 - Tratamento de erro e notificacoes
+
+Status: Implementado em 2026-06-27.
+
+Resumo:
+
+- criado `AppApiError` em `src/features/platform/lib/api-error.ts` para preservar `status`, `statusText`, `url`, corpo da resposta e mensagem normalizada
+- criado parser de erro de API para respostas JSON/texto, cobrindo formatos comuns como `detail`, `message`, `error`, `errors`, `non_field_errors` e erros por campo
+- criado `getErrorMessage` como helper unico para transformar erros desconhecidos em mensagens exibiveis
+- criado `ModuleErrorAlert` em `src/features/platform/components/module-error-alert.tsx` para alertas de erro reutilizaveis nos modulos
+- atualizado `ModuleError` para usar o alerta e o normalizador compartilhados
+- criado `src/features/platform/lib/notifications.ts` com wrappers `notifySuccess`, `notifyError` e `createMutationFeedback` para futuras mutacoes de modulo
+- atualizado `src/lib/api/orval-fetcher.ts` para lancar `AppApiError` nas chamadas geradas por Orval
+- atualizado `src/lib/api-client.ts` para usar o mesmo erro padrao nas chamadas legadas/demo
+- nenhum contrato HTTP, modelo gerado por Orval ou comportamento de navegacao foi alterado
+
+Validacao:
+
+- `bun run lint` passou; permanecem warnings preexistentes que nao bloqueiam a execucao
+- `bun run build` passou com rede liberada para download de fontes do Google usadas por `next/font`
