@@ -346,3 +346,63 @@ Formato de colunas:
 - Analytics (overview, NPS, CSAT, CES, CSI, por campanha/formulario): src/lib/api/generated/endpoints.ts
 
 Observacao: os hooks gerados por Orval devem ser a unica fonte de chamada HTTP dos modulos de negocio.
+
+## 12. Registro de Implementacao
+
+### FE-002 - Estrutura de rotas dos modulos
+
+Status: Implementado em 2026-06-27.
+
+Resumo:
+
+- criados shells dinamicos para detalhes de formulario, perguntas, contatos da lista, edicao de template, detalhes/steps de campanha e analytics por campanha/formulario
+- adicionados componentes reutilizaveis de estado em `src/features/platform/components/module-loading.tsx` e `src/features/platform/components/module-error.tsx`
+- adicionados `loading.tsx` e `error.tsx` para os segmentos `surveys`, `contacts`, `email-templates`, `campaigns`, `analytics`, `delivery` e `/s/[token]`
+- nenhuma alteracao em navegacao, Kanban, contratos de API, Orval ou modelos gerados
+
+Rotas entregues:
+
+- `/dashboard/surveys/forms/[id]`
+- `/dashboard/surveys/forms/[id]/questions`
+- `/dashboard/contacts/lists/[id]/contacts`
+- `/dashboard/email-templates/[id]/edit`
+- `/dashboard/campaigns/[id]`
+- `/dashboard/campaigns/[id]/steps`
+- `/dashboard/analytics/campaigns/[id]`
+- `/dashboard/analytics/forms/[id]`
+
+Validacao:
+
+- `bun run build` passou com rede liberada para download de fontes do Google usadas por `next/font`
+- `bun run lint` foi executado, mas permanece bloqueado por erro preexistente em `src/components/ui/input-group.tsx:64`; os arquivos do FE-002 nao apareceram no output do lint
+
+### FE-003 - Wrappers de tabela padrao com filtros e paginacao
+
+Status: Implementado em 2026-06-27.
+
+Resumo:
+
+- criada a base visual reutilizavel `ModuleDataTable` em `src/features/platform/components/module-data-table.tsx`, combinando `DataTable` e `DataTableToolbar` com defaults de layout para modulos de negocio
+- criado `ModuleDataTableSkeleton` em `src/features/platform/components/module-data-table-skeleton.tsx`, usando `DataTableSkeleton` com defaults de colunas, linhas, filtros, view options e paginacao
+- criado `useModuleTableParams` em `src/features/platform/hooks/use-module-table-params.ts`, padronizando leitura de `page`, `perPage`, `sort` e filtros simples via `nuqs`
+- criados utilitarios em `src/features/platform/lib/module-table.ts` para ids de colunas, calculo seguro de `pageCount`, serializacao de sort e compactacao de filtros de API
+- nenhum modulo de negocio foi conectado ainda; a base sera consumida nas proximas tasks de listagem real
+
+Validacao:
+
+- `bun run build` passou com rede liberada para download de fontes do Google usadas por `next/font`
+- `bun run lint` passou apos o ajuste de qualidade registrado abaixo; permanecem warnings preexistentes que nao bloqueiam a execucao
+
+### Ajuste de qualidade - Desbloqueio do lint
+
+Status: Implementado em 2026-06-27.
+
+Resumo:
+
+- corrigido o erro `jsx-a11y(no-noninteractive-element-interactions)` em `src/components/ui/input-group.tsx`
+- o `InputGroupAddon` deixou de usar `onClick`/`onKeyDown` em um `div` nao interativo e passou a usar `onPointerDown` somente para manter o foco do input ao clicar no addon
+- nenhuma API publica de componente foi alterada
+
+Validacao:
+
+- `bun run lint` passou; permanecem warnings preexistentes que nao bloqueiam a execucao
