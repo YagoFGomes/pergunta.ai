@@ -1,6 +1,7 @@
 'use client';
 
 import {
+  authRefreshClaimsCreate,
   loginCreate,
   logoutCreate,
   refreshCreate,
@@ -121,4 +122,23 @@ export async function registerUser(data: {
 
 export async function onboardTenant(data: TrialTenantOnboarding): Promise<void> {
   await onboardingTrialTenantCreate(data);
+}
+
+/**
+ * Re-issues a fresh JWT pair re-reading the user's tenant memberships from the DB.
+ * Must be called after onboarding so the new tenant_id claim is included in the tokens.
+ * Uses POST /api/auth/refresh-claims/ which is in TenantMiddleware public_paths,
+ * so it works even when the current token has tenant_id: null.
+ */
+export async function refreshClaims(): Promise<void> {
+  const result = (await authRefreshClaimsCreate()) as unknown as {
+    access: string;
+    refresh: string;
+  };
+
+  if (!result?.access || !result?.refresh) {
+    throw new Error('Unable to refresh JWT claims after onboarding.');
+  }
+
+  setStoredAuthTokens({ accessToken: result.access, refreshToken: result.refresh });
 }

@@ -6,18 +6,35 @@ import {
   setStoredAuthTokens
 } from '@/lib/auth/session';
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8000';
+const BACKEND_BASE_URL = (process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8000').replace(
+  /\/$/,
+  ''
+);
 
-function normalizeBaseUrl(url: string): string {
-  return url.endsWith('/') ? url.slice(0, -1) : url;
+/**
+ * Resolves the final URL for an API call.
+ *
+ * Browser: keeps relative path (/api/...) so requests go through the
+ * Next.js catch-all proxy at src/app/api/[...path]/route.ts — same
+ * origin, no CORS.
+ *
+ * Server (SSR/RSC): uses absolute backend URL directly (server-to-server,
+ * no CORS involved).
+ */
+function resolveRequestUrl(url: string): string {
+  if (url.startsWith('http')) {
+    return url;
+  }
+
+  if (typeof window !== 'undefined') {
+    return url; // browser — proxy handles the rest
+  }
+
+  return `${BACKEND_BASE_URL}${url}`; // server-side — go direct
 }
 
 export async function customFetch<T>(url: string, options: RequestInit = {}): Promise<T> {
-  const requestUrl = url.startsWith('http')
-    ? url
-    : typeof window !== 'undefined'
-      ? url
-      : `${normalizeBaseUrl(API_BASE_URL)}${url}`;
+  const requestUrl = resolveRequestUrl(url);
 
   const headers = new Headers(options.headers ?? {});
   const accessToken = getAccessToken();

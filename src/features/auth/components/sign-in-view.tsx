@@ -66,6 +66,7 @@ export default function SignInViewPage() {
       router.replace(redirectTo);
     } catch (loginError) {
       setError(loginError instanceof Error ? loginError.message : 'Unable to sign in.');
+      console.log('Login error:', loginError);
     } finally {
       setIsSubmitting(false);
     }

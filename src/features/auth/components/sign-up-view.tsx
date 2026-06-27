@@ -16,6 +16,7 @@ import {
   useRegisterCreate
 } from '@/lib/api/generated/endpoints';
 import { setStoredAuthTokens } from '@/lib/auth/session';
+import { refreshClaims } from '../api/service';
 import { useFormStepper } from '@/hooks/use-stepper';
 import { cn } from '@/lib/utils';
 import Link from 'next/link';
@@ -285,6 +286,10 @@ export default function SignUpViewPage() {
             }
           });
         }
+
+        // Re-issue JWT so the new tenant_id claim is included before navigating to the dashboard.
+        // /api/auth/refresh-claims/ re-queries the DB for memberships and returns a fresh token pair.
+        await refreshClaims();
 
         router.replace('/dashboard/overview');
       } catch (error) {
