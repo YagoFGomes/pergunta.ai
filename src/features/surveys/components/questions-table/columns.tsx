@@ -2,13 +2,25 @@
 
 import type { Column, ColumnDef } from '@tanstack/react-table';
 
+import { Icons } from '@/components/icons';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { DataTableColumnHeader } from '@/components/ui/table/data-table-column-header';
 import type { FormQuestion } from '@/lib/api/generated/model/formQuestion';
 
 import { getQuestionTypeLabel } from '../../schemas/survey-question';
 
-export function getSurveyQuestionsColumns(): ColumnDef<FormQuestion>[] {
+type GetSurveyQuestionsColumnsConfig = {
+  onEdit?: (question: FormQuestion) => void;
+  onDelete?: (question: FormQuestion) => void;
+  disableActions?: boolean;
+};
+
+export function getSurveyQuestionsColumns({
+  onEdit,
+  onDelete,
+  disableActions = false
+}: GetSurveyQuestionsColumnsConfig = {}): ColumnDef<FormQuestion>[] {
   return [
     {
       id: 'order',
@@ -58,6 +70,36 @@ export function getSurveyQuestionsColumns(): ColumnDef<FormQuestion>[] {
         ) : (
           <Badge variant='outline'>Nao</Badge>
         )
+    },
+    {
+      id: 'actions',
+      enableSorting: false,
+      enableHiding: false,
+      cell: ({ row }) => (
+        <div className='flex items-center justify-end gap-1'>
+          <Button
+            type='button'
+            variant='ghost'
+            size='icon'
+            onClick={() => onEdit?.(row.original)}
+            disabled={disableActions || !onEdit}
+            aria-label='Editar pergunta'
+          >
+            <Icons.edit className='h-4 w-4' />
+          </Button>
+          <Button
+            type='button'
+            variant='ghost'
+            size='icon'
+            className='text-destructive hover:text-destructive'
+            onClick={() => onDelete?.(row.original)}
+            disabled={disableActions || !onDelete}
+            aria-label='Remover pergunta'
+          >
+            <Icons.trash className='h-4 w-4' />
+          </Button>
+        </div>
+      )
     }
   ];
 }

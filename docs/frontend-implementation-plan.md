@@ -548,6 +548,25 @@ Validacao:
 
 - `get_errors` retornou "No errors found" nos novos arquivos de FE-106 e na rota de perguntas
 
+### FE-107 - Editar e remover perguntas
+
+Status: Implementado em 2026-06-27.
+
+Resumo:
+
+- adicionadas acoes por linha na tabela de perguntas para editar e remover
+- `getSurveyQuestionsColumns` passou a aceitar callbacks de acao (`onEdit`, `onDelete`) e estado `disableActions`
+- criada edicao em modal (`Dialog`) com formulario tipado para atualizar `label`, `question_type` e `is_required`
+- conectada mutacao `useSurveysFormsQuestionsPartialUpdate` para `PATCH /api/surveys/forms/{formId}/questions/{questionId}/`
+- criada confirmacao de exclusao com `AlertDialog`
+- conectada mutacao `useSurveysFormsQuestionsDestroy` para `DELETE /api/surveys/forms/{formId}/questions/{questionId}/`
+- apos editar/remover, a lista de perguntas e o formulario sao invalidados no TanStack Query e a interface e atualizada
+- quando o formulario esta arquivado, as acoes de linha ficam desabilitadas
+
+Validacao:
+
+- `get_errors` retornou "No errors found" nos arquivos de perguntas apos a implementacao
+
 ### FE-104 e FE-105 - Publicar e Arquivar formulario
 
 Status: Implementado em 2026-06-27.

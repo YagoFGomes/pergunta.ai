@@ -4,8 +4,26 @@ import { useQueryClient } from '@tanstack/react-query';
 import * as React from 'react';
 
 import { Icons } from '@/components/icons';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle
+} from '@/components/ui/alert-dialog';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle
+} from '@/components/ui/dialog';
 import { useAppForm, useFormFields } from '@/components/ui/tanstack-form';
 import { ModuleDataTable } from '@/features/platform/components/module-data-table';
 import { ModuleDataTableSkeleton } from '@/features/platform/components/module-data-table-skeleton';
@@ -19,9 +37,12 @@ import { getOrvalResponseData } from '@/features/platform/lib/orval-response';
 import { useDataTable } from '@/hooks/use-data-table';
 import {
   getSurveysFormsQuestionsListQueryKey,
+  getSurveysFormsQuestionsRetrieveQueryKey,
   getSurveysFormsRetrieveQueryKey,
   useSurveysFormsQuestionsCreate,
+  useSurveysFormsQuestionsDestroy,
   useSurveysFormsQuestionsList,
+  useSurveysFormsQuestionsPartialUpdate,
   useSurveysFormsRetrieve
 } from '@/lib/api/generated/endpoints';
 import type { FormQuestion } from '@/lib/api/generated/model/formQuestion';
@@ -36,6 +57,7 @@ import {
 import { getSurveyQuestionsColumns } from './columns';
 
 const CREATE_QUESTION_FORM_ID = 'survey-question-create';
+const EDIT_QUESTION_FORM_ID = 'survey-question-edit';
 
 type SurveyFormQuestionsProps = {
   formId: string;
@@ -59,7 +81,8 @@ function SurveyQuestionsEmptyState() {
 
 export function SurveyFormQuestions({ formId }: SurveyFormQuestionsProps) {
   const queryClient = useQueryClient();
-  const columns = React.useMemo(() => getSurveyQuestionsColumns(), []);
+  const [editQuestion, setEditQuestion] = React.useState<FormQuestion | null>(null);
+  const [deleteQuestion, setDeleteQuestion] = React.useState<FormQuestion | null>(null);
 
   const formQuery = useSurveysFormsRetrieve(formId, {
     query: {
@@ -80,6 +103,42 @@ export function SurveyFormQuestions({ formId }: SurveyFormQuestionsProps) {
       },
       onError: (error) => {
         notifyError(error, 'Nao foi possivel criar a pergunta.');
+      }
+    }
+  });
+
+  const updateMutation = useSurveysFormsQuestionsPartialUpdate({
+    mutation: {
+      onSuccess: async (response) => {
+        const updatedQuestion = getOrvalResponseData<FormQuestion>(response);
+        await Promise.all([
+          queryClient.invalidateQueries({ queryKey: getSurveysFormsQuestionsListQueryKey(formId) }),
+          queryClient.invalidateQueries({ queryKey: getSurveysFormsRetrieveQueryKey(formId) }),
+          queryClient.invalidateQueries({
+            queryKey: getSurveysFormsQuestionsRetrieveQueryKey(formId, updatedQuestion?.id)
+          })
+        ]);
+        notifySuccess('Pergunta atualizada.');
+        setEditQuestion(null);
+      },
+      onError: (error) => {
+        notifyError(error, 'Nao foi possivel atualizar a pergunta.');
+      }
+    }
+  });
+
+  const destroyMutation = useSurveysFormsQuestionsDestroy({
+    mutation: {
+      onSuccess: async () => {
+        await Promise.all([
+          queryClient.invalidateQueries({ queryKey: getSurveysFormsQuestionsListQueryKey(formId) }),
+          queryClient.invalidateQueries({ queryKey: getSurveysFormsRetrieveQueryKey(formId) })
+        ]);
+        notifySuccess('Pergunta removida.');
+        setDeleteQuestion(null);
+      },
+      onError: (error) => {
+        notifyError(error, 'Nao foi possivel remover a pergunta.');
       }
     }
   });
@@ -109,8 +168,56 @@ export function SurveyFormQuestions({ formId }: SurveyFormQuestionsProps) {
     }
   });
 
+  const editForm = useAppForm({
+    defaultValues: {
+      label: editQuestion?.label ?? '',
+      question_type: editQuestion?.question_type ?? surveyQuestionTypeOptions[0].value,
+      is_required: editQuestion?.is_required ?? false
+    } as SurveyQuestionCreateValues,
+    validators: {
+      onSubmit: surveyQuestionCreateSchema
+    },
+    onSubmit: async ({ value }) => {
+      if (!editQuestion) return;
+
+      await updateMutation.mutateAsync({
+        formId,
+        questionId: editQuestion.id,
+        data: {
+          label: value.label.trim(),
+          question_type: value.question_type,
+          is_required: value.is_required
+        }
+      });
+    }
+  });
+
   const { FormTextField, FormSelectField, FormSwitchField } =
     useFormFields<SurveyQuestionCreateValues>();
+
+  const isFormArchived = formDetails?.status === Status37cEnum.ARCHIVED;
+  const isMutating =
+    createMutation.isPending || updateMutation.isPending || destroyMutation.isPending;
+
+  const columns = React.useMemo(
+    () =>
+      getSurveyQuestionsColumns({
+        onEdit: (question) => setEditQuestion(question),
+        onDelete: (question) => setDeleteQuestion(question),
+        disableActions: isFormArchived || isMutating
+      }),
+    [isFormArchived, isMutating]
+  );
+
+  React.useEffect(() => {
+    if (!editQuestion) return;
+
+    editForm.reset({
+      label: editQuestion.label,
+      question_type: editQuestion.question_type,
+      is_required: Boolean(editQuestion.is_required)
+    });
+  }, [editForm, editQuestion]);
 
   const { table } = useDataTable({
     data: questions,
@@ -151,8 +258,6 @@ export function SurveyFormQuestions({ formId }: SurveyFormQuestionsProps) {
     );
   }
 
-  const isFormArchived = formDetails?.status === Status37cEnum.ARCHIVED;
-
   return (
     <div className='grid gap-6'>
       <ModuleFormCard
@@ -162,7 +267,7 @@ export function SurveyFormQuestions({ formId }: SurveyFormQuestionsProps) {
           <ModuleFormActions
             mode='create'
             formId={CREATE_QUESTION_FORM_ID}
-            isPending={createMutation.isPending}
+            isPending={createMutation.isPending || isFormArchived}
             submitLabel='Adicionar pergunta'
             cancelLabel='Limpar'
             onCancel={() => form.reset()}
@@ -219,6 +324,13 @@ export function SurveyFormQuestions({ formId }: SurveyFormQuestionsProps) {
                 }}
               />
             </ModuleFormSection>
+
+            {isFormArchived ? (
+              <ModuleErrorAlert
+                title='Formulario arquivado'
+                message='Nao e permitido criar, editar ou remover perguntas em formulario arquivado.'
+              />
+            ) : null}
           </form.Form>
         </form.AppForm>
       </ModuleFormCard>
@@ -241,6 +353,92 @@ export function SurveyFormQuestions({ formId }: SurveyFormQuestionsProps) {
           }
         />
       )}
+
+      <Dialog open={Boolean(editQuestion)} onOpenChange={(open) => !open && setEditQuestion(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Editar pergunta</DialogTitle>
+            <DialogDescription>
+              Atualize o texto, tipo e obrigatoriedade da pergunta.
+            </DialogDescription>
+          </DialogHeader>
+
+          <editForm.AppForm>
+            <editForm.Form id={EDIT_QUESTION_FORM_ID} className='space-y-6 p-0 md:p-0'>
+              <FormTextField
+                name='label'
+                label='Pergunta'
+                required
+                maxLength={255}
+                validators={{
+                  onBlur: surveyQuestionCreateFieldSchemas.label
+                }}
+              />
+
+              <FormSelectField
+                name='question_type'
+                label='Tipo'
+                required
+                options={surveyQuestionTypeOptions}
+                validators={{
+                  onBlur: surveyQuestionCreateFieldSchemas.question_type
+                }}
+              />
+
+              <FormSwitchField
+                name='is_required'
+                label='Resposta obrigatoria'
+                validators={{
+                  onBlur: surveyQuestionCreateFieldSchemas.is_required
+                }}
+              />
+            </editForm.Form>
+          </editForm.AppForm>
+
+          <DialogFooter>
+            <Button
+              type='button'
+              variant='outline'
+              onClick={() => setEditQuestion(null)}
+              disabled={updateMutation.isPending}
+            >
+              Cancelar
+            </Button>
+            <Button type='submit' form={EDIT_QUESTION_FORM_ID} isLoading={updateMutation.isPending}>
+              Salvar alteracoes
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <AlertDialog
+        open={Boolean(deleteQuestion)}
+        onOpenChange={(open) => !open && setDeleteQuestion(null)}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Remover pergunta?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Esta acao remove definitivamente a pergunta selecionada do formulario.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={destroyMutation.isPending}>Cancelar</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => {
+                if (!deleteQuestion) return;
+                void destroyMutation.mutateAsync({ formId, questionId: deleteQuestion.id });
+              }}
+              disabled={destroyMutation.isPending}
+            >
+              {destroyMutation.isPending ? (
+                <Icons.spinner className='mr-2 h-4 w-4 animate-spin' />
+              ) : null}
+              Remover
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
