@@ -18,6 +18,12 @@ export default function KBar({ children }: { children: React.ReactNode }) {
       router.push(url);
     };
 
+    const toActionId = (title: string, url: string) => {
+      const normalizedTitle = title.toLowerCase().replace(/\s+/g, '-');
+      const normalizedUrl = url === '#' ? 'container' : url.replace(/[^a-zA-Z0-9]/g, '-');
+      return `${normalizedTitle}-${normalizedUrl}-action`;
+    };
+
     const allItems = filteredGroups.flatMap((group) => group.items);
 
     return allItems.flatMap((navItem) => {
@@ -25,7 +31,7 @@ export default function KBar({ children }: { children: React.ReactNode }) {
       const baseAction =
         navItem.url !== '#'
           ? {
-              id: `${navItem.title.toLowerCase()}Action`,
+              id: toActionId(navItem.title, navItem.url),
               name: navItem.title,
               shortcut: navItem.shortcut,
               keywords: navItem.title.toLowerCase(),
@@ -38,7 +44,7 @@ export default function KBar({ children }: { children: React.ReactNode }) {
       // Map child items into actions
       const childActions =
         navItem.items?.map((childItem) => ({
-          id: `${childItem.title.toLowerCase()}Action`,
+          id: toActionId(childItem.title, childItem.url),
           name: childItem.title,
           shortcut: childItem.shortcut,
           keywords: childItem.title.toLowerCase(),

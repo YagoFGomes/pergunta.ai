@@ -703,3 +703,64 @@ Validacao:
 
 - `bun run lint` passou; permanecem warnings preexistentes que nao bloqueiam a execucao
 - `bun run build` passou com rede liberada para download de fontes do Google usadas por `next/font`
+
+### FE-201 - CRUD listas de contatos
+
+Status: Implementado em 2026-06-27.
+
+Resumo:
+
+- substituido o shell de `/dashboard/contacts/lists` por tela real de gerenciamento de listas
+- criada feature `src/features/contacts/components/lists-table/` com tabela e acoes por linha
+- implementadas operacoes de CRUD:
+  - listagem via `useContactsListsList`
+  - criacao via `useContactsListsCreate`
+  - edicao via `useContactsListsPartialUpdate`
+  - exclusao via `useContactsListsDestroy`
+- adicionada validacao de formulario em `src/features/contacts/schemas/contact-list.ts`
+- listagem exibe nome, descricao, quantidade de contatos, status e data de criacao
+- adicionada acao de atalho para abrir rota de contatos da lista (`/dashboard/contacts/lists/{id}/contacts`)
+
+Validacao:
+
+- `get_errors` retornou "No errors found" para:
+  - `src/app/dashboard/contacts/lists/page.tsx`
+  - `src/features/contacts/components/lists-table/contact-lists-manager.tsx`
+  - `src/features/contacts/components/lists-table/columns.tsx`
+  - `src/features/contacts/schemas/contact-list.ts`
+
+### FE-202 - Listar contatos por lista
+
+Status: Implementado em 2026-06-27.
+
+Resumo:
+
+- substituido o shell de `/dashboard/contacts/lists/[id]/contacts` por tela real de listagem
+- criada feature `src/features/contacts/components/contacts-table/` com manager e colunas
+- consulta de metadados da lista via `useContactsListsRetrieve`
+- consulta de contatos por lista via `useContactsListsContactsList`
+- listagem exibe contato (nome + email), telefone, status e data de criacao
+- adicionados estados de loading, erro e vazio
+- escopo mantido apenas em listagem; criacao/edicao/exclusao de contatos seguem para FE-203
+
+Validacao:
+
+- `get_errors` retornou "No errors found" para:
+  - `src/app/dashboard/contacts/lists/[id]/contacts/page.tsx`
+  - `src/features/contacts/components/contacts-table/contact-list-contacts-manager.tsx`
+  - `src/features/contacts/components/contacts-table/columns.tsx`
+
+### Ajuste de qualidade - Chaves duplicadas na navegacao
+
+Status: Implementado em 2026-06-27.
+
+Resumo:
+
+- corrigido warning React de chaves duplicadas (`Encountered two children with the same key`) na navegacao
+- `src/components/layout/app-sidebar.tsx` passou a usar keys baseadas em `url + title + index`
+- `src/components/kbar/index.tsx` passou a gerar ids unicos de action via `title + url`
+- mitigado risco de colisoes quando itens compartilham o mesmo titulo em secoes diferentes
+
+Validacao:
+
+- `get_errors` retornou "No errors found" para os arquivos alterados

@@ -52,15 +52,15 @@ export default function AppSidebar() {
         <OrgSwitcher />
       </SidebarHeader>
       <SidebarContent className='overflow-x-hidden'>
-        {filteredGroups.map((group) => (
-          <SidebarGroup key={group.label || 'ungrouped'} className='py-0'>
+        {filteredGroups.map((group, groupIndex) => (
+          <SidebarGroup key={`${group.label || 'ungrouped'}-${groupIndex}`} className='py-0'>
             {group.label && <SidebarGroupLabel>{group.label}</SidebarGroupLabel>}
             <SidebarMenu>
-              {group.items.map((item) => {
+              {group.items.map((item, itemIndex) => {
                 const Icon = item.icon ? Icons[item.icon] : Icons.logo;
                 return item?.items && item?.items?.length > 0 ? (
                   <Collapsible
-                    key={item.title}
+                    key={`${item.url}-${item.title}-${itemIndex}`}
                     asChild
                     defaultOpen={item.isActive}
                     className='group/collapsible'
@@ -75,8 +75,10 @@ export default function AppSidebar() {
                       </CollapsibleTrigger>
                       <CollapsibleContent>
                         <SidebarMenuSub>
-                          {item.items?.map((subItem) => (
-                            <SidebarMenuSubItem key={subItem.title}>
+                          {item.items?.map((subItem, subItemIndex) => (
+                            <SidebarMenuSubItem
+                              key={`${subItem.url}-${subItem.title}-${subItemIndex}`}
+                            >
                               <SidebarMenuSubButton asChild isActive={pathname === subItem.url}>
                                 <Link href={subItem.url}>
                                   <span>{subItem.title}</span>
@@ -89,7 +91,7 @@ export default function AppSidebar() {
                     </SidebarMenuItem>
                   </Collapsible>
                 ) : (
-                  <SidebarMenuItem key={item.title}>
+                  <SidebarMenuItem key={`${item.url}-${item.title}-${itemIndex}`}>
                     <SidebarMenuButton
                       asChild
                       tooltip={item.title}

@@ -1,4 +1,5 @@
-import ModuleShellPage from '@/features/platform/components/module-shell-page';
+import PageContainer from '@/components/layout/page-container';
+import { ContactListContactsManager } from '@/features/contacts/components/contacts-table/contact-list-contacts-manager';
 
 export const metadata = {
   title: 'Dashboard: Contacts'
@@ -12,21 +13,11 @@ export default async function ContactListContactsPage({ params }: ContactListCon
   const { id } = await params;
 
   return (
-    <ModuleShellPage
+    <PageContainer
       pageTitle='Contatos da Lista'
-      pageDescription={`Lista ${id}: contatos, busca, filtros e paginacao.`}
-      scope='FE-202..FE-204'
-      nextSteps={[
-        'Implementar tabela de contatos por lista.',
-        'Adicionar busca, filtros e paginacao sincronizados com URL.',
-        'Conectar criacao, edicao e remocao de contatos.'
-      ]}
-      endpointReferences={[
-        'GET /api/contacts/lists/{listId}/contacts/',
-        'POST /api/contacts/lists/{listId}/contacts/',
-        'PATCH /api/contacts/lists/{listId}/contacts/{contactId}/',
-        'DELETE /api/contacts/lists/{listId}/contacts/{contactId}/'
-      ]}
-    />
+      pageDescription={`Lista ${id}: contatos disponiveis para campanhas de pesquisa.`}
+    >
+      <ContactListContactsManager listId={id} />
+    </PageContainer>
   );
 }
