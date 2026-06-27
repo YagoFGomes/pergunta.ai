@@ -35,7 +35,7 @@ import { NavGroup } from '@/types';
  */
 export const navGroups: NavGroup[] = [
   {
-    label: 'Overview',
+    label: 'Produto',
     items: [
       {
         title: 'Dashboard',
@@ -45,6 +45,95 @@ export const navGroups: NavGroup[] = [
         shortcut: ['d', 'd'],
         items: []
       },
+      {
+        title: 'Campanhas',
+        url: '/dashboard/campaigns',
+        icon: 'send',
+        shortcut: ['c', 'p'],
+        isActive: false,
+        items: []
+      },
+      {
+        title: 'Surveys',
+        url: '#',
+        icon: 'forms',
+        isActive: false,
+        items: [
+          {
+            title: 'Forms',
+            url: '/dashboard/surveys/forms',
+            icon: 'forms',
+            shortcut: ['s', 'f']
+          },
+          {
+            title: 'Frameworks',
+            url: '/dashboard/surveys/frameworks',
+            icon: 'adjustments'
+          }
+        ]
+      },
+      {
+        title: 'Contatos',
+        url: '/dashboard/contacts/lists',
+        icon: 'teams',
+        shortcut: ['c', 'l'],
+        isActive: false,
+        items: []
+      },
+      {
+        title: 'Templates de Email',
+        url: '/dashboard/email-templates',
+        icon: 'post',
+        shortcut: ['e', 't'],
+        isActive: false,
+        items: []
+      },
+      {
+        title: 'Analytics',
+        url: '#',
+        icon: 'trendingUp',
+        isActive: false,
+        items: [
+          {
+            title: 'Overview',
+            url: '/dashboard/analytics/overview',
+            icon: 'dashboard',
+            shortcut: ['a', 'o']
+          },
+          {
+            title: 'NPS',
+            url: '/dashboard/analytics/nps',
+            icon: 'trendingUp'
+          },
+          {
+            title: 'CSAT',
+            url: '/dashboard/analytics/csat',
+            icon: 'trendingUp'
+          },
+          {
+            title: 'CES',
+            url: '/dashboard/analytics/ces',
+            icon: 'trendingUp'
+          },
+          {
+            title: 'CSI',
+            url: '/dashboard/analytics/csi',
+            icon: 'trendingUp'
+          }
+        ]
+      },
+      {
+        title: 'Logs de Entrega',
+        url: '/dashboard/delivery/logs',
+        icon: 'notification',
+        isActive: false,
+        items: []
+      }
+    ]
+  },
+  {
+    label: 'Workspace',
+    items: [
       {
         title: 'Workspaces',
         url: '/dashboard/workspaces',
@@ -61,15 +150,7 @@ export const navGroups: NavGroup[] = [
         access: { requireOrg: true }
       },
       {
-        title: 'Product',
-        url: '/dashboard/product',
-        icon: 'product',
-        shortcut: ['p', 'p'],
-        isActive: false,
-        items: []
-      },
-      {
-        title: 'Users',
+        title: 'Usuarios',
         url: '/dashboard/users',
         icon: 'teams',
         shortcut: ['u', 'u'],
@@ -83,82 +164,12 @@ export const navGroups: NavGroup[] = [
         shortcut: ['k', 'k'],
         isActive: false,
         items: []
-      },
-      {
-        title: 'Chat',
-        url: '/dashboard/chat',
-        icon: 'chat',
-        shortcut: ['c', 'c'],
-        isActive: false,
-        items: []
       }
     ]
   },
   {
-    label: 'Elements',
+    label: 'Conta',
     items: [
-      {
-        title: 'Forms',
-        url: '#',
-        icon: 'forms',
-        isActive: true,
-        items: [
-          {
-            title: 'Basic Form',
-            url: '/dashboard/forms/basic',
-            icon: 'forms',
-            shortcut: ['f', 'f']
-          },
-          {
-            title: 'Multi-Step Form',
-            url: '/dashboard/forms/multi-step',
-            icon: 'forms'
-          },
-          {
-            title: 'Sheet & Dialog',
-            url: '/dashboard/forms/sheet-form',
-            icon: 'forms'
-          },
-          {
-            title: 'Advanced Patterns',
-            url: '/dashboard/forms/advanced',
-            icon: 'forms'
-          }
-        ]
-      },
-      {
-        title: 'React Query',
-        url: '/dashboard/react-query',
-        icon: 'code',
-        isActive: false,
-        items: []
-      },
-      {
-        title: 'Icons',
-        url: '/dashboard/elements/icons',
-        icon: 'palette',
-        isActive: false,
-        items: []
-      }
-    ]
-  },
-  {
-    label: '',
-    items: [
-      {
-        title: 'Pro',
-        url: '#',
-        icon: 'pro',
-        isActive: true,
-        items: [
-          {
-            title: 'Exclusive',
-            url: '/dashboard/exclusive',
-            icon: 'exclusive',
-            shortcut: ['e', 'e']
-          }
-        ]
-      },
       {
         title: 'Account',
         url: '#',
