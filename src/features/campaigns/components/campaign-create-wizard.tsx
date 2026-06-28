@@ -61,7 +61,7 @@ const DEFAULT_VALUES: CampaignWizardValues = {
   send_condition: SendConditionEnum.ALWAYS
 };
 
-const STEPS = ['Base', 'Publico', 'Template', 'Agendamento', 'Revisao'] as const;
+const STEPS = ['Base', 'Público', 'Template', 'Agendamento', 'Revisao'] as const;
 
 type FieldProps = {
   label: string;
@@ -190,7 +190,7 @@ export function CampaignCreateWizard() {
   function validateCurrentStep() {
     if (step === 0) {
       if (!values.name.trim() || !values.form) {
-        toast.error('Informe nome e formulario para continuar.');
+        toast.error('Informe nome e formulário para continuar.');
         return false;
       }
     }
@@ -276,7 +276,7 @@ export function CampaignCreateWizard() {
       toast.success('Campanha criada com sucesso.');
       router.push(`/dashboard/campaigns/${campaign.id}`);
     } catch (mutationError) {
-      notifyError(mutationError, 'Nao foi possivel criar a campanha.');
+      notifyError(mutationError, 'Não foi possível criar a campanha.');
     }
   }
 
@@ -288,8 +288,8 @@ export function CampaignCreateWizard() {
     return (
       <ModuleErrorAlert
         error={error}
-        title='Erro ao carregar pre-requisitos'
-        fallbackMessage='Nao foi possivel carregar formularios, listas ou templates.'
+        title='Erro ao carregar pré-requisitos'
+        fallbackMessage='Não foi possível carregar formulários, listas ou templates.'
       />
     );
   }
@@ -323,7 +323,7 @@ export function CampaignCreateWizard() {
         <Alert>
           <AlertTitle>Pre-requisitos incompletos</AlertTitle>
           <AlertDescription>
-            Para campanhas por email, tenha ao menos um formulario, uma lista e um template
+            Para campanhas por email, tenha ao menos um formulário, uma lista e um template
             cadastrados no tenant atual.
           </AlertDescription>
         </Alert>
@@ -339,9 +339,9 @@ export function CampaignCreateWizard() {
               maxLength={255}
             />
           </Field>
-          <Field label='Formulario'>
+          <Field label='Formulário'>
             <NativeSelect value={values.form} onChange={(value) => updateValue('form', value)}>
-              <option value=''>Selecione um formulario</option>
+              <option value=''>Selecione um formulário</option>
               {forms.map((form) => (
                 <option key={form.id} value={form.id}>
                   {getFormLabel(form)}
@@ -354,7 +354,7 @@ export function CampaignCreateWizard() {
               value={values.description}
               onChange={(event) => updateValue('description', event.target.value)}
               className='border-input bg-background min-h-28 w-full rounded-md border px-3 py-2 text-sm shadow-xs outline-none focus-visible:ring-2'
-              placeholder='Objetivo, segmento ou observacoes internas.'
+              placeholder='Objetivo, segmento ou observações internas.'
             />
           </Field>
           <Field label='Canal de entrega'>
@@ -374,14 +374,14 @@ export function CampaignCreateWizard() {
           {selectedForm ? (
             <ResourcePreview
               title={selectedForm.title}
-              description={selectedForm.description || 'Formulario selecionado para a campanha.'}
+              description={selectedForm.description || 'Formulário selecionado para a campanha.'}
               actions={
                 <Link
                   href={`/dashboard/surveys/forms/${selectedForm.id}`}
                   className={cn(buttonVariants({ variant: 'outline', size: 'sm' }))}
                 >
                   <Icons.edit className='mr-2 h-4 w-4' />
-                  Editar formulario
+                  Editar formulário
                 </Link>
               }
             >
@@ -430,9 +430,9 @@ export function CampaignCreateWizard() {
             </Field>
           )}
           <div className='rounded-md border p-4'>
-            <h3 className='font-medium'>Resumo do publico</h3>
+            <h3 className='font-medium'>Resumo do público</h3>
             <p className='text-muted-foreground mt-1 text-sm'>
-              O backend segmenta os dados pelo tenant autenticado. A selecao exibida aqui ja vem do
+              O backend segmenta os dados pelo tenant autenticado. A seleção exibida aqui já vem do
               tenant atual.
             </p>
           </div>
@@ -570,7 +570,7 @@ export function CampaignCreateWizard() {
 
       {step === 3 ? (
         <div className='grid gap-4 md:grid-cols-3'>
-          <Field label='Data de inicio' description='Opcional. Se vazio, a campanha fica rascunho.'>
+          <Field label='Data de início' description='Opcional. Se vazio, a campanha fica rascunho.'>
             <Input
               type='date'
               value={values.start_date ?? ''}
@@ -605,7 +605,7 @@ export function CampaignCreateWizard() {
             <Badge variant='outline'>{values.delivery_channel}</Badge>
           </div>
           <div>
-            <span className='text-muted-foreground block'>Formulario</span>
+            <span className='text-muted-foreground block'>Formulário</span>
             <span>{selectedForm?.title ?? '-'}</span>
           </div>
           <div>

@@ -172,7 +172,7 @@ export default function SignInViewPage() {
           </form>
 
           <p className='text-muted-foreground text-center text-sm'>
-            Don&apos;t have an account?{' '}
+            Don&após;t have an account?{' '}
             <Link href='/auth/sign-up' className='hover:text-primary underline underline-offset-4'>
               Sign up
             </Link>

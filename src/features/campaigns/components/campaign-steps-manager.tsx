@@ -140,7 +140,7 @@ export function CampaignStepsManager({ campaignId }: CampaignStepsManagerProps) 
         toast.success('Step criado com sucesso.');
         setIsDialogOpen(false);
       },
-      onError: (error) => notifyError(error, 'Nao foi possivel criar o step.')
+      onError: (error) => notifyError(error, 'Não foi possível criar o step.')
     }
   });
   const updateMutation = useCampaignsStepsPartialUpdate({
@@ -150,7 +150,7 @@ export function CampaignStepsManager({ campaignId }: CampaignStepsManagerProps) 
         toast.success('Step atualizado com sucesso.');
         setIsDialogOpen(false);
       },
-      onError: (error) => notifyError(error, 'Nao foi possivel atualizar o step.')
+      onError: (error) => notifyError(error, 'Não foi possível atualizar o step.')
     }
   });
   const destroyMutation = useCampaignsStepsDestroy({
@@ -160,7 +160,7 @@ export function CampaignStepsManager({ campaignId }: CampaignStepsManagerProps) 
         toast.success('Step removido com sucesso.');
         setDeleteStep(null);
       },
-      onError: (error) => notifyError(error, 'Nao foi possivel remover o step.')
+      onError: (error) => notifyError(error, 'Não foi possível remover o step.')
     }
   });
 
@@ -249,7 +249,7 @@ export function CampaignStepsManager({ campaignId }: CampaignStepsManagerProps) 
       <ModuleErrorAlert
         error={campaignQuery.error ?? stepsQuery.error ?? templatesQuery.error}
         title='Erro ao carregar steps'
-        fallbackMessage='Nao foi possivel carregar a campanha, steps ou templates.'
+        fallbackMessage='Não foi possível carregar a campanha, steps ou templates.'
       />
     );
   }
@@ -259,8 +259,8 @@ export function CampaignStepsManager({ campaignId }: CampaignStepsManagerProps) 
       title='Steps da campanha'
       description={
         campaign?.name
-          ? `Sequencia de envios da campanha ${campaign.name}.`
-          : 'Sequencia de envios da campanha.'
+          ? `Sequência de envios da campanha ${campaign.name}.`
+          : 'Sequência de envios da campanha.'
       }
       contentClassName='space-y-4'
       footer={
@@ -283,7 +283,7 @@ export function CampaignStepsManager({ campaignId }: CampaignStepsManagerProps) 
         <Alert>
           <AlertTitle>Nenhum step cadastrado</AlertTitle>
           <AlertDescription>
-            Adicione o primeiro step para definir a sequencia de envio da campanha.
+            Adicione o primeiro step para definir a sequência de envio da campanha.
           </AlertDescription>
         </Alert>
       ) : (
@@ -296,7 +296,7 @@ export function CampaignStepsManager({ campaignId }: CampaignStepsManagerProps) 
                 <TableHead>Template</TableHead>
                 <TableHead>Delay</TableHead>
                 <TableHead>Condicao</TableHead>
-                <TableHead className='w-24 text-right'>Acoes</TableHead>
+                <TableHead className='w-24 text-right'>Ações</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -452,7 +452,7 @@ export function CampaignStepsManager({ campaignId }: CampaignStepsManagerProps) 
             </Button>
             <Button onClick={() => void submitStep()} disabled={isMutating}>
               {isMutating ? <Icons.spinner className='mr-2 h-4 w-4 animate-spin' /> : null}
-              {formMode === 'create' ? 'Criar step' : 'Salvar alteracoes'}
+              {formMode === 'create' ? 'Criar step' : 'Salvar alterações'}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -470,7 +470,7 @@ export function CampaignStepsManager({ campaignId }: CampaignStepsManagerProps) 
           <AlertDialogHeader>
             <AlertDialogTitle>Excluir step?</AlertDialogTitle>
             <AlertDialogDescription>
-              O step selecionado sera removido da sequencia desta campanha.
+              O step selecionado será removido da sequência desta campanha.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

@@ -87,7 +87,7 @@ export function EmailTemplatesManager() {
         setIsCreateDialogOpen(false);
       },
       onError: (error) => {
-        notifyError(error, 'Nao foi possivel criar o template.');
+        notifyError(error, 'Não foi possível criar o template.');
       }
     }
   });
@@ -100,7 +100,7 @@ export function EmailTemplatesManager() {
         setDeleteTemplate(null);
       },
       onError: (error) => {
-        notifyError(error, 'Nao foi possivel excluir o template.');
+        notifyError(error, 'Não foi possível excluir o template.');
       }
     }
   });
@@ -162,7 +162,7 @@ export function EmailTemplatesManager() {
       const missingVariables = getMissingRequiredVariableDeclarations(normalized);
 
       if (missingVariables.length > 0) {
-        toast.error(`Declare as variaveis usadas no template: ${missingVariables.join(', ')}.`);
+        toast.error(`Declare as variáveis usadas no template: ${missingVariables.join(', ')}.`);
         return;
       }
 
@@ -199,7 +199,7 @@ export function EmailTemplatesManager() {
         <ModuleErrorAlert
           error={templatesQuery.error}
           title='Erro ao carregar templates'
-          fallbackMessage='Nao foi possivel carregar os templates de email.'
+          fallbackMessage='Não foi possível carregar os templates de email.'
         />
         <div>
           <Button variant='outline' onClick={() => templatesQuery.refetch()}>
@@ -217,7 +217,7 @@ export function EmailTemplatesManager() {
           <div className='space-y-1'>
             <h2 className='text-xl font-semibold'>Templates de email</h2>
             <p className='text-muted-foreground text-sm'>
-              Consulte os templates disponiveis para vincular nas campanhas.
+              Consulte os templates disponíveis para vincular nas campanhas.
             </p>
           </div>
           <Button onClick={openCreateDialog} disabled={hasMutationInFlight}>
@@ -264,7 +264,7 @@ export function EmailTemplatesManager() {
           <DialogHeader>
             <DialogTitle>Novo template</DialogTitle>
             <DialogDescription>
-              Configure o conteudo e as variaveis obrigatorias do template.
+              Configure o conteúdo e as variáveis obrigatórias do template.
             </DialogDescription>
           </DialogHeader>
 
@@ -311,7 +311,7 @@ export function EmailTemplatesManager() {
           <AlertDialogHeader>
             <AlertDialogTitle>Excluir template?</AlertDialogTitle>
             <AlertDialogDescription>
-              O template {deleteTemplate?.name ? `"${deleteTemplate.name}"` : ''} sera removido
+              O template {deleteTemplate?.name ? `"${deleteTemplate.name}"` : ''} será removido
               permanentemente. Templates globais podem exigir permissao de superuser.
             </AlertDialogDescription>
           </AlertDialogHeader>

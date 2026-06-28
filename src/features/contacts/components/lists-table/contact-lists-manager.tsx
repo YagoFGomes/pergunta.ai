@@ -82,7 +82,7 @@ export function ContactListsManager() {
         setIsFormDialogOpen(false);
       },
       onError: () => {
-        toast.error('Nao foi possivel criar a lista.');
+        toast.error('Não foi possível criar a lista.');
       }
     }
   });
@@ -95,7 +95,7 @@ export function ContactListsManager() {
         setIsFormDialogOpen(false);
       },
       onError: () => {
-        toast.error('Nao foi possivel atualizar a lista.');
+        toast.error('Não foi possível atualizar a lista.');
       }
     }
   });
@@ -108,7 +108,7 @@ export function ContactListsManager() {
         setDeleteList(null);
       },
       onError: () => {
-        toast.error('Nao foi possivel remover a lista.');
+        toast.error('Não foi possível remover a lista.');
       }
     }
   });
@@ -194,7 +194,7 @@ export function ContactListsManager() {
         <div className='space-y-1'>
           <h2 className='text-xl font-semibold'>Listas de contatos</h2>
           <p className='text-muted-foreground text-sm'>
-            Organize seus destinatarios em listas para vincular nas campanhas.
+            Organize seus destinatários em listas para vincular nas campanhas.
           </p>
         </div>
         <Button onClick={openCreateDialog}>Nova lista</Button>
@@ -204,7 +204,7 @@ export function ContactListsManager() {
         <Alert variant='destructive'>
           <AlertTitle>Erro ao carregar listas</AlertTitle>
           <AlertDescription>
-            Nao foi possivel carregar as listas de contatos. Atualize a pagina e tente novamente.
+            Não foi possível carregar as listas de contatos. Atualize a página e tente novamente.
           </AlertDescription>
         </Alert>
       ) : null}
@@ -213,7 +213,7 @@ export function ContactListsManager() {
         <Alert>
           <AlertTitle>Nenhuma lista encontrada</AlertTitle>
           <AlertDescription>
-            Crie sua primeira lista para comecar a organizar os destinatarios das campanhas.
+            Crie sua primeira lista para começar a organizar os destinatários das campanhas.
           </AlertDescription>
         </Alert>
       ) : null}
@@ -295,7 +295,7 @@ export function ContactListsManager() {
                 >
                   {([canSubmit, isSubmitting]) => (
                     <Button type='submit' disabled={!canSubmit || isSubmitting}>
-                      {formMode === 'create' ? 'Criar lista' : 'Salvar alteracoes'}
+                      {formMode === 'create' ? 'Criar lista' : 'Salvar alterações'}
                     </Button>
                   )}
                 </form.Subscribe>
@@ -317,7 +317,7 @@ export function ContactListsManager() {
           <AlertDialogHeader>
             <AlertDialogTitle>Excluir lista de contatos?</AlertDialogTitle>
             <AlertDialogDescription>
-              A lista {deleteList?.name ? `"${deleteList.name}"` : ''} sera removida
+              A lista {deleteList?.name ? `"${deleteList.name}"` : ''} será removida
               permanentemente.
             </AlertDialogDescription>
           </AlertDialogHeader>

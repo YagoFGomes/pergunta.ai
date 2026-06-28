@@ -114,7 +114,7 @@ export function getEmailTemplatesColumns({
       accessorKey: 'required_variables',
       enableSorting: false,
       header: ({ column }: { column: Column<EmailTemplate, unknown> }) => (
-        <DataTableColumnHeader column={column} title='Variaveis' />
+        <DataTableColumnHeader column={column} title='Variáveis' />
       ),
       cell: ({ row }) => (
         <Badge variant='outline'>

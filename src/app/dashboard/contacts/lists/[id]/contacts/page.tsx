@@ -15,7 +15,7 @@ export default async function ContactListContactsPage({ params }: ContactListCon
   return (
     <PageContainer
       pageTitle='Contatos da Lista'
-      pageDescription={`Lista ${id}: contatos disponiveis para campanhas de pesquisa.`}
+      pageDescription={`Lista ${id}: contatos disponíveis para campanhas de pesquisa.`}
     >
       <ContactListContactsManager listId={id} />
     </PageContainer>

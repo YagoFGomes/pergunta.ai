@@ -27,7 +27,7 @@ export const ANALYTICS_METRIC_DASHBOARD_CONFIG: Record<
     title: 'Analytics CSAT',
     description: 'Acompanhamento de Customer Satisfaction Score.',
     scoreLabel: 'CSAT atual',
-    interpretation: 'Percentuais acima de 75% indicam boa satisfacao no recorte atual.'
+    interpretation: 'Percentuais acima de 75% indicam boa satisfação no recorte atual.'
   },
   [MetricTypeEnum.CES]: {
     type: MetricTypeEnum.CES,

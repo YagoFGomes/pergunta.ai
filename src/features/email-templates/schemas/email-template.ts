@@ -26,7 +26,7 @@ export const emailTemplateFormSchema = z.object({
     .trim()
     .min(3, 'Informe ao menos 3 caracteres.')
     .max(255, 'Maximo de 255 caracteres.'),
-  html_content: z.string().trim().min(1, 'Informe o conteudo HTML.'),
+  html_content: z.string().trim().min(1, 'Informe o conteúdo HTML.'),
   plain_text_content: z.string().trim().optional(),
   requiredVariablesText: z
     .string()
@@ -42,7 +42,7 @@ export const emailTemplateFormSchema = z.object({
         const variables = parseRequiredVariables(value);
         return new Set(variables).size === variables.length;
       },
-      { message: 'Remova variaveis duplicadas.' }
+      { message: 'Remova variáveis duplicadas.' }
     ),
   language: z.string().trim().min(2, 'Informe o idioma.').max(10, 'Maximo de 10 caracteres.'),
   status: z.nativeEnum(Status372Enum)

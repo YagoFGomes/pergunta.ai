@@ -56,10 +56,10 @@ export function SurveyFormCellAction({ data }: SurveyFormCellActionProps) {
       onSuccess: async (response) => {
         const updated = getOrvalResponseData<Form>(response);
         await invalidateQueries(updated?.id);
-        notifySuccess('Formulario publicado.');
+        notifySuccess('Formulário publicado.');
       },
       onError: (error) => {
-        notifyError(error, 'Nao foi possivel publicar o formulario.');
+        notifyError(error, 'Não foi possível publicar o formulário.');
       }
     }
   });
@@ -69,10 +69,10 @@ export function SurveyFormCellAction({ data }: SurveyFormCellActionProps) {
       onSuccess: async (response) => {
         const updated = getOrvalResponseData<Form>(response);
         await invalidateQueries(updated?.id);
-        notifySuccess('Formulario arquivado.');
+        notifySuccess('Formulário arquivado.');
       },
       onError: (error) => {
-        notifyError(error, 'Nao foi possivel arquivar o formulario.');
+        notifyError(error, 'Não foi possível arquivar o formulário.');
       }
     }
   });
@@ -97,12 +97,12 @@ export function SurveyFormCellAction({ data }: SurveyFormCellActionProps) {
       <DropdownMenu modal={false}>
         <DropdownMenuTrigger asChild>
           <Button variant='ghost' className='h-8 w-8 p-0' disabled={isPending}>
-            <span className='sr-only'>Abrir acoes do formulario</span>
+            <span className='sr-only'>Abrir ações do formulário</span>
             <Icons.ellipsis className='h-4 w-4' />
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align='end'>
-          <DropdownMenuLabel>Acoes</DropdownMenuLabel>
+          <DropdownMenuLabel>Ações</DropdownMenuLabel>
           <DropdownMenuItem onClick={() => router.push(`/dashboard/surveys/forms/${data.id}`)}>
             <Icons.edit className='mr-2 h-4 w-4' />
             Editar
@@ -141,12 +141,12 @@ export function SurveyFormCellAction({ data }: SurveyFormCellActionProps) {
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>
-              {confirmAction === 'publish' ? 'Publicar formulario?' : 'Arquivar formulario?'}
+              {confirmAction === 'publish' ? 'Publicar formulário?' : 'Arquivar formulário?'}
             </AlertDialogTitle>
             <AlertDialogDescription>
               {confirmAction === 'publish'
-                ? 'O formulario sera publicado e ficara disponivel para uso em campanhas. O formulario deve ter ao menos uma pergunta para ser publicado.'
-                : 'O formulario sera arquivado e nao podera mais ser usado em novas campanhas. Esta acao nao pode ser desfeita.'}
+                ? 'O formulário será publicado e ficara disponível para uso em campanhas. O formulário deve ter ao menos uma pergunta para ser publicado.'
+                : 'O formulário será arquivado e não podera mais ser usado em novas campanhas. Esta ação não pode ser desfeita.'}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

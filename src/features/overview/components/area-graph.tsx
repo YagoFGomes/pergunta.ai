@@ -44,7 +44,7 @@ export function AreaGraph() {
     <Card>
       <CardHeader>
         <CardTitle>
-          Dotted Area Chart
+          Gráfico de área pontilhado
           <Badge variant='outline'>
             <Icons.trendingUp />
             -5.2%

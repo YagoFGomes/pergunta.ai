@@ -89,7 +89,7 @@ export function MessageComposer({
               if (e.target.files?.length) {
                 onAddAttachments(e.target.files);
               }
-              // Reset so same file can be re-selected
+              // Reset só same file can be re-selected
               e.target.value = '';
             }}
           />

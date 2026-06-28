@@ -119,14 +119,14 @@ function MetricCard({
           {latest?.campaign_id
             ? 'Campanha vinculada'
             : latest
-              ? 'Formulario consolidado'
+              ? 'Formulário consolidado'
               : 'Aguardando calculo'}
         </span>
         <Link
           href={metric.href}
           className={cn(buttonVariants({ variant: 'ghost', size: 'sm' }), 'h-8 px-2 text-xs')}
         >
-          Ver serie
+          Ver série
           <Icons.arrowRight className='ml-1 size-3.5' />
         </Link>
       </CardContent>
@@ -190,21 +190,21 @@ export function AnalyticsOverview() {
           <ModuleErrorAlert
             error={overviewQuery.error}
             title='Erro ao carregar analytics'
-            fallbackMessage='Nao foi possivel carregar o resumo de analytics.'
+            fallbackMessage='Não foi possível carregar o resumo de analytics.'
           />
         ) : null}
         {campaignsQuery.isError ? (
           <ModuleErrorAlert
             error={campaignsQuery.error}
             title='Erro ao carregar campanhas'
-            fallbackMessage='Nao foi possivel carregar o resumo de campanhas.'
+            fallbackMessage='Não foi possível carregar o resumo de campanhas.'
           />
         ) : null}
         {deliveryLogsQuery.isError ? (
           <ModuleErrorAlert
             error={deliveryLogsQuery.error}
             title='Erro ao carregar entregas'
-            fallbackMessage='Nao foi possivel carregar o resumo de entregas.'
+            fallbackMessage='Não foi possível carregar o resumo de entregas.'
           />
         ) : null}
         <Button
@@ -230,7 +230,7 @@ export function AnalyticsOverview() {
         <div className='space-y-1'>
           <h2 className='text-lg font-semibold'>Sem dados de analytics</h2>
           <p className='text-muted-foreground max-w-md text-sm'>
-            Crie uma campanha, envie respostas e calcule metricas para acompanhar o desempenho.
+            Crie uma campanha, envie respostas e calcule métricas para acompanhar o desempenho.
           </p>
         </div>
         <div className='flex flex-wrap justify-center gap-2'>
@@ -246,7 +246,7 @@ export function AnalyticsOverview() {
             className={cn(buttonVariants({ variant: 'outline' }), 'text-xs md:text-sm')}
           >
             <Icons.forms className='mr-2 h-4 w-4' />
-            Formularios
+            Formulários
           </Link>
         </div>
       </div>
@@ -258,7 +258,7 @@ export function AnalyticsOverview() {
       <Card>
         <CardContent className='flex flex-col gap-4 p-4 md:flex-row md:items-end md:justify-between'>
           <div className='grid gap-2'>
-            <Label htmlFor='analytics-period'>Periodo</Label>
+            <Label htmlFor='analytics-period'>Período</Label>
             <div className='flex flex-col gap-2 sm:flex-row'>
               <Input
                 id='analytics-period'
@@ -296,19 +296,19 @@ export function AnalyticsOverview() {
           icon={Icons.send}
           label='Campanhas'
           value={formatAnalyticsNumber(campaignCount)}
-          description={`${formatAnalyticsNumber(overview?.campaigns_count ?? 0)} com metricas vinculadas`}
+          description={`${formatAnalyticsNumber(overview?.campaigns_count ?? 0)} com métricas vinculadas`}
         />
         <StatCard
           icon={Icons.checks}
           label='Respostas'
           value={formatAnalyticsNumber(responseSummary.responded)}
-          description={`${formatAnalyticsNumber(responseSummary.sent)} destinatarios enviados`}
+          description={`${formatAnalyticsNumber(responseSummary.sent)} destinatários enviados`}
         />
         <StatCard
           icon={Icons.trendingUp}
           label='Taxa de resposta'
           value={formatRate(responseSummary.rate)}
-          description='Respostas registradas sobre destinatarios enviados'
+          description='Respostas registradas sobre destinatários enviados'
         />
         <StatCard
           icon={Icons.notification}
@@ -331,25 +331,25 @@ export function AnalyticsOverview() {
           <Card>
             <CardHeader>
               <CardTitle className='text-base'>Cobertura</CardTitle>
-              <CardDescription>Indicadores com valor calculado no periodo atual.</CardDescription>
+              <CardDescription>Indicadores com valor calculado no período atual.</CardDescription>
             </CardHeader>
             <CardContent className='space-y-4'>
               <div className='space-y-2'>
                 <div className='flex items-center justify-between text-sm'>
-                  <span className='text-muted-foreground'>Metricas ativas</span>
+                  <span className='text-muted-foreground'>Métricas ativas</span>
                   <span className='font-medium'>{metricCoverage}/4</span>
                 </div>
                 <Progress value={metricCoveragePercent} />
               </div>
               <div className='grid gap-2 rounded-md border p-3 text-sm'>
                 <div className='flex items-center justify-between'>
-                  <span className='text-muted-foreground'>Registros de metrica</span>
+                  <span className='text-muted-foreground'>Registros de métrica</span>
                   <span className='font-medium'>
                     {formatAnalyticsNumber(overview?.metrics_count ?? 0)}
                   </span>
                 </div>
                 <div className='flex items-center justify-between'>
-                  <span className='text-muted-foreground'>Formularios medidos</span>
+                  <span className='text-muted-foreground'>Formulários medidos</span>
                   <span className='font-medium'>
                     {formatAnalyticsNumber(overview?.forms_count ?? 0)}
                   </span>
@@ -361,7 +361,7 @@ export function AnalyticsOverview() {
           <Card>
             <CardHeader>
               <CardTitle className='text-base'>Atalhos</CardTitle>
-              <CardDescription>Ir direto para operacao e analise detalhada.</CardDescription>
+              <CardDescription>Ir direto para operação e análise detalhada.</CardDescription>
             </CardHeader>
             <CardContent className='grid gap-2'>
               <Link
@@ -383,7 +383,7 @@ export function AnalyticsOverview() {
                 className={cn(buttonVariants({ variant: 'outline' }), 'justify-start')}
               >
                 <Icons.forms className='mr-2 size-4' />
-                Formularios
+                Formulários
               </Link>
             </CardContent>
           </Card>
@@ -392,9 +392,9 @@ export function AnalyticsOverview() {
 
       {overview?.metrics_count === 0 ? (
         <Alert>
-          <AlertTitle>Metricas ainda nao calculadas</AlertTitle>
+          <AlertTitle>Métricas ainda não calculadas</AlertTitle>
           <AlertDescription>
-            O painel operacional ja mostra campanhas e entregas, mas NPS, CSAT, CES e CSI dependem
+            O painel operacional já mostra campanhas e entregas, mas NPS, CSAT, CES e CSI dependem
             dos registros de analytics gerados no backend.
           </AlertDescription>
         </Alert>

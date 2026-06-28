@@ -42,10 +42,10 @@ function SurveyFormsEmptyState() {
         <Icons.forms className='text-muted-foreground size-6' />
       </div>
       <div className='space-y-1'>
-        <h2 className='text-lg font-semibold'>Nenhum formulario criado</h2>
+        <h2 className='text-lg font-semibold'>Nenhum formulário criado</h2>
         <p className='text-muted-foreground max-w-md text-sm'>
-          Comece criando o primeiro formulario de pesquisa. A configuracao de perguntas entra nas
-          proximas tarefas do fluxo de surveys.
+          Comece criando o primeiro formulário de pesquisa. A configuração de perguntas entra nas
+          próximas tarefas do fluxo de surveys.
         </p>
       </div>
       <Link
@@ -53,7 +53,7 @@ function SurveyFormsEmptyState() {
         className={cn(buttonVariants(), 'text-xs md:text-sm')}
       >
         <Icons.add className='mr-2 h-4 w-4' />
-        Novo formulario
+        Novo formulário
       </Link>
     </div>
   );
@@ -132,8 +132,8 @@ export function SurveyFormsTable() {
       <div className='grid gap-4'>
         <ModuleErrorAlert
           error={formsQuery.error}
-          title='Erro ao carregar formularios'
-          fallbackMessage='Nao foi possivel carregar a lista de formularios.'
+          title='Erro ao carregar formulários'
+          fallbackMessage='Não foi possível carregar a lista de formulários.'
         />
         <div>
           <Button variant='outline' onClick={() => formsQuery.refetch()}>
@@ -166,12 +166,12 @@ export function SurveyFormsTable() {
             </Badge>
           ) : null}
           {frameworksQuery.isError ? (
-            <Badge variant='outline'>Filtro de frameworks indisponivel</Badge>
+            <Badge variant='outline'>Filtro de frameworks indisponível</Badge>
           ) : null}
           {hasNoFrameworkFilterOptions ? (
             <Badge variant='outline'>Sem frameworks ativos</Badge>
           ) : null}
-          <Badge variant='outline'>{totalItems} formularios</Badge>
+          <Badge variant='outline'>{totalItems} formulários</Badge>
         </>
       }
     />

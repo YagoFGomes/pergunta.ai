@@ -20,7 +20,7 @@ export default async function EmailTemplateEditPage({ params }: EmailTemplateEdi
   return (
     <PageContainer
       pageTitle='Editar template de email'
-      pageDescription='Atualize conteudo, variaveis e preview do template.'
+      pageDescription='Atualize conteúdo, variáveis e preview do template.'
       pageHeaderAction={
         <Link
           href='/dashboard/email-templates'

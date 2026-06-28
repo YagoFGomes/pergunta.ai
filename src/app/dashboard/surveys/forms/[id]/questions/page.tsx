@@ -19,8 +19,8 @@ export default async function SurveyQuestionsPage({ params }: SurveyQuestionsPag
 
   return (
     <PageContainer
-      pageTitle='Perguntas do formulario'
-      pageDescription='Liste e crie perguntas associadas a este formulario.'
+      pageTitle='Perguntas do formulário'
+      pageDescription='Liste e crie perguntas associadas a este formulário.'
       pageHeaderAction={
         <div className='flex flex-wrap items-center justify-end gap-2'>
           <Link
@@ -28,7 +28,7 @@ export default async function SurveyQuestionsPage({ params }: SurveyQuestionsPag
             className={cn(buttonVariants({ variant: 'outline' }), 'text-xs md:text-sm')}
           >
             <Icons.edit className='mr-2 h-4 w-4' />
-            Editar formulario
+            Editar formulário
           </Link>
           <Link
             href='/dashboard/surveys/forms'

@@ -46,7 +46,7 @@ export function getSurveyFormsColumns({
       accessorKey: 'title',
       enableSorting: false,
       header: ({ column }: { column: Column<Form, unknown> }) => (
-        <DataTableColumnHeader column={column} title='Formulario' />
+        <DataTableColumnHeader column={column} title='Formulário' />
       ),
       cell: ({ row }) => (
         <div className='flex min-w-[260px] flex-col gap-1'>

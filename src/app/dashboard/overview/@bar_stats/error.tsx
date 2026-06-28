@@ -19,7 +19,7 @@ export default function StatsError({ error, reset }: StatsErrorProps) {
     console.error(error);
   }, [error]);
 
-  // the reload fn ensures the refresh is deffered  until the next render phase allowing react to handle any pending states before processing
+  // Defers refresh until the next render phase so React can process pending states.
   const reload = () => {
     startTransition(() => {
       router.refresh();
@@ -32,9 +32,9 @@ export default function StatsError({ error, reset }: StatsErrorProps) {
         <div className='flex flex-1 flex-col justify-center gap-1 px-6 py-5 sm:py-6'>
           <Alert variant='destructive' className='border-none'>
             <Icons.alertCircle className='h-4 w-4' />
-            <AlertTitle>Error</AlertTitle>
+            <AlertTitle>Erro</AlertTitle>
             <AlertDescription className='mt-2'>
-              Failed to load statistics: {error.message}
+              Não foi possível carregar as estatísticas: {error.message}
             </AlertDescription>
           </Alert>
         </div>
@@ -42,7 +42,7 @@ export default function StatsError({ error, reset }: StatsErrorProps) {
       <CardContent className='flex h-[316px] items-center justify-center p-6'>
         <div className='text-center'>
           <p className='text-muted-foreground mb-4 text-sm'>
-            Unable to display statistics at this time
+            Não foi possível exibir as estatísticas neste momento.
           </p>
           <Button
             onClick={() => reload()}
@@ -50,7 +50,7 @@ export default function StatsError({ error, reset }: StatsErrorProps) {
             className='min-w-[120px]'
             disabled={isPending}
           >
-            Try again
+            Tentar novamente
           </Button>
         </div>
       </CardContent>

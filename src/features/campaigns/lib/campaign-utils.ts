@@ -41,7 +41,7 @@ export const STEP_TYPE_OPTIONS: Option[] = [
 
 export const SEND_CONDITION_OPTIONS: Option[] = [
   { label: 'Sempre', value: SendConditionEnum.ALWAYS },
-  { label: 'Se nao respondeu', value: SendConditionEnum.IF_NOT_RESPONDED }
+  { label: 'Se não respondeu', value: SendConditionEnum.IF_NOT_RESPONDED }
 ];
 
 export function getCampaignStatusLabel(status?: Campaign['status']) {

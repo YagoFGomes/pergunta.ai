@@ -10,8 +10,8 @@ type PublicSurveyErrorProps = {
 export default function PublicSurveyError({ error, reset }: PublicSurveyErrorProps) {
   return (
     <ModuleError
-      pageTitle='Formulario Publico'
-      pageDescription='Nao foi possivel carregar a pesquisa publica.'
+      pageTitle='Formulário Público'
+      pageDescription='Não foi possível carregar a pesquisa pública.'
       error={error}
       reset={reset}
     />

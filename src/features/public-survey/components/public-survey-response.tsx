@@ -111,7 +111,7 @@ function QuestionShell({
         <div className='space-y-1'>
           <Label className='text-base font-medium'>{question.label}</Label>
           {question.is_required ? (
-            <p className='text-muted-foreground text-xs'>Obrigatoria</p>
+            <p className='text-muted-foreground text-xs'>Obrigatória</p>
           ) : (
             <p className='text-muted-foreground text-xs'>Opcional</p>
           )}
@@ -157,11 +157,11 @@ function ScaleQuestion({
 function MissingOptionsNotice({ isRequired }: { isRequired: boolean }) {
   return (
     <Alert variant={isRequired ? 'destructive' : 'default'}>
-      <AlertTitle>Pergunta sem opcoes</AlertTitle>
+      <AlertTitle>Pergunta sem opções</AlertTitle>
       <AlertDescription>
         {isRequired
-          ? 'Esta pergunta e obrigatoria, mas ainda nao possui opcoes cadastradas.'
-          : 'Esta pergunta ainda nao possui opcoes cadastradas.'}
+          ? 'Esta pergunta e obrigatória, mas ainda não possui opções cadastradas.'
+          : 'Esta pergunta ainda não possui opções cadastradas.'}
       </AlertDescription>
     </Alert>
   );
@@ -282,7 +282,7 @@ export function PublicSurveyResponse({ token }: PublicSurveyResponseProps) {
   const submitMutation = useMutation({
     mutationFn: () => {
       if (!surveyQuery.data) {
-        throw new Error('Formulario indisponivel.');
+        throw new Error('Formulário indisponível.');
       }
 
       const questions = getOrderedPublicQuestions(surveyQuery.data);
@@ -293,7 +293,7 @@ export function PublicSurveyResponse({ token }: PublicSurveyResponseProps) {
       toast.success('Resposta enviada com sucesso.');
     },
     onError: (error) => {
-      toast.error(getErrorMessage(error, 'Nao foi possivel enviar suas respostas.'));
+      toast.error(getErrorMessage(error, 'Não foi possível enviar suas respostas.'));
     }
   });
 
@@ -323,7 +323,7 @@ export function PublicSurveyResponse({ token }: PublicSurveyResponseProps) {
 
     if (!validation.valid) {
       setErrors(validation.errors);
-      toast.error('Revise as perguntas obrigatorias.');
+      toast.error('Revise as perguntas obrigatórias.');
       return;
     }
 
@@ -338,10 +338,10 @@ export function PublicSurveyResponse({ token }: PublicSurveyResponseProps) {
     return (
       <PublicSurveyMessage
         variant='error'
-        title='Pesquisa indisponivel'
+        title='Pesquisa indisponível'
         description={getErrorMessage(
           surveyQuery.error,
-          'Nao foi possivel carregar esta pesquisa. O link pode ter expirado ou ja ter sido respondido.'
+          'Não foi possível carregar esta pesquisa. O link pode ter expirado ou já ter sido respondido.'
         )}
         action={
           <Button variant='outline' onClick={() => surveyQuery.refetch()}>
@@ -357,7 +357,7 @@ export function PublicSurveyResponse({ token }: PublicSurveyResponseProps) {
       <PublicSurveyMessage
         variant='success'
         title='Obrigado pela resposta'
-        description='Suas respostas foram registradas com sucesso. Voce ja pode fechar esta pagina.'
+        description='Suas respostas foram registradas com sucesso. Você já pode fechar esta página.'
       />
     );
   }
@@ -366,7 +366,7 @@ export function PublicSurveyResponse({ token }: PublicSurveyResponseProps) {
     return (
       <PublicSurveyMessage
         title='Pesquisa sem perguntas'
-        description='Este formulario ainda nao possui perguntas disponiveis para resposta.'
+        description='Este formulário ainda não possui perguntas disponíveis para resposta.'
       />
     );
   }
@@ -407,9 +407,9 @@ export function PublicSurveyResponse({ token }: PublicSurveyResponseProps) {
 
         {hasRequiredQuestionsMissingOptions ? (
           <Alert variant='destructive'>
-            <AlertTitle>Formulario precisa de ajuste</AlertTitle>
+            <AlertTitle>Formulário precisa de ajuste</AlertTitle>
             <AlertDescription>
-              Ha perguntas obrigatorias de escolha sem opcoes cadastradas. Edite o formulario antes
+              Há perguntas obrigatórias de escolha sem opções cadastradas. Edite o formulário antes
               de compartilhar este link.
             </AlertDescription>
           </Alert>
@@ -429,7 +429,7 @@ export function PublicSurveyResponse({ token }: PublicSurveyResponseProps) {
 
             <div className='flex flex-col gap-2 border-t pt-4 sm:flex-row sm:items-center sm:justify-between'>
               <p className='text-muted-foreground text-xs'>
-                Ao enviar, este link sera marcado como respondido.
+                Ao enviar, este link será marcado como respondido.
               </p>
               <Button
                 onClick={handleSubmit}

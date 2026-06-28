@@ -11,7 +11,7 @@ export default function CampaignsError({ error, reset }: CampaignsErrorProps) {
   return (
     <ModuleError
       pageTitle='Campanhas'
-      pageDescription='Nao foi possivel carregar campanhas ou steps.'
+      pageDescription='Não foi possível carregar campanhas ou steps.'
       error={error}
       reset={reset}
     />

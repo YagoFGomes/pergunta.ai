@@ -14,7 +14,7 @@ export default function NewCampaignPage() {
   return (
     <PageContainer
       pageTitle='Nova Campanha'
-      pageDescription='Wizard para criacao de campanha com formulario, lista, template e agendamento.'
+      pageDescription='Wizard para criação de campanha com formulário, lista, template e agendamento.'
       pageHeaderAction={
         <Link
           href='/dashboard/campaigns'

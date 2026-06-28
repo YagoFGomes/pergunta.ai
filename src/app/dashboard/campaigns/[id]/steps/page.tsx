@@ -20,7 +20,7 @@ export default async function CampaignStepsPage({ params }: CampaignStepsPagePro
   return (
     <PageContainer
       pageTitle='Steps da Campanha'
-      pageDescription='Sequencia de envios, templates, delays e condicoes.'
+      pageDescription='Sequência de envios, templates, delays e condições.'
       pageHeaderAction={
         <Link
           href={`/dashboard/campaigns/${id}`}

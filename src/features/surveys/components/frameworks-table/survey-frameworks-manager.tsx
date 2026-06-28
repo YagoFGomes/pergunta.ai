@@ -70,7 +70,7 @@ export function SurveyFrameworksManager() {
         setIsDialogOpen(false);
       },
       onError: () => {
-        toast.error('Nao foi possivel criar o framework.');
+        toast.error('Não foi possível criar o framework.');
       }
     }
   });
@@ -83,7 +83,7 @@ export function SurveyFrameworksManager() {
         setIsDialogOpen(false);
       },
       onError: () => {
-        toast.error('Nao foi possivel atualizar o framework.');
+        toast.error('Não foi possível atualizar o framework.');
       }
     }
   });
@@ -96,7 +96,7 @@ export function SurveyFrameworksManager() {
         setIsDialogOpen(false);
       },
       onError: () => {
-        toast.error('Nao foi possivel desativar o framework.');
+        toast.error('Não foi possível desativar o framework.');
       }
     }
   });
@@ -149,7 +149,7 @@ export function SurveyFrameworksManager() {
 
   function openEditDialog(framework: SurveyFramework) {
     if (framework.is_seed) {
-      toast.error('Framework seed nao pode ser editado neste perfil.');
+      toast.error('Framework seed não pode ser editado neste perfil.');
       return;
     }
 
@@ -166,7 +166,7 @@ export function SurveyFrameworksManager() {
 
   async function toggleActive(framework: SurveyFramework) {
     if (framework.is_seed) {
-      toast.error('Framework seed nao pode ser alterado neste perfil.');
+      toast.error('Framework seed não pode ser alterado neste perfil.');
       return;
     }
 
@@ -180,7 +180,7 @@ export function SurveyFrameworksManager() {
 
   function openDeactivateAsDeleteDialog(framework: SurveyFramework) {
     if (framework.is_seed) {
-      toast.error('Framework seed nao pode ser excluido.');
+      toast.error('Framework seed não pode ser excluido.');
       return;
     }
 
@@ -220,7 +220,7 @@ export function SurveyFrameworksManager() {
         <div className='space-y-1'>
           <h2 className='text-xl font-semibold'>Frameworks</h2>
           <p className='text-muted-foreground text-sm'>
-            Gerencie os frameworks de pesquisa disponiveis para os formularios.
+            Gerencie os frameworks de pesquisa disponíveis para os formulários.
           </p>
         </div>
         <Button onClick={openCreateDialog}>Novo framework</Button>
@@ -230,7 +230,7 @@ export function SurveyFrameworksManager() {
         <Alert variant='destructive'>
           <AlertTitle>Erro ao carregar frameworks</AlertTitle>
           <AlertDescription>
-            Nao foi possivel carregar os frameworks. Atualize a pagina e tente novamente.
+            Não foi possível carregar os frameworks. Atualize a página e tente novamente.
           </AlertDescription>
         </Alert>
       ) : null}
@@ -239,7 +239,7 @@ export function SurveyFrameworksManager() {
         <Alert>
           <AlertTitle>Nenhum framework encontrado</AlertTitle>
           <AlertDescription>
-            Crie o primeiro framework para comecar a organizar os formularios.
+            Crie o primeiro framework para começar a organizar os formulários.
           </AlertDescription>
         </Alert>
       ) : null}
@@ -274,7 +274,7 @@ export function SurveyFrameworksManager() {
                 ? 'Preencha os dados para criar um framework.'
                 : mode === 'edit'
                   ? 'Atualize os dados do framework selecionado.'
-                  : 'A API nao possui endpoint DELETE para frameworks. Esta acao vai desativar o registro.'}
+                  : 'A API não possui endpoint DELETE para frameworks. Esta ação vai desativar o registro.'}
             </DialogDescription>
           </DialogHeader>
 
@@ -331,7 +331,7 @@ export function SurveyFrameworksManager() {
                   <FormSwitchField
                     name='is_active'
                     label='Ativo'
-                    description='Frameworks inativos nao ficam disponiveis na criacao de formularios.'
+                    description='Frameworks inativos não ficam disponíveis na criação de formulários.'
                     validators={{
                       onBlur: surveyFrameworkFieldSchemas.is_active
                     }}
@@ -352,7 +352,7 @@ export function SurveyFrameworksManager() {
                   >
                     {([canSubmit, isSubmitting]) => (
                       <Button type='submit' disabled={!canSubmit || isSubmitting}>
-                        {mode === 'create' ? 'Criar framework' : 'Salvar alteracoes'}
+                        {mode === 'create' ? 'Criar framework' : 'Salvar alterações'}
                       </Button>
                     )}
                   </form.Subscribe>

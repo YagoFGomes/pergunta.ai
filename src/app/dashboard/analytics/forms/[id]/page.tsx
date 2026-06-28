@@ -14,8 +14,8 @@ export default async function FormAnalyticsPage({ params }: FormAnalyticsPagePro
 
   return (
     <PageContainer
-      pageTitle='Analytics do Formulario'
-      pageDescription='Metricas agregadas, indicadores e historico por formulario.'
+      pageTitle='Analytics do Formulário'
+      pageDescription='Métricas agregadas, indicadores e histórico por formulário.'
     >
       <AnalyticsDetail id={id} scope='form' />
     </PageContainer>

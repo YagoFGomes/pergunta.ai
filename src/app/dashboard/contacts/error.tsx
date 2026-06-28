@@ -11,7 +11,7 @@ export default function ContactsError({ error, reset }: ContactsErrorProps) {
   return (
     <ModuleError
       pageTitle='Contatos'
-      pageDescription='Nao foi possivel carregar listas ou contatos.'
+      pageDescription='Não foi possível carregar listas ou contatos.'
       error={error}
       reset={reset}
     />

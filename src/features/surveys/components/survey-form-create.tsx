@@ -86,10 +86,10 @@ function getFormDefaultValues(form?: Form): SurveyFormCreateValues {
 }
 
 function formatDateTime(value?: string) {
-  if (!value) return 'Data indisponivel';
+  if (!value) return 'Data indisponível';
 
   const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return 'Data indisponivel';
+  if (Number.isNaN(date.getTime())) return 'Data indisponível';
 
   return new Intl.DateTimeFormat('pt-BR', {
     day: '2-digit',
@@ -142,10 +142,10 @@ function SurveyFormEditor({ mode, initialForm }: SurveyFormEditorProps) {
           })
         ]);
 
-        notifySuccess('Formulario atualizado.');
+        notifySuccess('Formulário atualizado.');
       },
       onError: (error) => {
-        notifyError(error, 'Nao foi possivel atualizar o formulario.');
+        notifyError(error, 'Não foi possível atualizar o formulário.');
       }
     }
   });
@@ -159,7 +159,7 @@ function SurveyFormEditor({ mode, initialForm }: SurveyFormEditorProps) {
           queryKey: getSurveysFormsListQueryKey()
         });
 
-        notifySuccess('Formulario criado.', 'Agora configure as perguntas da pesquisa.');
+        notifySuccess('Formulário criado.', 'Agora configure as perguntas da pesquisa.');
         router.push(
           createdForm?.id
             ? `/dashboard/surveys/forms/${createdForm.id}/questions`
@@ -167,7 +167,7 @@ function SurveyFormEditor({ mode, initialForm }: SurveyFormEditorProps) {
         );
       },
       onError: (error) => {
-        notifyError(error, 'Nao foi possivel criar o formulario.');
+        notifyError(error, 'Não foi possível criar o formulário.');
       }
     }
   });
@@ -182,10 +182,10 @@ function SurveyFormEditor({ mode, initialForm }: SurveyFormEditorProps) {
             queryKey: getSurveysFormsRetrieveQueryKey(updated?.id ?? initialForm?.id)
           })
         ]);
-        notifySuccess('Formulario publicado.');
+        notifySuccess('Formulário publicado.');
       },
       onError: (error) => {
-        notifyError(error, 'Nao foi possivel publicar o formulario.');
+        notifyError(error, 'Não foi possível publicar o formulário.');
       }
     }
   });
@@ -200,10 +200,10 @@ function SurveyFormEditor({ mode, initialForm }: SurveyFormEditorProps) {
             queryKey: getSurveysFormsRetrieveQueryKey(updated?.id ?? initialForm?.id)
           })
         ]);
-        notifySuccess('Formulario arquivado.');
+        notifySuccess('Formulário arquivado.');
       },
       onError: (error) => {
-        notifyError(error, 'Nao foi possivel arquivar o formulario.');
+        notifyError(error, 'Não foi possível arquivar o formulário.');
       }
     }
   });
@@ -258,7 +258,7 @@ function SurveyFormEditor({ mode, initialForm }: SurveyFormEditorProps) {
         <ModuleErrorAlert
           error={frameworksQuery.error}
           title='Erro ao carregar frameworks'
-          fallbackMessage='Nao foi possivel carregar os frameworks disponiveis para este tenant.'
+          fallbackMessage='Não foi possível carregar os frameworks disponíveis para este tenant.'
         />
         <div>
           <Button variant='outline' onClick={() => frameworksQuery.refetch()}>
@@ -276,8 +276,8 @@ function SurveyFormEditor({ mode, initialForm }: SurveyFormEditorProps) {
         <AlertTitle>Nenhum framework ativo</AlertTitle>
         <AlertDescription className='space-y-3'>
           <p>
-            Este tenant ainda nao possui frameworks ativos para criar formularios. Ative ou crie um
-            framework antes de iniciar um novo formulario.
+            Este tenant ainda não possui frameworks ativos para criar formulários. Ative ou crie um
+            framework antes de iniciar um novo formulário.
           </p>
           <Link
             href='/dashboard/surveys/frameworks'
@@ -293,10 +293,10 @@ function SurveyFormEditor({ mode, initialForm }: SurveyFormEditorProps) {
   return (
     <>
       <ModuleFormCard
-        title={isEdit ? 'Editar metadados' : 'Dados do formulario'}
+        title={isEdit ? 'Editar metadados' : 'Dados do formulário'}
         description={
           isEdit
-            ? 'Atualize as informacoes principais do formulario.'
+            ? 'Atualize as informações principais do formulário.'
             : 'Crie o rascunho inicial. As perguntas serao configuradas na proxima tela.'
         }
         footer={
@@ -304,7 +304,7 @@ function SurveyFormEditor({ mode, initialForm }: SurveyFormEditorProps) {
             mode={isEdit ? 'edit' : 'create'}
             formId={formId}
             isPending={isPending}
-            submitLabel={isEdit ? 'Salvar alteracoes' : 'Criar formulario'}
+            submitLabel={isEdit ? 'Salvar alterações' : 'Criar formulário'}
             onCancel={() => router.push('/dashboard/surveys/forms')}
           />
         }
@@ -315,7 +315,7 @@ function SurveyFormEditor({ mode, initialForm }: SurveyFormEditorProps) {
               <Icons.info className='h-4 w-4' />
               <AlertTitle>Status atual: {initialForm.status ?? 'Sem status'}</AlertTitle>
               <AlertDescription>
-                Criado em {formatDateTime(initialForm.created_at)}. Ultima atualizacao em{' '}
+                Criado em {formatDateTime(initialForm.created_at)}. Última atualização em{' '}
                 {formatDateTime(initialForm.updated_at)}.
               </AlertDescription>
             </Alert>
@@ -351,8 +351,8 @@ function SurveyFormEditor({ mode, initialForm }: SurveyFormEditorProps) {
         <form.AppForm>
           <form.Form id={formId} className='space-y-8 p-0 md:p-0'>
             <ModuleFormSection
-              title='Configuracao base'
-              description='Escolha o framework e defina como este formulario aparecera no dashboard.'
+              title='Configuração base'
+              description='Escolha o framework e defina como este formulário aparecera no dashboard.'
             >
               <FormSelectField
                 name='framework'
@@ -369,7 +369,7 @@ function SurveyFormEditor({ mode, initialForm }: SurveyFormEditorProps) {
                 name='title'
                 label='Titulo'
                 required
-                placeholder='Ex.: Pesquisa de satisfacao pos-atendimento'
+                placeholder='Ex.: Pesquisa de satisfação pós-atendimento'
                 maxLength={255}
                 validators={{
                   onBlur: surveyFormCreateFieldSchemas.title
@@ -386,7 +386,7 @@ function SurveyFormEditor({ mode, initialForm }: SurveyFormEditorProps) {
               <FormTextareaField
                 name='description'
                 label='Descricao'
-                placeholder='Explique o objetivo deste formulario.'
+                placeholder='Explique o objetivo deste formulário.'
                 maxLength={2000}
                 rows={5}
                 validators={{
@@ -405,12 +405,12 @@ function SurveyFormEditor({ mode, initialForm }: SurveyFormEditorProps) {
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>
-              {confirmAction === 'publish' ? 'Publicar formulario?' : 'Arquivar formulario?'}
+              {confirmAction === 'publish' ? 'Publicar formulário?' : 'Arquivar formulário?'}
             </AlertDialogTitle>
             <AlertDialogDescription>
               {confirmAction === 'publish'
-                ? 'O formulario sera publicado e ficara disponivel para uso em campanhas. O formulario deve ter ao menos uma pergunta para ser publicado.'
-                : 'O formulario sera arquivado e nao podera mais ser usado em novas campanhas. Esta acao nao pode ser desfeita.'}
+                ? 'O formulário será publicado e ficara disponível para uso em campanhas. O formulário deve ter ao menos uma pergunta para ser publicado.'
+                : 'O formulário será arquivado e não podera mais ser usado em novas campanhas. Esta ação não pode ser desfeita.'}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
@@ -447,8 +447,8 @@ export function SurveyFormEdit({ formId }: SurveyFormEditProps) {
       <div className='grid gap-4'>
         <ModuleErrorAlert
           error={formQuery.error}
-          title='Erro ao carregar formulario'
-          fallbackMessage='Nao foi possivel carregar os dados deste formulario.'
+          title='Erro ao carregar formulário'
+          fallbackMessage='Não foi possível carregar os dados deste formulário.'
         />
         <div>
           <Button variant='outline' onClick={() => formQuery.refetch()}>
@@ -462,8 +462,8 @@ export function SurveyFormEdit({ formId }: SurveyFormEditProps) {
   if (!surveyForm) {
     return (
       <ModuleErrorAlert
-        title='Formulario nao encontrado'
-        message='Nao encontramos dados para este formulario.'
+        title='Formulário não encontrado'
+        message='Não encontramos dados para este formulário.'
       />
     );
   }

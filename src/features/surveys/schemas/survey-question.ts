@@ -30,7 +30,7 @@ export const surveyQuestionCreateFieldSchemas = {
 
 export const surveyQuestionTypeOptions = [
   { value: QuestionTypeEnum.TEXT, label: 'Texto livre' },
-  { value: QuestionTypeEnum.SINGLE_CHOICE, label: 'Escolha unica' },
+  { value: QuestionTypeEnum.SINGLE_CHOICE, label: 'Escolha única' },
   { value: QuestionTypeEnum.MULTIPLE_CHOICE, label: 'Multiplas escolhas' },
   { value: QuestionTypeEnum.SCALE_1_5, label: 'Escala 1 a 5' },
   { value: QuestionTypeEnum.SCALE_0_10, label: 'Escala 0 a 10' }

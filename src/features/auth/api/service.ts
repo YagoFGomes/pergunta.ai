@@ -126,9 +126,9 @@ export async function onboardTenant(data: TrialTenantOnboarding): Promise<void> 
 
 /**
  * Re-issues a fresh JWT pair re-reading the user's tenant memberships from the DB.
- * Must be called after onboarding so the new tenant_id claim is included in the tokens.
+ * Must be called after onboarding só the new tenant_id claim is included in the tokens.
  * Uses POST /api/auth/refresh-claims/ which is in TenantMiddleware public_paths,
- * so it works even when the current token has tenant_id: null.
+ * só it works even when the current token has tenant_id: null.
  */
 export async function refreshClaims(): Promise<void> {
   const result = (await authRefreshClaimsCreate()) as unknown as {

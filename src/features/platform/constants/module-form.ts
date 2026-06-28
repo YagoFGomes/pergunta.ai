@@ -1,6 +1,6 @@
 export const MODULE_FORM_ACTION_LABELS = {
   create: 'Criar',
-  edit: 'Salvar alteracoes',
+  edit: 'Salvar alterações',
   cancel: 'Cancelar'
 } as const;
 

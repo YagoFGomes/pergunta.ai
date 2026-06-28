@@ -93,9 +93,9 @@ export function EmailTemplatePreview({ template }: EmailTemplatePreviewProps) {
         {requiredVariables.length === 0 ? (
           <Alert>
             <Icons.info className='h-4 w-4' />
-            <AlertTitle>Sem variaveis obrigatorias</AlertTitle>
+            <AlertTitle>Sem variáveis obrigatórias</AlertTitle>
             <AlertDescription>
-              Este template nao declarou variaveis. O preview pode ser renderizado diretamente.
+              Este template não declarou variáveis. O preview pode ser renderizado diretamente.
             </AlertDescription>
           </Alert>
         ) : (
@@ -130,8 +130,8 @@ export function EmailTemplatePreview({ template }: EmailTemplatePreviewProps) {
             <AlertTitle>Erro ao gerar preview</AlertTitle>
             <AlertDescription>
               {missingVariables.length > 0
-                ? `Preencha as variaveis: ${missingVariables.join(', ')}.`
-                : getErrorMessage(previewMutation.error, 'Nao foi possivel renderizar o preview.')}
+                ? `Preencha as variáveis: ${missingVariables.join(', ')}.`
+                : getErrorMessage(previewMutation.error, 'Não foi possível renderizar o preview.')}
             </AlertDescription>
           </Alert>
         ) : null}
@@ -151,7 +151,7 @@ export function EmailTemplatePreview({ template }: EmailTemplatePreviewProps) {
                 className='bg-background min-h-32 rounded-md border p-4 text-sm'
                 // Backend sanitizes template HTML before saving; preview reflects saved content.
                 dangerouslySetInnerHTML={{
-                  __html: preview.html_content || '<p>Sem conteudo HTML renderizado</p>'
+                  __html: preview.html_content || '<p>Sem conteúdo HTML renderizado</p>'
                 }}
               />
             </div>

@@ -1,12 +1,12 @@
 import type { InfobarContent } from '@/components/ui/infobar';
 
 export const usersInfoContent: InfobarContent = {
-  title: 'Users — React Query + nuqs Pattern',
+  title: 'Users â€” React Query + nuqs Pattern',
   sections: [
     {
       title: 'Overview',
       description:
-        'This page demonstrates client-side data fetching with React Query combined with nuqs URL search params — as an alternative to the Products page which uses server-side RSC fetching. Both patterns use the same DataTable, useDataTable hook, and nuqs URL state.',
+        'This page demonstrates client-side data fetching with React Query combined with nuqs URL search params â€” as an alternative to the Products page which uses server-side RSC fetching. Both patterns use the same DataTable, useDataTable hook, and nuqs URL state.',
       links: [
         {
           title: 'TanStack Query SSR Docs',
@@ -17,7 +17,7 @@ export const usersInfoContent: InfobarContent = {
     {
       title: 'Server Prefetch + Client Hydration',
       description:
-        'The server component reads search params via searchParamsCache, builds filters, and calls queryClient.prefetchQuery(). The dehydrated state is passed to HydrationBoundary so the client starts with cached data. The client component reads the same search params via useQueryState and calls useSuspenseQuery with matching filters.',
+        'The server component reads search params via searchParamsCache, builds filters, and calls queryClient.prefetchQuery(). The dehydrated state is passed to HydrationBoundary só the client starts with cached data. The client component reads the same search params via useQueryState and calls useSuspenseQuery with matching filters.',
       links: []
     },
     {
@@ -34,7 +34,7 @@ export const usersInfoContent: InfobarContent = {
     {
       title: 'Products vs Users Pattern',
       description:
-        'Products: searchParams → RSC fetch → pass data as props to client table. Users: searchParams → server prefetch → HydrationBoundary → client useSuspenseQuery. The Users pattern enables background refetching, cache sharing across components, and optimistic mutations.',
+        'Products: searchParams â†’ RSC fetch â†’ pass data as props to client table. Users: searchParams â†’ server prefetch â†’ HydrationBoundary â†’ client useSuspenseQuery. The Users pattern enables background refetching, cache sharing across components, and optimistic mutations.',
       links: []
     }
   ]

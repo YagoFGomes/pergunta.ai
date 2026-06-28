@@ -11,7 +11,7 @@ export default function EmailTemplatesError({ error, reset }: EmailTemplatesErro
   return (
     <ModuleError
       pageTitle='Templates de Email'
-      pageDescription='Nao foi possivel carregar templates de email.'
+      pageDescription='Não foi possível carregar templates de email.'
       error={error}
       reset={reset}
     />

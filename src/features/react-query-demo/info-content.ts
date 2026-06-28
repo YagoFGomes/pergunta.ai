@@ -6,7 +6,7 @@ export const reactQueryInfoContent: InfobarContent = {
     {
       title: 'Server Prefetch',
       description:
-        'Data is prefetched on the server using getQueryClient().prefetchQuery(). The dehydrated state is passed to HydrationBoundary so the client starts with cached data — no loading spinners on first load.',
+        'Data is prefetched on the server using getQueryClient().prefetchQuery(). The dehydrated state is passed to HydrationBoundary só the client starts with cached data â€” no loading spinners on first load.',
       links: [
         {
           title: 'TanStack Query SSR Docs',
@@ -28,7 +28,7 @@ export const reactQueryInfoContent: InfobarContent = {
     {
       title: 'Suspense Query',
       description:
-        'The client uses useSuspenseQuery() which integrates with React Suspense. Combined with server prefetch, data is available immediately — Suspense only shows the fallback on subsequent navigations if the cache is stale.',
+        'The client uses useSuspenseQuery() which integrates with React Suspense. Combined with server prefetch, data is available immediately â€” Suspense only shows the fallback on subsequent navigations if the cache is stale.',
       links: []
     },
     {

@@ -9,7 +9,7 @@ export default function ContactListsPage() {
   return (
     <PageContainer
       pageTitle='Listas de Contatos'
-      pageDescription='Gerencie as listas de destinatarios para uso nas campanhas de pesquisa.'
+      pageDescription='Gerencie as listas de destinatários para uso nas campanhas de pesquisa.'
     >
       <ContactListsManager />
     </PageContainer>

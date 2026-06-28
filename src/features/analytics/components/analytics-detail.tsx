@@ -108,7 +108,7 @@ function MetricCard({
       </CardHeader>
       <CardContent className='border-t pt-4'>
         <p className='text-muted-foreground text-xs'>
-          {getMetricHistoryByType(metrics, type).length} registros no historico filtrado
+          {getMetricHistoryByType(metrics, type).length} registros no histórico filtrado
         </p>
       </CardContent>
     </Card>
@@ -121,9 +121,9 @@ function MetricsHistoryTable({ metrics }: { metrics: MetricResult[] }) {
       <div className='flex min-h-[220px] flex-col items-center justify-center gap-3 rounded-md border border-dashed p-6 text-center'>
         <Icons.trendingUp className='text-muted-foreground size-8' />
         <div className='space-y-1'>
-          <h3 className='font-medium'>Sem historico para o filtro atual</h3>
+          <h3 className='font-medium'>Sem histórico para o filtro atual</h3>
           <p className='text-muted-foreground max-w-md text-sm'>
-            Ajuste o periodo ou aguarde novos calculos de metricas para este escopo.
+            Ajuste o período ou aguarde novos calculos de métricas para este escopo.
           </p>
         </div>
       </div>
@@ -137,8 +137,8 @@ function MetricsHistoryTable({ metrics }: { metrics: MetricResult[] }) {
           <TableRow>
             <TableHead>Indicador</TableHead>
             <TableHead>Valor</TableHead>
-            <TableHead>Periodo</TableHead>
-            <TableHead>Formulario</TableHead>
+            <TableHead>Período</TableHead>
+            <TableHead>Formulário</TableHead>
             <TableHead>Campanha</TableHead>
           </TableRow>
         </TableHeader>
@@ -197,7 +197,7 @@ export function AnalyticsDetail({ id, scope }: AnalyticsDetailProps) {
         <ModuleErrorAlert
           error={detailQuery.error}
           title='Erro ao carregar analytics'
-          fallbackMessage='Nao foi possivel carregar os detalhes de analytics.'
+          fallbackMessage='Não foi possível carregar os detalhes de analytics.'
         />
         <Button variant='outline' onClick={() => detailQuery.refetch()}>
           Tentar novamente
@@ -212,8 +212,8 @@ export function AnalyticsDetail({ id, scope }: AnalyticsDetailProps) {
         <CardHeader className='flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between'>
           <div className='space-y-2'>
             <div className='flex flex-wrap items-center gap-2'>
-              <Badge variant='secondary'>{scope === 'campaign' ? 'Campanha' : 'Formulario'}</Badge>
-              {latestPeriod ? <Badge variant='outline'>Ultimo periodo {latestPeriod}</Badge> : null}
+              <Badge variant='secondary'>{scope === 'campaign' ? 'Campanha' : 'Formulário'}</Badge>
+              {latestPeriod ? <Badge variant='outline'>Último período {latestPeriod}</Badge> : null}
             </div>
             <CardTitle className='text-xl'>{title}</CardTitle>
             <CardDescription className='font-mono text-xs'>{entityId ?? id}</CardDescription>
@@ -227,7 +227,7 @@ export function AnalyticsDetail({ id, scope }: AnalyticsDetailProps) {
               }
               className={cn(buttonVariants({ variant: 'outline' }), 'text-xs md:text-sm')}
             >
-              {scope === 'campaign' ? 'Ver campanha' : 'Ver formulario'}
+              {scope === 'campaign' ? 'Ver campanha' : 'Ver formulário'}
             </Link>
             {scope === 'campaign' ? (
               <Link
@@ -264,7 +264,7 @@ export function AnalyticsDetail({ id, scope }: AnalyticsDetailProps) {
       <Card>
         <CardContent className='flex flex-col gap-4 p-4 md:flex-row md:items-end md:justify-between'>
           <div className='grid gap-2'>
-            <Label htmlFor='analytics-detail-period'>Periodo</Label>
+            <Label htmlFor='analytics-detail-period'>Período</Label>
             <div className='flex flex-col gap-2 sm:flex-row'>
               <Input
                 id='analytics-detail-period'
@@ -294,9 +294,9 @@ export function AnalyticsDetail({ id, scope }: AnalyticsDetailProps) {
 
       {totalMetrics === 0 ? (
         <Alert>
-          <AlertTitle>Sem metricas calculadas</AlertTitle>
+          <AlertTitle>Sem métricas calculadas</AlertTitle>
           <AlertDescription>
-            Este escopo ainda nao possui NPS, CSAT, CES ou CSI gerados no backend.
+            Este escopo ainda não possui NPS, CSAT, CES ou CSI gerados no backend.
           </AlertDescription>
         </Alert>
       ) : null}
@@ -314,10 +314,10 @@ export function AnalyticsDetail({ id, scope }: AnalyticsDetailProps) {
 
       <Card>
         <CardHeader>
-          <CardTitle className='text-base'>Historico de metricas</CardTitle>
+          <CardTitle className='text-base'>Histórico de métricas</CardTitle>
           <CardDescription>
             Registros retornados pelo backend para{' '}
-            {scope === 'campaign' ? 'esta campanha' : 'este formulario'}.
+            {scope === 'campaign' ? 'esta campanha' : 'este formulário'}.
           </CardDescription>
         </CardHeader>
         <CardContent>

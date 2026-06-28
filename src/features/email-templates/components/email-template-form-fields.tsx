@@ -105,7 +105,7 @@ export function EmailTemplateFormFields({ disabled = false }: EmailTemplateFormF
       <div className='grid gap-4 md:grid-cols-[1fr_160px]'>
         <FormTextField
           name='requiredVariablesText'
-          label='Variaveis obrigatorias'
+          label='Variáveis obrigatórias'
           placeholder='contact_name, survey_link'
           validators={{
             onBlur: emailTemplateFieldSchemas.requiredVariablesText

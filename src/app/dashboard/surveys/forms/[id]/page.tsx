@@ -7,7 +7,7 @@ import { SurveyFormEdit } from '@/features/surveys/components/survey-form-create
 import { cn } from '@/lib/utils';
 
 export const metadata = {
-  title: 'Dashboard: Editar formulario'
+  title: 'Dashboard: Editar formulário'
 };
 
 type SurveyFormPageProps = {
@@ -19,8 +19,8 @@ export default async function SurveyFormPage({ params }: SurveyFormPageProps) {
 
   return (
     <PageContainer
-      pageTitle='Editar formulario'
-      pageDescription='Atualize framework, titulo e descricao do formulario.'
+      pageTitle='Editar formulário'
+      pageDescription='Atualize framework, titulo e descricao do formulário.'
       pageHeaderAction={
         <div className='flex flex-wrap items-center justify-end gap-2'>
           <Link

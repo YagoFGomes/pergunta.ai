@@ -4,8 +4,8 @@ import { toast } from 'sonner';
 
 import { getErrorMessage } from '@/features/platform/lib/api-error';
 
-const DEFAULT_SUCCESS_MESSAGE = 'Operacao concluida.';
-const DEFAULT_ERROR_MESSAGE = 'Nao foi possivel concluir a acao.';
+const DEFAULT_SUCCESS_MESSAGE = 'Operação concluida.';
+const DEFAULT_ERROR_MESSAGE = 'Não foi possível concluir a ação.';
 
 export type ModuleMutationFeedbackMessages = {
   success?: string;

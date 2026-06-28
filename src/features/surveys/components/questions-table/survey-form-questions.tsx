@@ -92,7 +92,7 @@ function SurveyQuestionsEmptyState() {
       <div className='space-y-1'>
         <h2 className='text-lg font-semibold'>Nenhuma pergunta cadastrada</h2>
         <p className='text-muted-foreground max-w-md text-sm'>
-          Adicione a primeira pergunta para comecar a montar este formulario de pesquisa.
+          Adicione a primeira pergunta para começar a montar este formulário de pesquisa.
         </p>
       </div>
     </div>
@@ -138,7 +138,7 @@ export function SurveyFormQuestions({ formId }: SurveyFormQuestionsProps) {
         notifySuccess('Pergunta criada.');
       },
       onError: (error) => {
-        notifyError(error, 'Nao foi possivel criar a pergunta.');
+        notifyError(error, 'Não foi possível criar a pergunta.');
       }
     }
   });
@@ -158,7 +158,7 @@ export function SurveyFormQuestions({ formId }: SurveyFormQuestionsProps) {
         setEditQuestion(null);
       },
       onError: (error) => {
-        notifyError(error, 'Nao foi possivel atualizar a pergunta.');
+        notifyError(error, 'Não foi possível atualizar a pergunta.');
       }
     }
   });
@@ -174,7 +174,7 @@ export function SurveyFormQuestions({ formId }: SurveyFormQuestionsProps) {
         setDeleteQuestion(null);
       },
       onError: (error) => {
-        notifyError(error, 'Nao foi possivel remover a pergunta.');
+        notifyError(error, 'Não foi possível remover a pergunta.');
       }
     }
   });
@@ -189,7 +189,7 @@ export function SurveyFormQuestions({ formId }: SurveyFormQuestionsProps) {
         notifySuccess('Ordem das perguntas atualizada.');
       },
       onError: (error) => {
-        notifyError(error, 'Nao foi possivel reordenar as perguntas.');
+        notifyError(error, 'Não foi possível reordenar as perguntas.');
       }
     }
   });
@@ -207,7 +207,7 @@ export function SurveyFormQuestions({ formId }: SurveyFormQuestionsProps) {
         notifySuccess('Opcao criada.');
       },
       onError: (error) => {
-        notifyError(error, 'Nao foi possivel criar a opcao.');
+        notifyError(error, 'Não foi possível criar a opção.');
       }
     }
   });
@@ -224,7 +224,7 @@ export function SurveyFormQuestions({ formId }: SurveyFormQuestionsProps) {
         notifySuccess('Opcao atualizada.');
       },
       onError: (error) => {
-        notifyError(error, 'Nao foi possivel atualizar a opcao.');
+        notifyError(error, 'Não foi possível atualizar a opção.');
       }
     }
   });
@@ -241,7 +241,7 @@ export function SurveyFormQuestions({ formId }: SurveyFormQuestionsProps) {
         notifySuccess('Opcao removida.');
       },
       onError: (error) => {
-        notifyError(error, 'Nao foi possivel remover a opcao.');
+        notifyError(error, 'Não foi possível remover a opção.');
       }
     }
   });
@@ -363,7 +363,7 @@ export function SurveyFormQuestions({ formId }: SurveyFormQuestionsProps) {
     const value = newOptionValue.trim();
 
     if (!label || !value) {
-      notifyError(new Error('Opcao invalida.'), 'Informe label e value da opcao.');
+      notifyError(new Error('Opcao invalida.'), 'Informe label e value da opção.');
       return;
     }
 
@@ -384,7 +384,7 @@ export function SurveyFormQuestions({ formId }: SurveyFormQuestionsProps) {
     const value = editOptionValue.trim();
 
     if (!label || !value) {
-      notifyError(new Error('Opcao invalida.'), 'Informe label e value da opcao.');
+      notifyError(new Error('Opcao invalida.'), 'Informe label e value da opção.');
       return;
     }
 
@@ -490,7 +490,7 @@ export function SurveyFormQuestions({ formId }: SurveyFormQuestionsProps) {
         <ModuleErrorAlert
           error={questionsQuery.error}
           title='Erro ao carregar perguntas'
-          fallbackMessage='Nao foi possivel carregar as perguntas deste formulario.'
+          fallbackMessage='Não foi possível carregar as perguntas deste formulário.'
         />
         <div>
           <Button variant='outline' onClick={() => questionsQuery.refetch()}>
@@ -505,7 +505,7 @@ export function SurveyFormQuestions({ formId }: SurveyFormQuestionsProps) {
     <div className='grid gap-6'>
       <ModuleFormCard
         title='Nova pergunta'
-        description='Cadastre perguntas para compor o formulario. Reordenacao e opcoes entram nas proximas tarefas.'
+        description='Cadastre perguntas para compor o formulário. Reordenação e opções entram nas próximas tarefas.'
         footer={
           <ModuleFormActions
             mode='create'
@@ -518,9 +518,9 @@ export function SurveyFormQuestions({ formId }: SurveyFormQuestionsProps) {
         }
       >
         <div className='flex flex-wrap items-center gap-2'>
-          <Badge variant='outline'>Formulario: {formDetails?.title ?? formId}</Badge>
+          <Badge variant='outline'>Formulário: {formDetails?.title ?? formId}</Badge>
           <Badge variant='outline'>Total: {questions.length} perguntas</Badge>
-          {isFormArchived ? <Badge variant='outline'>Formulario arquivado</Badge> : null}
+          {isFormArchived ? <Badge variant='outline'>Formulário arquivado</Badge> : null}
         </div>
 
         <form.AppForm>
@@ -534,7 +534,7 @@ export function SurveyFormQuestions({ formId }: SurveyFormQuestionsProps) {
                 label='Pergunta'
                 required
                 maxLength={255}
-                placeholder='Ex.: Como voce avalia o atendimento recebido?'
+                placeholder='Ex.: Como você avalia o atendimento recebido?'
                 validators={{
                   onBlur: surveyQuestionCreateFieldSchemas.label
                 }}
@@ -560,8 +560,8 @@ export function SurveyFormQuestions({ formId }: SurveyFormQuestionsProps) {
             >
               <FormSwitchField
                 name='is_required'
-                label='Resposta obrigatoria'
-                description='Quando ativado, o envio so sera permitido com esta pergunta respondida.'
+                label='Resposta obrigatória'
+                description='Quando ativado, o envio só será permitido com esta pergunta respondida.'
                 validators={{
                   onBlur: surveyQuestionCreateFieldSchemas.is_required
                 }}
@@ -570,8 +570,8 @@ export function SurveyFormQuestions({ formId }: SurveyFormQuestionsProps) {
 
             {isFormArchived ? (
               <ModuleErrorAlert
-                title='Formulario arquivado'
-                message='Nao e permitido criar, editar ou remover perguntas em formulario arquivado.'
+                title='Formulário arquivado'
+                message='Não e permitido criar, editar ou remover perguntas em formulário arquivado.'
               />
             ) : null}
           </form.Form>
@@ -592,7 +592,7 @@ export function SurveyFormQuestions({ formId }: SurveyFormQuestionsProps) {
                 </Badge>
               ) : null}
               {hasOrderChanges ? <Badge variant='outline'>Ordem alterada</Badge> : null}
-              {isFormArchived ? <Badge variant='outline'>Reordenacao bloqueada</Badge> : null}
+              {isFormArchived ? <Badge variant='outline'>Reordenação bloqueada</Badge> : null}
               <Badge variant='outline'>{questions.length} perguntas</Badge>
               <Button
                 type='button'
@@ -601,7 +601,7 @@ export function SurveyFormQuestions({ formId }: SurveyFormQuestionsProps) {
                 onClick={() => setOrderedQuestionIds(currentOrderIds)}
                 disabled={!hasOrderChanges || isMutating}
               >
-                Descartar alteracoes
+                Descartar alterações
               </Button>
               <Button
                 type='button'
@@ -631,23 +631,23 @@ export function SurveyFormQuestions({ formId }: SurveyFormQuestionsProps) {
       >
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Gerenciar opcoes da pergunta</DialogTitle>
+            <DialogTitle>Gerenciar opções da pergunta</DialogTitle>
             <DialogDescription>
               {manageOptionsQuestion
                 ? `Pergunta: ${manageOptionsQuestion.label}`
-                : 'Selecione uma pergunta para gerenciar opcoes.'}
+                : 'Selecione uma pergunta para gerenciar opções.'}
             </DialogDescription>
           </DialogHeader>
 
           {!supportsQuestionOptions(manageOptionsQuestion) ? (
             <ModuleErrorAlert
-              title='Pergunta sem opcoes'
-              message='Somente perguntas de escolha unica ou multipla possuem opcoes.'
+              title='Pergunta sem opções'
+              message='Somente perguntas de escolha única ou múltipla possuem opções.'
             />
           ) : (
             <div className='grid gap-4'>
               <div className='grid gap-3 rounded-md border p-3'>
-                <h4 className='text-sm font-semibold'>Nova opcao</h4>
+                <h4 className='text-sm font-semibold'>Nova opção</h4>
                 <div className='grid gap-2'>
                   <Label htmlFor='option-label'>Label</Label>
                   <Input
@@ -676,14 +676,14 @@ export function SurveyFormQuestions({ formId }: SurveyFormQuestionsProps) {
                     isLoading={optionCreateMutation.isPending}
                     disabled={isFormArchived}
                   >
-                    Adicionar opcao
+                    Adicionar opção
                   </Button>
                 </div>
               </div>
 
               {editingOption ? (
                 <div className='grid gap-3 rounded-md border p-3'>
-                  <h4 className='text-sm font-semibold'>Editar opcao</h4>
+                  <h4 className='text-sm font-semibold'>Editar opção</h4>
                   <div className='grid gap-2'>
                     <Label htmlFor='edit-option-label'>Label</Label>
                     <Input
@@ -718,7 +718,7 @@ export function SurveyFormQuestions({ formId }: SurveyFormQuestionsProps) {
                       onClick={() => void handleUpdateOption()}
                       isLoading={optionUpdateMutation.isPending}
                     >
-                      Salvar opcao
+                      Salvar opção
                     </Button>
                   </div>
                 </div>
@@ -729,12 +729,12 @@ export function SurveyFormQuestions({ formId }: SurveyFormQuestionsProps) {
               ) : optionsQuery.isError ? (
                 <ModuleErrorAlert
                   error={optionsQuery.error}
-                  title='Erro ao carregar opcoes'
-                  fallbackMessage='Nao foi possivel carregar as opcoes desta pergunta.'
+                  title='Erro ao carregar opções'
+                  fallbackMessage='Não foi possível carregar as opções desta pergunta.'
                 />
               ) : questionOptions.length === 0 ? (
                 <div className='text-muted-foreground rounded-md border border-dashed p-4 text-sm'>
-                  Nenhuma opcao cadastrada para esta pergunta.
+                  Nenhuma opção cadastrada para esta pergunta.
                 </div>
               ) : (
                 <ul className='space-y-2'>
@@ -756,7 +756,7 @@ export function SurveyFormQuestions({ formId }: SurveyFormQuestionsProps) {
                           size='icon'
                           onClick={() => setEditingOption(option)}
                           disabled={isFormArchived || optionDeleteMutation.isPending}
-                          aria-label='Editar opcao'
+                          aria-label='Editar opção'
                         >
                           <Icons.edit className='h-4 w-4' />
                         </Button>
@@ -767,7 +767,7 @@ export function SurveyFormQuestions({ formId }: SurveyFormQuestionsProps) {
                           className='text-destructive hover:text-destructive'
                           onClick={() => setDeleteOption(option)}
                           disabled={isFormArchived || optionDeleteMutation.isPending}
-                          aria-label='Remover opcao'
+                          aria-label='Remover opção'
                         >
                           <Icons.trash className='h-4 w-4' />
                         </Button>
@@ -779,8 +779,8 @@ export function SurveyFormQuestions({ formId }: SurveyFormQuestionsProps) {
 
               {isFormArchived ? (
                 <ModuleErrorAlert
-                  title='Formulario arquivado'
-                  message='Nao e permitido criar, editar ou remover opcoes em formulario arquivado.'
+                  title='Formulário arquivado'
+                  message='Não e permitido criar, editar ou remover opções em formulário arquivado.'
                 />
               ) : null}
             </div>
@@ -835,7 +835,7 @@ export function SurveyFormQuestions({ formId }: SurveyFormQuestionsProps) {
 
               <FormSwitchField
                 name='is_required'
-                label='Resposta obrigatoria'
+                label='Resposta obrigatória'
                 validators={{
                   onBlur: surveyQuestionCreateFieldSchemas.is_required
                 }}
@@ -853,7 +853,7 @@ export function SurveyFormQuestions({ formId }: SurveyFormQuestionsProps) {
               Cancelar
             </Button>
             <Button type='submit' form={EDIT_QUESTION_FORM_ID} isLoading={updateMutation.isPending}>
-              Salvar alteracoes
+              Salvar alterações
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -867,7 +867,7 @@ export function SurveyFormQuestions({ formId }: SurveyFormQuestionsProps) {
           <AlertDialogHeader>
             <AlertDialogTitle>Remover pergunta?</AlertDialogTitle>
             <AlertDialogDescription>
-              Esta acao remove definitivamente a pergunta selecionada do formulario.
+              Esta ação remove definitivamente a pergunta selecionada do formulário.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
@@ -894,9 +894,9 @@ export function SurveyFormQuestions({ formId }: SurveyFormQuestionsProps) {
       >
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Remover opcao?</AlertDialogTitle>
+            <AlertDialogTitle>Remover opção?</AlertDialogTitle>
             <AlertDialogDescription>
-              Esta acao remove a opcao selecionada desta pergunta.
+              Esta ação remove a opção selecionada desta pergunta.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

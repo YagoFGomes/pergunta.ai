@@ -7,21 +7,21 @@ import { SurveyFormsTable } from '@/features/surveys/components/forms-table/surv
 import { cn } from '@/lib/utils';
 
 export const metadata = {
-  title: 'Dashboard: Formularios'
+  title: 'Dashboard: Formulários'
 };
 
 export default function SurveyFormsPage() {
   return (
     <PageContainer
-      pageTitle='Formularios de pesquisa'
-      pageDescription='Listagem, status e filtros dos formularios do tenant.'
+      pageTitle='Formulários de pesquisa'
+      pageDescription='Listagem, status e filtros dos formulários do tenant.'
       pageHeaderAction={
         <Link
           href='/dashboard/surveys/forms/new'
           className={cn(buttonVariants(), 'text-xs md:text-sm')}
         >
           <Icons.add className='mr-2 h-4 w-4' />
-          Novo formulario
+          Novo formulário
         </Link>
       }
     >

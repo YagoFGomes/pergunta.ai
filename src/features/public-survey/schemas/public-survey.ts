@@ -41,13 +41,13 @@ export function isPublicQuestionMissingOptions(question: PublicFormQuestion) {
 
 export function getPublicQuestionRequiredMessage(question: PublicFormQuestion) {
   if (isPublicQuestionMissingOptions(question)) {
-    return 'Esta pergunta obrigatoria ainda nao tem opcoes cadastradas.';
+    return 'Esta pergunta obrigatória ainda não tem opções cadastradas.';
   }
 
   if (question.question_type === QuestionTypeEnum.TEXT) return 'Preencha esta resposta.';
   if (question.question_type === QuestionTypeEnum.MULTIPLE_CHOICE)
-    return 'Selecione ao menos uma opcao.';
-  if (question.question_type === QuestionTypeEnum.SINGLE_CHOICE) return 'Selecione uma opcao.';
+    return 'Selecione ao menos uma opção.';
+  if (question.question_type === QuestionTypeEnum.SINGLE_CHOICE) return 'Selecione uma opção.';
   return 'Selecione uma nota.';
 }
 

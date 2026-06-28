@@ -33,10 +33,10 @@ import type { EmailTemplate } from '@/lib/api/generated/model/emailTemplate';
 const EDIT_EMAIL_TEMPLATE_FORM_ID = 'email-template-edit';
 
 function formatDateTime(value?: string) {
-  if (!value) return 'Data indisponivel';
+  if (!value) return 'Data indisponível';
 
   const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return 'Data indisponivel';
+  if (Number.isNaN(date.getTime())) return 'Data indisponível';
 
   return new Intl.DateTimeFormat('pt-BR', {
     day: '2-digit',
@@ -70,7 +70,7 @@ function EmailTemplateEditor({ template }: EmailTemplateEditorProps) {
         notifySuccess('Template atualizado.');
       },
       onError: (error) => {
-        notifyError(error, 'Nao foi possivel atualizar o template.');
+        notifyError(error, 'Não foi possível atualizar o template.');
       }
     }
   });
@@ -92,7 +92,7 @@ function EmailTemplateEditor({ template }: EmailTemplateEditorProps) {
       const missingVariables = getMissingRequiredVariableDeclarations(normalized);
 
       if (missingVariables.length > 0) {
-        toast.error(`Declare as variaveis usadas no template: ${missingVariables.join(', ')}.`);
+        toast.error(`Declare as variáveis usadas no template: ${missingVariables.join(', ')}.`);
         return;
       }
 
@@ -109,13 +109,13 @@ function EmailTemplateEditor({ template }: EmailTemplateEditorProps) {
     <div className='space-y-6'>
       <ModuleFormCard
         title='Editar template'
-        description='Atualize assunto, conteudo e variaveis obrigatorias do template.'
+        description='Atualize assunto, conteúdo e variáveis obrigatórias do template.'
         footer={
           <ModuleFormActions
             mode='edit'
             formId={EDIT_EMAIL_TEMPLATE_FORM_ID}
             isPending={isPending}
-            submitLabel='Salvar alteracoes'
+            submitLabel='Salvar alterações'
             onCancel={() => router.push('/dashboard/email-templates')}
           />
         }
@@ -126,7 +126,7 @@ function EmailTemplateEditor({ template }: EmailTemplateEditorProps) {
             {template.is_default ? 'Template padrao' : 'Template customizado'}
           </AlertTitle>
           <AlertDescription>
-            Criado em {formatDateTime(template.created_at)}. Ultima atualizacao em{' '}
+            Criado em {formatDateTime(template.created_at)}. Última atualização em{' '}
             {formatDateTime(template.updated_at)}.
           </AlertDescription>
         </Alert>
@@ -161,7 +161,7 @@ export function EmailTemplateEdit({ templateId }: EmailTemplateEditProps) {
         <ModuleErrorAlert
           error={templateQuery.error}
           title='Erro ao carregar template'
-          fallbackMessage='Nao foi possivel carregar os dados deste template.'
+          fallbackMessage='Não foi possível carregar os dados deste template.'
         />
         <div>
           <Button variant='outline' onClick={() => templateQuery.refetch()}>
@@ -175,8 +175,8 @@ export function EmailTemplateEdit({ templateId }: EmailTemplateEditProps) {
   if (!template) {
     return (
       <ModuleErrorAlert
-        title='Template nao encontrado'
-        message='Nao encontramos dados para este template.'
+        title='Template não encontrado'
+        message='Não encontramos dados para este template.'
       />
     );
   }

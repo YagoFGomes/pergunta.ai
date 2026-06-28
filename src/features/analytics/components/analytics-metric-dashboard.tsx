@@ -97,7 +97,7 @@ function Timeline({ metrics }: { metrics: MetricResult[] }) {
   if (chronologicalMetrics.length === 0) {
     return (
       <div className='flex min-h-[180px] items-center justify-center rounded-md border border-dashed p-6 text-center'>
-        <p className='text-muted-foreground text-sm'>Sem serie temporal para exibir.</p>
+        <p className='text-muted-foreground text-sm'>Sem série temporal para exibir.</p>
       </div>
     );
   }
@@ -127,7 +127,7 @@ function MetricsTable({ metrics }: { metrics: MetricResult[] }) {
         <div className='space-y-1'>
           <h3 className='font-medium'>Nenhum registro encontrado</h3>
           <p className='text-muted-foreground max-w-md text-sm'>
-            Ajuste filtros por periodo, formulario ou campanha para visualizar outros registros.
+            Ajuste filtros por período, formulário ou campanha para visualizar outros registros.
           </p>
         </div>
       </div>
@@ -139,12 +139,12 @@ function MetricsTable({ metrics }: { metrics: MetricResult[] }) {
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead>Periodo</TableHead>
+            <TableHead>Período</TableHead>
             <TableHead>Valor</TableHead>
-            <TableHead>Formulario</TableHead>
+            <TableHead>Formulário</TableHead>
             <TableHead>Campanha</TableHead>
             <TableHead>Atualizado em</TableHead>
-            <TableHead className='text-right'>Acoes</TableHead>
+            <TableHead className='text-right'>Ações</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -239,7 +239,7 @@ export function AnalyticsMetricDashboard({ metricType }: AnalyticsMetricDashboar
         <ModuleErrorAlert
           error={metricsQuery.error}
           title={`Erro ao carregar ${metricType}`}
-          fallbackMessage='Nao foi possivel carregar os registros deste indicador.'
+          fallbackMessage='Não foi possível carregar os registros deste indicador.'
         />
         <Button variant='outline' onClick={() => metricsQuery.refetch()}>
           Tentar novamente
@@ -254,7 +254,7 @@ export function AnalyticsMetricDashboard({ metricType }: AnalyticsMetricDashboar
         <CardContent className='flex flex-col gap-4 p-4 xl:flex-row xl:items-end xl:justify-between'>
           <div className='grid gap-4 md:grid-cols-3'>
             <div className='space-y-2'>
-              <Label htmlFor='analytics-metric-period'>Periodo</Label>
+              <Label htmlFor='analytics-metric-period'>Período</Label>
               <Input
                 id='analytics-metric-period'
                 type='date'
@@ -263,12 +263,12 @@ export function AnalyticsMetricDashboard({ metricType }: AnalyticsMetricDashboar
               />
             </div>
             <div className='space-y-2'>
-              <Label htmlFor='analytics-metric-form'>Formulario</Label>
+              <Label htmlFor='analytics-metric-form'>Formulário</Label>
               <Input
                 id='analytics-metric-form'
                 value={form}
                 onChange={(event) => setForm(event.target.value)}
-                placeholder='ID do formulario'
+                placeholder='ID do formulário'
               />
             </div>
             <div className='space-y-2'>
@@ -311,7 +311,7 @@ export function AnalyticsMetricDashboard({ metricType }: AnalyticsMetricDashboar
           <AlertDescription>
             {hasFilters
               ? 'Ajuste os filtros para visualizar outros registros.'
-              : 'Este indicador ainda nao possui metricas geradas no backend.'}
+              : 'Este indicador ainda não possui métricas geradas no backend.'}
           </AlertDescription>
         </Alert>
       ) : null}
@@ -324,31 +324,31 @@ export function AnalyticsMetricDashboard({ metricType }: AnalyticsMetricDashboar
               {latest ? formatMetricValue(latest) : '-'}
             </span>
           }
-          description={latest ? `Periodo ${formatMetricPeriod(latest)}` : config.interpretation}
+          description={latest ? `Período ${formatMetricPeriod(latest)}` : config.interpretation}
         />
         <StatCard
-          label='Media'
+          label='Média'
           value={formatMetricNumericValue(metricType, average)}
-          description='Media simples dos registros filtrados'
+          description='Média simples dos registros filtrados'
         />
         <StatCard
-          label='Variacao'
+          label='Variação'
           value={
             formattedDelta === undefined ? '-' : <span className={deltaTone}>{formattedDelta}</span>
           }
-          description='Comparacao entre os dois periodos mais recentes'
+          description='Comparação entre os dois períodos mais recentes'
         />
         <StatCard
           label='Escopo'
           value={`${formatAnalyticsNumber(scopes.forms)} / ${formatAnalyticsNumber(scopes.campaigns)}`}
-          description='Formularios / campanhas no recorte atual'
+          description='Formulários / campanhas no recorte atual'
         />
       </div>
 
       <div className='grid gap-4 xl:grid-cols-[0.45fr_1fr]'>
         <Card>
           <CardHeader>
-            <CardTitle className='text-base'>Tendencia</CardTitle>
+            <CardTitle className='text-base'>Tendência</CardTitle>
             <CardDescription>{config.interpretation}</CardDescription>
           </CardHeader>
           <CardContent>
@@ -359,7 +359,7 @@ export function AnalyticsMetricDashboard({ metricType }: AnalyticsMetricDashboar
         <Card>
           <CardHeader className='flex flex-col gap-3 md:flex-row md:items-start md:justify-between'>
             <div>
-              <CardTitle className='text-base'>Historico de {metricType}</CardTitle>
+              <CardTitle className='text-base'>Histórico de {metricType}</CardTitle>
               <CardDescription>Registros retornados pelo backend para o indicador.</CardDescription>
             </div>
             <Link

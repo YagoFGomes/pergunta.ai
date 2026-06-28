@@ -7,13 +7,13 @@ import { SurveyFormCreate } from '@/features/surveys/components/survey-form-crea
 import { cn } from '@/lib/utils';
 
 export const metadata = {
-  title: 'Dashboard: Novo formulario'
+  title: 'Dashboard: Novo formulário'
 };
 
 export default function NewSurveyFormPage() {
   return (
     <PageContainer
-      pageTitle='Novo formulario'
+      pageTitle='Novo formulário'
       pageDescription='Crie um rascunho inicial para configurar perguntas e publicar depois.'
       pageHeaderAction={
         <Link

@@ -22,9 +22,9 @@ export default function ModuleShellPage({
       <div className='grid gap-4'>
         <Card>
           <CardHeader>
-            <CardTitle>Modulo em implementacao</CardTitle>
+            <CardTitle>Módulo em implementação</CardTitle>
             <CardDescription>
-              Esta pagina ja faz parte da estrutura do MVP e sera evoluida nas proximas tasks.
+              Esta página já faz parte da estrutura do MVP e será evoluida nas próximas tasks.
             </CardDescription>
           </CardHeader>
           <CardContent className='space-y-4'>

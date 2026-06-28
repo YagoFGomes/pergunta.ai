@@ -111,7 +111,7 @@ export function DeliveryLogsManager({ initialCampaign = '' }: DeliveryLogsManage
       toast.success('Retry enfileirado com sucesso.');
       await logsQuery.refetch();
     },
-    onError: (error) => notifyError(error, 'Nao foi possivel reenfileirar o envio.')
+    onError: (error) => notifyError(error, 'Não foi possível reenfileirar o envio.')
   });
 
   const response = getOrvalResponseData<MaybePaginatedDeliveryLogs>(logsQuery.data);
@@ -130,7 +130,7 @@ export function DeliveryLogsManager({ initialCampaign = '' }: DeliveryLogsManage
         <ModuleErrorAlert
           error={logsQuery.error}
           title='Erro ao carregar logs'
-          fallbackMessage='Nao foi possivel carregar os logs de entrega.'
+          fallbackMessage='Não foi possível carregar os logs de entrega.'
         />
         <Button variant='outline' onClick={() => logsQuery.refetch()}>
           Tentar novamente
@@ -206,7 +206,7 @@ export function DeliveryLogsManager({ initialCampaign = '' }: DeliveryLogsManage
           <AlertDescription>
             {hasFilters
               ? 'Ajuste os filtros para visualizar outros logs.'
-              : 'Ainda nao existem registros de envio para este tenant.'}
+              : 'Ainda não existem registros de envio para este tenant.'}
           </AlertDescription>
         </Alert>
       ) : null}
@@ -214,7 +214,7 @@ export function DeliveryLogsManager({ initialCampaign = '' }: DeliveryLogsManage
       <Card>
         <CardHeader>
           <CardTitle className='text-base'>Eventos de entrega</CardTitle>
-          <CardDescription>Status de envio, falhas e tentativas por destinatario.</CardDescription>
+          <CardDescription>Status de envio, falhas e tentativas por destinatário.</CardDescription>
         </CardHeader>
         <CardContent>
           <div className='overflow-x-auto rounded-md border'>
@@ -227,7 +227,7 @@ export function DeliveryLogsManager({ initialCampaign = '' }: DeliveryLogsManage
                   <TableHead>Erro</TableHead>
                   <TableHead>Tentativas</TableHead>
                   <TableHead>Enviado em</TableHead>
-                  <TableHead className='text-right'>Acoes</TableHead>
+                  <TableHead className='text-right'>Ações</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>

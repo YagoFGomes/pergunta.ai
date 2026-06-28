@@ -113,7 +113,7 @@ export function ContactListContactsManager({ listId }: ContactListContactsManage
         setIsFormDialogOpen(false);
       },
       onError: () => {
-        toast.error('Nao foi possivel criar o contato.');
+        toast.error('Não foi possível criar o contato.');
       }
     }
   });
@@ -130,7 +130,7 @@ export function ContactListContactsManager({ listId }: ContactListContactsManage
         setIsFormDialogOpen(false);
       },
       onError: () => {
-        toast.error('Nao foi possivel atualizar o contato.');
+        toast.error('Não foi possível atualizar o contato.');
       }
     }
   });
@@ -147,7 +147,7 @@ export function ContactListContactsManager({ listId }: ContactListContactsManage
         setDeleteContact(null);
       },
       onError: () => {
-        toast.error('Nao foi possivel remover o contato.');
+        toast.error('Não foi possível remover o contato.');
       }
     }
   });
@@ -272,7 +272,7 @@ export function ContactListContactsManager({ listId }: ContactListContactsManage
         <ModuleErrorAlert
           error={listQuery.error ?? contactsQuery.error}
           title='Erro ao carregar contatos da lista'
-          fallbackMessage='Nao foi possivel carregar os contatos desta lista.'
+          fallbackMessage='Não foi possível carregar os contatos desta lista.'
         />
       </div>
     );
@@ -285,7 +285,7 @@ export function ContactListContactsManager({ listId }: ContactListContactsManage
           <h2 className='text-xl font-semibold'>Contatos da lista</h2>
           <p className='text-muted-foreground text-sm'>
             {listData?.name
-              ? `Lista ${listData.name}: contatos disponiveis para campanhas.`
+              ? `Lista ${listData.name}: contatos disponíveis para campanhas.`
               : 'Contatos vinculados a esta lista.'}
           </p>
         </div>
@@ -296,7 +296,7 @@ export function ContactListContactsManager({ listId }: ContactListContactsManage
         <Alert>
           <AlertTitle>Nenhum contato cadastrado</AlertTitle>
           <AlertDescription>
-            Esta lista ainda nao possui contatos. Crie o primeiro contato para habilitar campanhas.
+            Esta lista ainda não possui contatos. Crie o primeiro contato para habilitar campanhas.
           </AlertDescription>
         </Alert>
       ) : null}
@@ -397,7 +397,7 @@ export function ContactListContactsManager({ listId }: ContactListContactsManage
                 >
                   {([canSubmit, isSubmitting]) => (
                     <Button type='submit' disabled={!canSubmit || isSubmitting}>
-                      {formMode === 'create' ? 'Criar contato' : 'Salvar alteracoes'}
+                      {formMode === 'create' ? 'Criar contato' : 'Salvar alterações'}
                     </Button>
                   )}
                 </form.Subscribe>
@@ -419,7 +419,7 @@ export function ContactListContactsManager({ listId }: ContactListContactsManage
           <AlertDialogHeader>
             <AlertDialogTitle>Excluir contato?</AlertDialogTitle>
             <AlertDialogDescription>
-              O contato {deleteContact?.name ? `"${deleteContact.name}"` : ''} sera removido
+              O contato {deleteContact?.name ? `"${deleteContact.name}"` : ''} será removido
               permanentemente desta lista.
             </AlertDialogDescription>
           </AlertDialogHeader>

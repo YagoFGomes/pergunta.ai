@@ -11,7 +11,7 @@ export default function DeliveryError({ error, reset }: DeliveryErrorProps) {
   return (
     <ModuleError
       pageTitle='Logs de Entrega'
-      pageDescription='Nao foi possivel carregar os logs de entrega.'
+      pageDescription='Não foi possível carregar os logs de entrega.'
       error={error}
       reset={reset}
     />

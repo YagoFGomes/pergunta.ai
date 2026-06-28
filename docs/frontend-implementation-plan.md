@@ -294,9 +294,9 @@ Formato de colunas:
 
 ## Epic FE-08 - Quality Gate
 
-- FE-701 Empty/loading/error states globais
-- FE-702 Revisao de responsividade
-- FE-703 Revisao de acessibilidade minima
+- FE-701 Empty/loading/error states globais - implementado
+- FE-702 Revisão de responsividade
+- FE-703 Revisão de acessibilidade mínima
 - FE-704 Smoke test ponta a ponta
 - FE-705 Checklist de release
 
@@ -1357,3 +1357,31 @@ Smoke test manual:
 - aplicar filtros por periodo, formulario e campanha
 - validar linha de tendencia e tabela de historico
 - abrir atalhos para analytics por formulario e por campanha
+
+### FE-701 - Empty/loading/error states globais
+
+Status: Implementado em 2026-06-28.
+
+Resumo:
+
+- revisada a copy dos estados globais de loading, erro e vazio nos módulos principais
+- corrigidos textos em português, acentuação e mensagens de erro nos componentes compartilhados de plataforma
+- atualizado `ModuleErrorAlert` para exibir "Erro ao carregar módulo" e fallback com acentuação correta
+- revisados estados do dashboard overview e slots paralelos para mensagens em português
+- normalizados textos de estados em analytics, delivery, surveys, contacts, campaigns, email templates e pesquisa pública
+- removidos falsos positivos técnicos da revisão de copy, preservando imports e identificadores como `scroll-area`, `chat-area`, `area-graph` e chaves de ícones
+- preservados contratos de API e arquivos gerados do Orval sem alterações funcionais
+
+Validação:
+
+- `git diff --check` sem erros de whitespace
+- `bun run lint` passou; permanecem warnings preexistentes que não bloqueiam a execução
+- `bun run build` passou
+
+Smoke test manual:
+
+- acessar páginas de listagem vazias em surveys, contacts, campaigns e email templates
+- validar loading/error dos segmentos `/dashboard/surveys`, `/dashboard/contacts`, `/dashboard/campaigns`, `/dashboard/email-templates`, `/dashboard/analytics`, `/dashboard/delivery` e `/s/[token]`
+- abrir `/dashboard/overview` e confirmar mensagens de erro em português caso algum slot falhe
+- abrir dashboards de analytics e delivery sem dados e confirmar estados vazios com copy acentuada
+- testar `/s/{token}` com token inválido e confirmar mensagem de erro pública em português

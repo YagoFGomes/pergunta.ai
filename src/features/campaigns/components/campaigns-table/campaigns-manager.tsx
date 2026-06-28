@@ -59,7 +59,7 @@ function CampaignsEmptyState() {
       <div className='space-y-1'>
         <h2 className='text-lg font-semibold'>Nenhuma campanha criada</h2>
         <p className='text-muted-foreground max-w-md text-sm'>
-          Crie uma campanha vinculando formulario, lista de contatos e template de email.
+          Crie uma campanha vinculando formulário, lista de contatos e template de email.
         </p>
       </div>
       <Link href='/dashboard/campaigns/new' className={cn(buttonVariants(), 'text-xs md:text-sm')}>
@@ -82,7 +82,7 @@ export function CampaignsManager() {
         setDeleteCampaign(null);
       },
       onError: (error) => {
-        notifyError(error, 'Nao foi possivel excluir a campanha.');
+        notifyError(error, 'Não foi possível excluir a campanha.');
       }
     }
   });
@@ -146,7 +146,7 @@ export function CampaignsManager() {
         <ModuleErrorAlert
           error={campaignsQuery.error}
           title='Erro ao carregar campanhas'
-          fallbackMessage='Nao foi possivel carregar as campanhas.'
+          fallbackMessage='Não foi possível carregar as campanhas.'
         />
         <div>
           <Button variant='outline' onClick={() => campaignsQuery.refetch()}>
@@ -197,7 +197,7 @@ export function CampaignsManager() {
           <AlertDialogHeader>
             <AlertDialogTitle>Excluir campanha?</AlertDialogTitle>
             <AlertDialogDescription>
-              A campanha {deleteCampaign?.name ? `"${deleteCampaign.name}"` : ''} sera removida
+              A campanha {deleteCampaign?.name ? `"${deleteCampaign.name}"` : ''} será removida
               permanentemente.
             </AlertDialogDescription>
           </AlertDialogHeader>

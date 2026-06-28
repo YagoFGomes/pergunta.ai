@@ -11,7 +11,7 @@ export default function AnalyticsError({ error, reset }: AnalyticsErrorProps) {
   return (
     <ModuleError
       pageTitle='Analytics'
-      pageDescription='Nao foi possivel carregar dashboards ou metricas.'
+      pageDescription='Não foi possível carregar dashboards ou métricas.'
       error={error}
       reset={reset}
     />

@@ -25,14 +25,14 @@ export const ANALYTICS_METRIC_CARDS: AnalyticsMetricCard[] = [
   {
     type: MetricTypeEnum.NPS,
     title: 'NPS',
-    description: 'Lealdade e recomendacao',
+    description: 'Lealdade e recomendação',
     href: '/dashboard/analytics/nps',
     emptyLabel: 'Sem NPS calculado'
   },
   {
     type: MetricTypeEnum.CSAT,
     title: 'CSAT',
-    description: 'Satisfacao com a experiencia',
+    description: 'Satisfação com a experiência',
     href: '/dashboard/analytics/csat',
     emptyLabel: 'Sem CSAT calculado'
   },
@@ -46,7 +46,7 @@ export const ANALYTICS_METRIC_CARDS: AnalyticsMetricCard[] = [
   {
     type: MetricTypeEnum.CSI,
     title: 'CSI',
-    description: 'Indice composto de satisfacao',
+    description: 'Índice composto de satisfação',
     href: '/dashboard/analytics/csi',
     emptyLabel: 'Sem CSI calculado'
   }
@@ -88,7 +88,7 @@ export function formatMetricValue(metric?: MetricResult) {
 }
 
 export function formatMetricPeriod(metric?: MetricResult) {
-  if (!metric) return 'Sem periodo';
+  if (!metric) return 'Sem período';
 
   const date = new Date(`${metric.period}T00:00:00`);
   if (Number.isNaN(date.getTime())) return metric.period;

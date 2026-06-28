@@ -15,7 +15,7 @@ type AppApiErrorInput = {
   message?: string;
 };
 
-const DEFAULT_API_ERROR_MESSAGE = 'Nao foi possivel concluir a acao.';
+const DEFAULT_API_ERROR_MESSAGE = 'Não foi possível concluir a ação.';
 
 export class AppApiError extends Error {
   status: number;

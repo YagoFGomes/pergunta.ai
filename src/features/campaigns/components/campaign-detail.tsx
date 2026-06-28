@@ -86,7 +86,7 @@ export function CampaignDetail({ campaignId }: CampaignDetailProps) {
         await invalidateCampaign();
         toast.success('Campanha agendada com sucesso.');
       },
-      onError: (error) => notifyError(error, 'Nao foi possivel agendar a campanha.')
+      onError: (error) => notifyError(error, 'Não foi possível agendar a campanha.')
     }
   });
   const pauseMutation = useCampaignsPauseCreate({
@@ -95,7 +95,7 @@ export function CampaignDetail({ campaignId }: CampaignDetailProps) {
         await invalidateCampaign();
         toast.success('Campanha pausada.');
       },
-      onError: (error) => notifyError(error, 'Nao foi possivel pausar a campanha.')
+      onError: (error) => notifyError(error, 'Não foi possível pausar a campanha.')
     }
   });
   const resumeMutation = useCampaignsResumeCreate({
@@ -104,7 +104,7 @@ export function CampaignDetail({ campaignId }: CampaignDetailProps) {
         await invalidateCampaign();
         toast.success('Campanha retomada.');
       },
-      onError: (error) => notifyError(error, 'Nao foi possivel retomar a campanha.')
+      onError: (error) => notifyError(error, 'Não foi possível retomar a campanha.')
     }
   });
   const cancelMutation = useCampaignsCancelCreate({
@@ -114,7 +114,7 @@ export function CampaignDetail({ campaignId }: CampaignDetailProps) {
         toast.success('Campanha cancelada.');
         setConfirmCancelOpen(false);
       },
-      onError: (error) => notifyError(error, 'Nao foi possivel cancelar a campanha.')
+      onError: (error) => notifyError(error, 'Não foi possível cancelar a campanha.')
     }
   });
 
@@ -153,7 +153,7 @@ export function CampaignDetail({ campaignId }: CampaignDetailProps) {
       <ModuleErrorAlert
         error={campaignQuery.error}
         title='Erro ao carregar campanha'
-        fallbackMessage='Nao foi possivel carregar os detalhes da campanha.'
+        fallbackMessage='Não foi possível carregar os detalhes da campanha.'
       />
     );
   }
@@ -189,7 +189,7 @@ export function CampaignDetail({ campaignId }: CampaignDetailProps) {
 
           <div className='grid gap-3 rounded-md border p-4 text-sm md:grid-cols-3'>
             <div>
-              <span className='text-muted-foreground block'>Formulario</span>
+              <span className='text-muted-foreground block'>Formulário</span>
               <span className='font-mono text-xs'>{campaign.form}</span>
             </div>
             <div>
@@ -197,7 +197,7 @@ export function CampaignDetail({ campaignId }: CampaignDetailProps) {
               <span className='font-mono text-xs'>{campaign.email_list ?? '-'}</span>
             </div>
             <div>
-              <span className='text-muted-foreground block'>Inicio</span>
+              <span className='text-muted-foreground block'>Início</span>
               <span>
                 {formatModuleDate(campaign.start_date)} {campaign.start_time || ''}
               </span>
@@ -227,7 +227,7 @@ export function CampaignDetail({ campaignId }: CampaignDetailProps) {
         <Card>
           <CardHeader>
             <CardTitle className='text-base'>Agendamento</CardTitle>
-            <CardDescription>Define data e horario de inicio da campanha.</CardDescription>
+            <CardDescription>Define data e horario de início da campanha.</CardDescription>
           </CardHeader>
           <CardContent className='grid gap-4 md:grid-cols-3'>
             <div className='space-y-2'>
@@ -273,7 +273,7 @@ export function CampaignDetail({ campaignId }: CampaignDetailProps) {
 
         <Card>
           <CardHeader>
-            <CardTitle className='text-base'>Operacao</CardTitle>
+            <CardTitle className='text-base'>Operação</CardTitle>
             <CardDescription>Pausar, retomar ou cancelar a execucao.</CardDescription>
           </CardHeader>
           <CardContent className='flex flex-wrap gap-2'>
@@ -310,7 +310,7 @@ export function CampaignDetail({ campaignId }: CampaignDetailProps) {
           <AlertDialogHeader>
             <AlertDialogTitle>Cancelar campanha?</AlertDialogTitle>
             <AlertDialogDescription>
-              Esta acao cancela a campanha atual e deve interromper novas tentativas de envio.
+              Esta ação cancela a campanha atual e deve interromper novas tentativas de envio.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

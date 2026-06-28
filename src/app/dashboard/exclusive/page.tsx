@@ -35,7 +35,7 @@ export default function ExclusivePage() {
           <div>
             <h1 className='flex items-center gap-2 text-3xl font-bold tracking-tight'>
               <Icons.badgeCheck className='h-7 w-7 text-green-600' />
-              Exclusive Area
+              Área exclusiva
             </h1>
             <p className='text-muted-foreground'>
               Welcome, <span className='font-semibold'>{activeTenant?.tenant_name}</span>! This page

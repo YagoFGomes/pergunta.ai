@@ -25,7 +25,7 @@ export const campaignWizardSchema = z
   .object({
     name: z.string().trim().min(3, 'Informe ao menos 3 caracteres.').max(255),
     description: z.string().trim().max(1000).optional(),
-    form: z.string().trim().min(1, 'Selecione um formulario.'),
+    form: z.string().trim().min(1, 'Selecione um formulário.'),
     delivery_channel: z.nativeEnum(DeliveryChannelEnum),
     email_list: z.string().trim().optional(),
     webhook_url: z.string().trim().optional(),

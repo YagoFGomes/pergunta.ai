@@ -15,7 +15,7 @@ export default function ModuleError({
   error,
   reset,
   pageTitle = 'Modulo',
-  pageDescription = 'Nao foi possivel carregar esta area.'
+  pageDescription = 'Não foi possível carregar esta área.'
 }: ModuleErrorProps) {
   return (
     <PageContainer pageTitle={pageTitle} pageDescription={pageDescription}>

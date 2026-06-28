@@ -9,7 +9,7 @@ export default function SurveyFrameworksPage() {
   return (
     <PageContainer
       pageTitle='Survey Frameworks'
-      pageDescription='Gerencie frameworks base e customizaveis para os formularios de pesquisa.'
+      pageDescription='Gerencie frameworks base e customizaveis para os formulários de pesquisa.'
     >
       <SurveyFrameworksManager />
     </PageContainer>

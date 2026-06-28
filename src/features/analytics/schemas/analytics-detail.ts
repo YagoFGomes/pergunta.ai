@@ -27,13 +27,13 @@ export function getAnalyticsDetailTitle(
   scope: AnalyticsDetailScope,
   detail?: AnalyticsCampaignDetail | AnalyticsFormDetail
 ) {
-  if (!detail) return scope === 'campaign' ? 'Campanha' : 'Formulario';
+  if (!detail) return scope === 'campaign' ? 'Campanha' : 'Formulário';
 
   if (scope === 'campaign') {
     return (detail as AnalyticsCampaignDetail).campaign.name ?? 'Campanha';
   }
 
-  return (detail as AnalyticsFormDetail).form.title ?? 'Formulario';
+  return (detail as AnalyticsFormDetail).form.title ?? 'Formulário';
 }
 
 export function getAnalyticsDetailEntityId(

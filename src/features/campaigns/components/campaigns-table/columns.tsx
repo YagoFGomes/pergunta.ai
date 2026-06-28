@@ -113,7 +113,7 @@ export function getCampaignsColumns({
       accessorKey: 'start_date',
       enableSorting: false,
       header: ({ column }: { column: Column<Campaign, unknown> }) => (
-        <DataTableColumnHeader column={column} title='Inicio' />
+        <DataTableColumnHeader column={column} title='Início' />
       ),
       cell: ({ row }) => (
         <div className='flex flex-col text-sm'>

@@ -4,7 +4,7 @@ export default function Loading() {
   return (
     <ModuleLoading
       pageTitle='Surveys'
-      pageDescription='Carregando formularios, perguntas e frameworks.'
+      pageDescription='Carregando formulários, perguntas e frameworks.'
     />
   );
 }

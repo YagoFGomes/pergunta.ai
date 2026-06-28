@@ -287,7 +287,7 @@ export default function SignUpViewPage() {
           });
         }
 
-        // Re-issue JWT so the new tenant_id claim is included before navigating to the dashboard.
+        // Re-issue JWT só the new tenant_id claim is included before navigating to the dashboard.
         // /api/auth/refresh-claims/ re-queries the DB for memberships and returns a fresh token pair.
         await refreshClaims();
 
@@ -386,7 +386,7 @@ export default function SignUpViewPage() {
 
                   <div className='flex items-center justify-between gap-3 pt-2'>
                     <form.StepButton
-                      label='← Back'
+                      label='â† Back'
                       disabled={isFirstStep}
                       handleMovement={() => handleCancelOrBack({})}
                       variant='ghost'
@@ -404,10 +404,10 @@ export default function SignUpViewPage() {
                         >
                           Skip for now
                         </Button>
-                        <form.SubmitButton>Continue →</form.SubmitButton>
+                        <form.SubmitButton>Continue â†’</form.SubmitButton>
                       </div>
                     ) : (
-                      <form.StepButton label='Next →' handleMovement={handleNext} />
+                      <form.StepButton label='Next â†’' handleMovement={handleNext} />
                     )}
                   </div>
                 </div>

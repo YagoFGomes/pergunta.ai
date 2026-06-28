@@ -20,7 +20,7 @@ export default async function CampaignDetailsPage({ params }: CampaignDetailsPag
   return (
     <PageContainer
       pageTitle='Detalhes da Campanha'
-      pageDescription='Status, funil de execucao e acoes operacionais da campanha.'
+      pageDescription='Status, funil de execucao e ações operacionais da campanha.'
       pageHeaderAction={
         <Link
           href='/dashboard/campaigns'

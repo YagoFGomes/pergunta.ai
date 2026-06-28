@@ -11,9 +11,9 @@ type ModuleErrorAlertProps = {
 
 export function ModuleErrorAlert({
   error,
-  title = 'Erro ao carregar modulo',
+  title = 'Erro ao carregar módulo',
   message,
-  fallbackMessage = 'Ocorreu um erro inesperado ao carregar esta pagina.'
+  fallbackMessage = 'Ocorreu um erro inesperado ao carregar esta página.'
 }: ModuleErrorAlertProps) {
   return (
     <Alert variant='destructive'>

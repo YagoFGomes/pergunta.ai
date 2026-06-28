@@ -15,7 +15,7 @@ export default async function CampaignAnalyticsPage({ params }: CampaignAnalytic
   return (
     <PageContainer
       pageTitle='Analytics da Campanha'
-      pageDescription='Respostas, indicadores e historico de metricas por campanha.'
+      pageDescription='Respostas, indicadores e histórico de métricas por campanha.'
     >
       <AnalyticsDetail id={id} scope='campaign' />
     </PageContainer>

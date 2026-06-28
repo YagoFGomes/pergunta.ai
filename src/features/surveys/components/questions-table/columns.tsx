@@ -72,7 +72,7 @@ export function getSurveyQuestionsColumns({
       accessorKey: 'is_required',
       enableSorting: false,
       header: ({ column }: { column: Column<FormQuestion, unknown> }) => (
-        <DataTableColumnHeader column={column} title='Obrigatoria' />
+        <DataTableColumnHeader column={column} title='Obrigatória' />
       ),
       cell: ({ row }) =>
         row.original.is_required ? (
@@ -80,7 +80,7 @@ export function getSurveyQuestionsColumns({
             Sim
           </Badge>
         ) : (
-          <Badge variant='outline'>Nao</Badge>
+          <Badge variant='outline'>Não</Badge>
         )
     },
     {
@@ -117,7 +117,7 @@ export function getSurveyQuestionsColumns({
             disabled={
               disableActions || !onManageOptions || !(canManageOptions?.(row.original) ?? false)
             }
-            aria-label='Gerenciar opcoes da pergunta'
+            aria-label='Gerenciar opções da pergunta'
           >
             <Icons.adjustments className='h-4 w-4' />
           </Button>
