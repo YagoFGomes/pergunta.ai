@@ -276,10 +276,10 @@ Formato de colunas:
 
 ## Epic FE-06 - Public Survey
 
-- FE-501 Render formulario publico por token
-- FE-502 Validacoes de preenchimento
-- FE-503 Submissao publica de respostas
-- FE-504 Tela de confirmacao de envio
+- FE-501 Render formulario publico por token - implementado
+- FE-502 Validacoes de preenchimento - implementado
+- FE-503 Submissao publica de respostas - implementado
+- FE-504 Tela de confirmacao de envio - implementado
 
 ## Epic FE-07 - Analytics e Operacao
 
@@ -1030,3 +1030,108 @@ Smoke test manual:
 - acessar `/dashboard/campaigns/new` e criar campanha com formulario, lista e template ativos
 - acessar `/dashboard/campaigns/{id}` e validar detalhe, agendamento, pausa, retomada e cancelamento conforme status permitido pelo backend
 - acessar `/dashboard/campaigns/{id}/steps` e validar criar, editar e remover steps
+
+### Ajuste de UX - Selecao de recursos no wizard de campanha
+
+Status: Implementado em 2026-06-28.
+
+Resumo:
+
+- o wizard de `/dashboard/campaigns/new` deixou de buscar apenas formularios, listas e templates ativos
+- a selecao agora mostra os recursos do tenant mesmo quando estao em status draft/inativo, evitando selects vazios quando a base tem dados nao ativos
+- o texto dos selects passou a exibir status junto do nome do recurso
+- ao selecionar um formulario, o wizard mostra um resumo com framework, status, ID e atalho para editar o formulario
+- ao selecionar uma lista de contatos, o wizard mostra contato total, status, ID e atalhos para:
+  - ver contatos da lista em `/dashboard/contacts/lists/{id}/contacts`
+  - gerenciar/editar listas em `/dashboard/contacts/lists`
+- ao selecionar um template, o wizard mostra tipo, status, idioma e atalho para editar o template
+- a mensagem de pre-requisitos foi ajustada para falar de recursos cadastrados no tenant atual, nao apenas recursos ativos
+
+Validacao:
+
+- `bun run lint` passou; permanecem warnings preexistentes que nao bloqueiam a execucao
+- `bun run build` passou
+
+Smoke test manual:
+
+- acessar `/dashboard/campaigns/new`
+- confirmar que formularios, listas e templates cadastrados aparecem nos selects mesmo se nao estiverem ativos
+- selecionar uma lista e abrir o atalho "Ver contatos"
+- voltar ao wizard e seguir a criacao da campanha
+
+### FE-501..FE-504 - Public Survey
+
+Status: Implementado em 2026-06-28.
+
+Plano executado:
+
+- FE-501: substituir shell de `/s/[token]` por uma experiencia publica real
+- FE-502: validar respostas obrigatorias no client antes do envio
+- FE-503: submeter respostas ao backend pelo token publico
+- FE-504: exibir confirmacao final depois do envio
+
+Resumo:
+
+- criada a feature `src/features/public-survey/`
+- criada API client local em `src/features/public-survey/api/public-survey.ts`
+- criada experiencia publica em `src/features/public-survey/components/public-survey-response.tsx`
+- criada camada de helpers/normalizacao em `src/features/public-survey/schemas/public-survey.ts`
+- rota `/s/[token]` agora renderiza `PublicSurveyResponse`
+- a tela carrega o formulario publico por token e trata:
+  - loading
+  - erro de token invalido/expirado/respondido
+  - formulario sem perguntas
+  - estado de sucesso apos envio
+- perguntas sao ordenadas por `order`
+- opcoes sao ordenadas por `order`
+- tipos renderizados:
+  - `TEXT` com textarea
+  - `SINGLE_CHOICE` com radio group
+  - `MULTIPLE_CHOICE` com checkboxes
+  - `SCALE_1_5` com botoes de 1 a 5
+  - `SCALE_0_10` com botoes de 0 a 10
+- validacao client-side exige respostas para perguntas marcadas como obrigatorias
+- indicador de progresso mostra obrigatorias respondidas
+- payload de submit segue `PublicSurveySubmit`
+- para `MULTIPLE_CHOICE`, o frontend envia uma resposta por opcao marcada, alinhado ao serializer atual que recebe `answer_choice_id`
+- observacao tecnica: os endpoints publicos gerados pelo Orval saem como `/public/...`, mas no browser isso nao passa pelo proxy Next; por isso a API local chama `/api/public/surveys/{token}/`, que o proxy encaminha para o backend
+
+Validacao:
+
+- `bun run build` passou
+- `bun run lint` passou; permanecem warnings preexistentes que nao bloqueiam a execucao
+
+Smoke test manual:
+
+- acessar `/s/{token}` com token valido de `CampaignRecipient`
+- validar carregamento do titulo, descricao e perguntas
+- tentar enviar sem preencher obrigatorias e conferir erros por pergunta
+- preencher respostas de texto, escolha unica, multipla escolha e escalas
+- enviar respostas e confirmar tela final de obrigado
+- abrir novamente o mesmo token e validar resposta de link ja respondido/indisponivel retornada pelo backend
+
+### Ajuste - Token publico e perguntas sem opcoes
+
+Status: Implementado em 2026-06-28.
+
+Contexto:
+
+- o token `_YwySjnWUxdjiYqcwvgCsqpjllCUdF8BKCjmOB-tcwI` carregava corretamente no backend em `/public/surveys/{token}/`
+- no frontend, a chamada `/api/public/surveys/{token}/` passava pelo catch-all do Next e era encaminhada incorretamente para `/api/public/surveys/{token}/` no Django
+- as rotas publicas do Django ficam fora do prefixo `/api`, portanto o proxy precisa encaminhar `/api/public/...` para `/public/...`
+- o mesmo token tambem retornava uma pergunta obrigatoria de escolha sem opcoes cadastradas, impossibilitando resposta valida
+
+Resumo:
+
+- `src/app/api/[...path]/route.ts` agora detecta chamadas iniciadas por `public` e remove o prefixo `/api` ao montar a URL do backend
+- `src/features/public-survey/api/public-survey.ts` passou a chamar `/api/public/surveys/{token}` e `/api/public/surveys/{token}/submit` sem barra final, evitando redirect 308 do Next
+- `src/features/public-survey/schemas/public-survey.ts` passou a identificar perguntas de escolha sem opcoes e retornar mensagem especifica de validacao
+- `src/features/public-survey/components/public-survey-response.tsx` passou a exibir aviso visual para perguntas sem opcoes
+- quando uma pergunta obrigatoria esta sem opcoes, o envio fica bloqueado e a tela orienta editar o formulario antes de compartilhar o link
+
+Validacao:
+
+- smoke test direto no backend: `GET http://localhost:8000/public/surveys/_YwySjnWUxdjiYqcwvgCsqpjllCUdF8BKCjmOB-tcwI/` retornou `200`
+- smoke test pelo proxy Next: `GET http://localhost:3000/api/public/surveys/_YwySjnWUxdjiYqcwvgCsqpjllCUdF8BKCjmOB-tcwI` retornou `200`
+- `bun run lint` passou; permanecem warnings preexistentes que nao bloqueiam a execucao
+- `bun run build` passou

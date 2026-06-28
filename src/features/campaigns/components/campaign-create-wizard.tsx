@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useMemo, useState } from 'react';
 import { toast } from 'sonner';
@@ -7,7 +8,8 @@ import { toast } from 'sonner';
 import { Icons } from '@/components/icons';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
+import { Button, buttonVariants } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { ModuleErrorAlert } from '@/features/platform/components/module-error-alert';
@@ -29,8 +31,6 @@ import type { EmailList } from '@/lib/api/generated/model/emailList';
 import type { EmailTemplate } from '@/lib/api/generated/model/emailTemplate';
 import type { Form } from '@/lib/api/generated/model/form';
 import { SendConditionEnum } from '@/lib/api/generated/model/sendConditionEnum';
-import { Status372Enum } from '@/lib/api/generated/model/status372Enum';
-import { Status37cEnum } from '@/lib/api/generated/model/status37cEnum';
 import { StepTypeEnum } from '@/lib/api/generated/model/stepTypeEnum';
 import { cn } from '@/lib/utils';
 import {
@@ -103,7 +103,32 @@ function NativeSelect({
 }
 
 function getFormLabel(form: Form) {
-  return `${form.title}${form.framework_code ? ` (${form.framework_code})` : ''}`;
+  return `${form.title}${form.framework_code ? ` (${form.framework_code})` : ''} - ${form.status ?? 'DRAFT'}`;
+}
+
+function ResourcePreview({
+  title,
+  description,
+  children,
+  actions
+}: {
+  title: string;
+  description?: string;
+  children: React.ReactNode;
+  actions?: React.ReactNode;
+}) {
+  return (
+    <Card className='md:col-span-2'>
+      <CardHeader className='flex flex-col gap-3 md:flex-row md:items-start md:justify-between'>
+        <div className='space-y-1'>
+          <CardTitle className='text-base'>{title}</CardTitle>
+          {description ? <CardDescription>{description}</CardDescription> : null}
+        </div>
+        {actions ? <div className='flex flex-wrap gap-2'>{actions}</div> : null}
+      </CardHeader>
+      <CardContent>{children}</CardContent>
+    </Card>
+  );
 }
 
 export function CampaignCreateWizard() {
@@ -111,18 +136,9 @@ export function CampaignCreateWizard() {
   const [step, setStep] = useState(0);
   const [values, setValues] = useState<CampaignWizardValues>(DEFAULT_VALUES);
 
-  const formsQuery = useSurveysFormsList(
-    { status: Status37cEnum.ACTIVE },
-    { query: { staleTime: 60_000 } }
-  );
-  const listsQuery = useContactsListsList(
-    { status: Status372Enum.ACTIVE },
-    { query: { staleTime: 60_000 } }
-  );
-  const templatesQuery = useEmailTemplatesList(
-    { status: Status372Enum.ACTIVE },
-    { query: { staleTime: 60_000 } }
-  );
+  const formsQuery = useSurveysFormsList({ page_size: '100' }, { query: { staleTime: 60_000 } });
+  const listsQuery = useContactsListsList(undefined, { query: { staleTime: 60_000 } });
+  const templatesQuery = useEmailTemplatesList(undefined, { query: { staleTime: 60_000 } });
 
   const forms = getCollectionItems(
     getOrvalResponseData<Form[] | { results?: Form[] }>(formsQuery.data)
@@ -141,6 +157,18 @@ export function CampaignCreateWizard() {
       templates: values.delivery_channel === DeliveryChannelEnum.WEBHOOK || templates.length > 0
     }),
     [forms.length, lists.length, templates.length, values.delivery_channel]
+  );
+  const selectedForm = useMemo(
+    () => forms.find((form) => form.id === values.form),
+    [forms, values.form]
+  );
+  const selectedList = useMemo(
+    () => lists.find((list) => list.id === values.email_list),
+    [lists, values.email_list]
+  );
+  const selectedTemplate = useMemo(
+    () => templates.find((template) => template.id === values.email_template),
+    [templates, values.email_template]
   );
 
   const createMutation = useCampaignsCreate();
@@ -295,8 +323,8 @@ export function CampaignCreateWizard() {
         <Alert>
           <AlertTitle>Pre-requisitos incompletos</AlertTitle>
           <AlertDescription>
-            Para campanhas por email, tenha ao menos um formulario ativo, uma lista ativa e um
-            template ativo.
+            Para campanhas por email, tenha ao menos um formulario, uma lista e um template
+            cadastrados no tenant atual.
           </AlertDescription>
         </Alert>
       ) : null}
@@ -343,6 +371,36 @@ export function CampaignCreateWizard() {
               ))}
             </NativeSelect>
           </Field>
+          {selectedForm ? (
+            <ResourcePreview
+              title={selectedForm.title}
+              description={selectedForm.description || 'Formulario selecionado para a campanha.'}
+              actions={
+                <Link
+                  href={`/dashboard/surveys/forms/${selectedForm.id}`}
+                  className={cn(buttonVariants({ variant: 'outline', size: 'sm' }))}
+                >
+                  <Icons.edit className='mr-2 h-4 w-4' />
+                  Editar formulario
+                </Link>
+              }
+            >
+              <div className='grid gap-3 text-sm md:grid-cols-3'>
+                <div>
+                  <span className='text-muted-foreground block'>Framework</span>
+                  <Badge variant='outline'>{selectedForm.framework_code || 'Custom'}</Badge>
+                </div>
+                <div>
+                  <span className='text-muted-foreground block'>Status</span>
+                  <Badge variant='outline'>{selectedForm.status ?? 'DRAFT'}</Badge>
+                </div>
+                <div>
+                  <span className='text-muted-foreground block'>ID</span>
+                  <span className='font-mono text-xs'>{selectedForm.id}</span>
+                </div>
+              </div>
+            </ResourcePreview>
+          ) : null}
         </div>
       ) : null}
 
@@ -357,7 +415,7 @@ export function CampaignCreateWizard() {
                 <option value=''>Selecione uma lista</option>
                 {lists.map((list) => (
                   <option key={list.id} value={list.id}>
-                    {list.name} ({list.contact_count} contatos)
+                    {list.name} ({list.contact_count} contatos) - {list.status ?? 'ACTIVE'}
                   </option>
                 ))}
               </NativeSelect>
@@ -378,6 +436,47 @@ export function CampaignCreateWizard() {
               tenant atual.
             </p>
           </div>
+          {selectedList ? (
+            <ResourcePreview
+              title={selectedList.name}
+              description={selectedList.description || 'Lista selecionada para envio por email.'}
+              actions={
+                <>
+                  <Link
+                    href={`/dashboard/contacts/lists/${selectedList.id}/contacts`}
+                    className={cn(buttonVariants({ variant: 'outline', size: 'sm' }))}
+                  >
+                    <Icons.teams className='mr-2 h-4 w-4' />
+                    Ver contatos
+                  </Link>
+                  <Link
+                    href='/dashboard/contacts/lists'
+                    className={cn(buttonVariants({ variant: 'outline', size: 'sm' }))}
+                  >
+                    <Icons.edit className='mr-2 h-4 w-4' />
+                    Editar listas
+                  </Link>
+                </>
+              }
+            >
+              <div className='grid gap-3 text-sm md:grid-cols-3'>
+                <div>
+                  <span className='text-muted-foreground block'>Contatos</span>
+                  <span className='text-lg font-semibold tabular-nums'>
+                    {selectedList.contact_count}
+                  </span>
+                </div>
+                <div>
+                  <span className='text-muted-foreground block'>Status</span>
+                  <Badge variant='outline'>{selectedList.status ?? 'ACTIVE'}</Badge>
+                </div>
+                <div>
+                  <span className='text-muted-foreground block'>ID</span>
+                  <span className='font-mono text-xs'>{selectedList.id}</span>
+                </div>
+              </div>
+            </ResourcePreview>
+          ) : null}
         </div>
       ) : null}
 
@@ -392,7 +491,7 @@ export function CampaignCreateWizard() {
               <option value=''>Selecione um template</option>
               {templates.map((template) => (
                 <option key={template.id} value={template.id}>
-                  {template.name} - {template.subject}
+                  {template.name} - {template.subject} - {template.status ?? 'ACTIVE'}
                 </option>
               ))}
             </NativeSelect>
@@ -436,6 +535,36 @@ export function CampaignCreateWizard() {
               ))}
             </NativeSelect>
           </Field>
+          {selectedTemplate ? (
+            <ResourcePreview
+              title={selectedTemplate.name}
+              description={selectedTemplate.subject}
+              actions={
+                <Link
+                  href={`/dashboard/email-templates/${selectedTemplate.id}/edit`}
+                  className={cn(buttonVariants({ variant: 'outline', size: 'sm' }))}
+                >
+                  <Icons.edit className='mr-2 h-4 w-4' />
+                  Editar template
+                </Link>
+              }
+            >
+              <div className='grid gap-3 text-sm md:grid-cols-3'>
+                <div>
+                  <span className='text-muted-foreground block'>Tipo</span>
+                  <Badge variant='outline'>{selectedTemplate.template_type ?? 'WELCOME'}</Badge>
+                </div>
+                <div>
+                  <span className='text-muted-foreground block'>Status</span>
+                  <Badge variant='outline'>{selectedTemplate.status ?? 'ACTIVE'}</Badge>
+                </div>
+                <div>
+                  <span className='text-muted-foreground block'>Idioma</span>
+                  <span className='uppercase'>{selectedTemplate.language ?? '-'}</span>
+                </div>
+              </div>
+            </ResourcePreview>
+          ) : null}
         </div>
       ) : null}
 
@@ -477,7 +606,15 @@ export function CampaignCreateWizard() {
           </div>
           <div>
             <span className='text-muted-foreground block'>Formulario</span>
-            <span>{forms.find((form) => form.id === values.form)?.title ?? '-'}</span>
+            <span>{selectedForm?.title ?? '-'}</span>
+          </div>
+          <div>
+            <span className='text-muted-foreground block'>Lista</span>
+            <span>{selectedList?.name ?? '-'}</span>
+          </div>
+          <div>
+            <span className='text-muted-foreground block'>Template</span>
+            <span>{selectedTemplate?.name ?? '-'}</span>
           </div>
           <div>
             <span className='text-muted-foreground block'>Agendamento</span>

@@ -19,7 +19,8 @@ const FORWARDED_REQUEST_HEADERS = ['content-type', 'authorization', 'accept'];
 const FORWARDED_RESPONSE_HEADERS = ['content-type'];
 
 async function proxyToBackend(request: NextRequest, pathSegments: string[]): Promise<NextResponse> {
-  const targetUrl = `${BACKEND_BASE_URL}/api/${pathSegments.join('/')}/${request.nextUrl.search}`;
+  const backendPrefix = pathSegments[0] === 'public' ? '' : '/api';
+  const targetUrl = `${BACKEND_BASE_URL}${backendPrefix}/${pathSegments.join('/')}/${request.nextUrl.search}`;
 
   const forwardHeaders = new Headers();
   for (const header of FORWARDED_REQUEST_HEADERS) {
