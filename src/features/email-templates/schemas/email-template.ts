@@ -1,5 +1,6 @@
 import * as z from 'zod';
 
+import type { EmailTemplate } from '@/lib/api/generated/model/emailTemplate';
 import { Status372Enum } from '@/lib/api/generated/model/status372Enum';
 import { TemplateTypeEnum } from '@/lib/api/generated/model/templateTypeEnum';
 
@@ -61,7 +62,7 @@ export type EmailTemplatePayload = {
   required_variables: string[];
   language: string;
   status: Status372Enum;
-  is_default: boolean;
+  is_default?: boolean;
 };
 
 export function parseRequiredVariables(value: string) {
@@ -76,7 +77,8 @@ function extractTemplateVariables(value: string) {
 }
 
 export function normalizeEmailTemplateValues(
-  values: EmailTemplateFormValues
+  values: EmailTemplateFormValues,
+  options: { isDefault?: boolean } = {}
 ): EmailTemplatePayload {
   return {
     name: values.name.trim(),
@@ -88,7 +90,23 @@ export function normalizeEmailTemplateValues(
     required_variables: parseRequiredVariables(values.requiredVariablesText),
     language: values.language.trim(),
     status: values.status,
-    is_default: false
+    ...(options.isDefault !== undefined && { is_default: options.isDefault })
+  };
+}
+
+export function getEmailTemplateFormValues(template: EmailTemplate): EmailTemplateFormValues {
+  return {
+    name: template.name,
+    slug: template.slug,
+    template_type: template.template_type ?? TemplateTypeEnum.WELCOME,
+    subject: template.subject,
+    html_content: template.html_content,
+    plain_text_content: template.plain_text_content ?? '',
+    requiredVariablesText: Array.isArray(template.required_variables)
+      ? template.required_variables.join(', ')
+      : '',
+    language: template.language ?? 'pt-BR',
+    status: template.status ?? Status372Enum.ACTIVE
   };
 }
 

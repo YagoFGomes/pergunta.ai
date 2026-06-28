@@ -6,6 +6,16 @@ import { toast } from 'sonner';
 
 import { Icons } from '@/components/icons';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle
+} from '@/components/ui/alert-dialog';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
@@ -16,7 +26,8 @@ import {
   DialogHeader,
   DialogTitle
 } from '@/components/ui/dialog';
-import { useAppForm, useFormFields } from '@/components/ui/tanstack-form';
+import { useAppForm } from '@/components/ui/tanstack-form';
+import { EmailTemplateFormFields } from '@/features/email-templates/components/email-template-form-fields';
 import { ModuleDataTable } from '@/features/platform/components/module-data-table';
 import { ModuleDataTableSkeleton } from '@/features/platform/components/module-data-table-skeleton';
 import { ModuleErrorAlert } from '@/features/platform/components/module-error-alert';
@@ -28,6 +39,7 @@ import { useDataTable } from '@/hooks/use-data-table';
 import {
   getEmailTemplatesListQueryKey,
   useEmailTemplatesCreate,
+  useEmailTemplatesDestroy,
   useEmailTemplatesList
 } from '@/lib/api/generated/endpoints';
 import type { EmailTemplate } from '@/lib/api/generated/model/emailTemplate';
@@ -35,7 +47,6 @@ import type { EmailTemplatesListParams } from '@/lib/api/generated/model/emailTe
 import { Status372Enum } from '@/lib/api/generated/model/status372Enum';
 import { TemplateTypeEnum } from '@/lib/api/generated/model/templateTypeEnum';
 import {
-  emailTemplateFieldSchemas,
   emailTemplateFormSchema,
   getMissingRequiredVariableDeclarations,
   normalizeEmailTemplateValues,
@@ -43,7 +54,6 @@ import {
 } from '@/features/email-templates/schemas/email-template';
 
 import { getEmailTemplatesColumns } from './columns';
-import { EMAIL_TEMPLATE_STATUS_OPTIONS, EMAIL_TEMPLATE_TYPE_OPTIONS } from './options';
 
 const EMAIL_TEMPLATE_FILTER_KEYS = ['search', 'status', 'template_type'] as const;
 
@@ -67,7 +77,44 @@ function normalizeSingleFilter(value: unknown) {
 export function EmailTemplatesManager() {
   const queryClient = useQueryClient();
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
-  const columns = useMemo(() => getEmailTemplatesColumns(), []);
+  const [deleteTemplate, setDeleteTemplate] = useState<EmailTemplate | null>(null);
+
+  const createMutation = useEmailTemplatesCreate({
+    mutation: {
+      onSuccess: async () => {
+        await queryClient.invalidateQueries({ queryKey: getEmailTemplatesListQueryKey() });
+        toast.success('Template criado com sucesso.');
+        setIsCreateDialogOpen(false);
+      },
+      onError: (error) => {
+        notifyError(error, 'Nao foi possivel criar o template.');
+      }
+    }
+  });
+
+  const destroyMutation = useEmailTemplatesDestroy({
+    mutation: {
+      onSuccess: async () => {
+        await queryClient.invalidateQueries({ queryKey: getEmailTemplatesListQueryKey() });
+        toast.success('Template excluido com sucesso.');
+        setDeleteTemplate(null);
+      },
+      onError: (error) => {
+        notifyError(error, 'Nao foi possivel excluir o template.');
+      }
+    }
+  });
+
+  const hasMutationInFlight = createMutation.isPending || destroyMutation.isPending;
+
+  const columns = useMemo(
+    () =>
+      getEmailTemplatesColumns({
+        onDelete: setDeleteTemplate,
+        disableActions: hasMutationInFlight
+      }),
+    [hasMutationInFlight]
+  );
 
   const { params } = useModuleTableParams<
     EmailTemplate,
@@ -98,22 +145,8 @@ export function EmailTemplatesManager() {
     }
   });
 
-  const createMutation = useEmailTemplatesCreate({
-    mutation: {
-      onSuccess: async () => {
-        await queryClient.invalidateQueries({ queryKey: getEmailTemplatesListQueryKey() });
-        toast.success('Template criado com sucesso.');
-        setIsCreateDialogOpen(false);
-      },
-      onError: (error) => {
-        notifyError(error, 'Nao foi possivel criar o template.');
-      }
-    }
-  });
-
   const templates = getOrvalResponseData<EmailTemplate[]>(templatesQuery.data) ?? [];
   const hasFilters = Boolean(params.search || params.status || params.template_type);
-  const isCreating = createMutation.isPending;
 
   const form = useAppForm({
     defaultValues: DEFAULT_TEMPLATE_VALUES,
@@ -125,7 +158,7 @@ export function EmailTemplatesManager() {
         return;
       }
 
-      const normalized = normalizeEmailTemplateValues(parsed.data);
+      const normalized = normalizeEmailTemplateValues(parsed.data, { isDefault: false });
       const missingVariables = getMissingRequiredVariableDeclarations(normalized);
 
       if (missingVariables.length > 0) {
@@ -138,9 +171,6 @@ export function EmailTemplatesManager() {
       });
     }
   });
-
-  const { FormTextField, FormTextareaField, FormSelectField } =
-    useFormFields<EmailTemplateFormValues>();
 
   function openCreateDialog() {
     form.reset(DEFAULT_TEMPLATE_VALUES);
@@ -190,7 +220,7 @@ export function EmailTemplatesManager() {
               Consulte os templates disponiveis para vincular nas campanhas.
             </p>
           </div>
-          <Button onClick={openCreateDialog} disabled={isCreating}>
+          <Button onClick={openCreateDialog} disabled={hasMutationInFlight}>
             Novo template
           </Button>
         </div>
@@ -223,7 +253,7 @@ export function EmailTemplatesManager() {
       <Dialog
         open={isCreateDialogOpen}
         onOpenChange={(open) => {
-          if (isCreating) {
+          if (hasMutationInFlight) {
             return;
           }
 
@@ -240,117 +270,14 @@ export function EmailTemplatesManager() {
 
           <form.AppForm>
             <form.Form className='space-y-4 p-0 md:p-0'>
-              <div className='grid gap-4 md:grid-cols-2'>
-                <FormTextField
-                  name='name'
-                  label='Nome'
-                  required
-                  placeholder='Ex: Convite NPS'
-                  maxLength={255}
-                  validators={{
-                    onBlur: emailTemplateFieldSchemas.name
-                  }}
-                  disabled={isCreating}
-                />
-
-                <FormTextField
-                  name='slug'
-                  label='Slug'
-                  required
-                  placeholder='convite-nps'
-                  maxLength={100}
-                  validators={{
-                    onBlur: emailTemplateFieldSchemas.slug
-                  }}
-                  disabled={isCreating}
-                />
-
-                <FormSelectField
-                  name='template_type'
-                  label='Tipo'
-                  required
-                  options={EMAIL_TEMPLATE_TYPE_OPTIONS}
-                  validators={{
-                    onBlur: emailTemplateFieldSchemas.template_type
-                  }}
-                  disabled={isCreating}
-                />
-
-                <FormSelectField
-                  name='status'
-                  label='Status'
-                  required
-                  options={EMAIL_TEMPLATE_STATUS_OPTIONS}
-                  validators={{
-                    onBlur: emailTemplateFieldSchemas.status
-                  }}
-                  disabled={isCreating}
-                />
-              </div>
-
-              <FormTextField
-                name='subject'
-                label='Assunto'
-                required
-                placeholder='Sua pesquisa esta pronta, {{ contact_name }}'
-                maxLength={255}
-                validators={{
-                  onBlur: emailTemplateFieldSchemas.subject
-                }}
-                disabled={isCreating}
-              />
-
-              <FormTextareaField
-                name='html_content'
-                label='Conteudo HTML'
-                required
-                rows={7}
-                validators={{
-                  onBlur: emailTemplateFieldSchemas.html_content
-                }}
-                disabled={isCreating}
-              />
-
-              <FormTextareaField
-                name='plain_text_content'
-                label='Conteudo texto'
-                rows={4}
-                validators={{
-                  onBlur: emailTemplateFieldSchemas.plain_text_content
-                }}
-                disabled={isCreating}
-              />
-
-              <div className='grid gap-4 md:grid-cols-[1fr_160px]'>
-                <FormTextField
-                  name='requiredVariablesText'
-                  label='Variaveis obrigatorias'
-                  placeholder='contact_name, survey_link'
-                  validators={{
-                    onBlur: emailTemplateFieldSchemas.requiredVariablesText
-                  }}
-                  disabled={isCreating}
-                />
-
-                <FormTextField
-                  name='language'
-                  label='Idioma'
-                  required
-                  placeholder='pt-BR'
-                  maxLength={10}
-                  validators={{
-                    onBlur: emailTemplateFieldSchemas.language
-                  }}
-                  disabled={isCreating}
-                />
-              </div>
+              <EmailTemplateFormFields disabled={hasMutationInFlight} />
 
               <DialogFooter>
                 <Button
                   type='button'
                   variant='outline'
                   onClick={() => setIsCreateDialogOpen(false)}
-                  disabled={isCreating}
+                  disabled={hasMutationInFlight}
                 >
                   Cancelar
                 </Button>
@@ -358,7 +285,10 @@ export function EmailTemplatesManager() {
                   selector={(state) => [state.canSubmit, state.isSubmitting] as const}
                 >
                   {([canSubmit, isSubmitting]) => (
-                    <Button type='submit' disabled={!canSubmit || isSubmitting || isCreating}>
+                    <Button
+                      type='submit'
+                      disabled={!canSubmit || isSubmitting || hasMutationInFlight}
+                    >
                       Criar template
                     </Button>
                   )}
@@ -368,6 +298,42 @@ export function EmailTemplatesManager() {
           </form.AppForm>
         </DialogContent>
       </Dialog>
+
+      <AlertDialog
+        open={Boolean(deleteTemplate)}
+        onOpenChange={(open) => {
+          if (!open) {
+            setDeleteTemplate(null);
+          }
+        }}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Excluir template?</AlertDialogTitle>
+            <AlertDialogDescription>
+              O template {deleteTemplate?.name ? `"${deleteTemplate.name}"` : ''} sera removido
+              permanentemente. Templates globais podem exigir permissao de superuser.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={hasMutationInFlight}>Cancelar</AlertDialogCancel>
+            <AlertDialogAction
+              disabled={hasMutationInFlight || !deleteTemplate}
+              onClick={(event) => {
+                event.preventDefault();
+
+                if (!deleteTemplate) {
+                  return;
+                }
+
+                void destroyMutation.mutateAsync({ id: deleteTemplate.id });
+              }}
+            >
+              Excluir template
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

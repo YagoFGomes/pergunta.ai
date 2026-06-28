@@ -49,7 +49,15 @@ function getRequiredVariablesCount(requiredVariables: EmailTemplate['required_va
   return 0;
 }
 
-export function getEmailTemplatesColumns(): ColumnDef<EmailTemplate>[] {
+type GetEmailTemplatesColumnsConfig = {
+  onDelete?: (template: EmailTemplate) => void;
+  disableActions?: boolean;
+};
+
+export function getEmailTemplatesColumns({
+  onDelete,
+  disableActions = false
+}: GetEmailTemplatesColumnsConfig = {}): ColumnDef<EmailTemplate>[] {
   return [
     {
       id: 'search',
@@ -152,6 +160,17 @@ export function getEmailTemplatesColumns(): ColumnDef<EmailTemplate>[] {
             <Link href={`/dashboard/email-templates/${row.original.id}/edit`}>
               <Icons.edit className='h-4 w-4' />
             </Link>
+          </Button>
+          <Button
+            type='button'
+            variant='ghost'
+            size='icon'
+            className='text-destructive hover:text-destructive'
+            aria-label='Excluir template'
+            disabled={disableActions || !onDelete}
+            onClick={() => onDelete?.(row.original)}
+          >
+            <Icons.trash className='h-4 w-4' />
           </Button>
         </div>
       )

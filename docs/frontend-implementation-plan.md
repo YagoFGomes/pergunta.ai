@@ -260,6 +260,7 @@ Formato de colunas:
 - FE-303 Editar template
 - FE-304 Excluir template
 - FE-305 Preview de template
+- FE-306 Editor HTML de templates (v1 reduzido / v2 rich text)
 
 ## Epic FE-05 - Campanhas
 
@@ -881,3 +882,72 @@ Validacao:
 
 - `bun run lint` passou; permanecem warnings preexistentes que nao bloqueiam a execucao
 - `bun run build` passou
+
+### FE-303 - Editar template
+
+Status: Implementado em 2026-06-28.
+
+Resumo:
+
+- substituido o shell de `/dashboard/email-templates/[id]/edit` por uma tela real de edicao
+- criada `EmailTemplateEdit` em `src/features/email-templates/components/email-template-edit.tsx`
+- conectada consulta `useEmailTemplatesRetrieve(id)` para carregar o template
+- conectada mutacao `useEmailTemplatesPartialUpdate` para `PATCH /api/email-templates/{id}/`
+- extraido `EmailTemplateFormFields` para reaproveitar os mesmos campos entre criacao e edicao
+- adicionado helper `getEmailTemplateFormValues` para transformar `EmailTemplate` em valores de formulario
+- a edicao reutiliza as validacoes de slug, variaveis obrigatorias, duplicadas e placeholders nao declarados
+- apos salvar, a listagem e o detalhe do template sao invalidados no TanStack Query
+- observacao de contrato: templates globais (`tenant = null`) aparecem na listagem, mas o backend permite edicao apenas para superuser
+
+Validacao:
+
+- `bun run lint` passou; permanecem warnings preexistentes que nao bloqueiam a execucao
+- `bun run build` passou
+
+### FE-304 - Excluir template
+
+Status: Implementado em 2026-06-28.
+
+Resumo:
+
+- adicionada acao de excluir por linha na tabela de templates
+- `getEmailTemplatesColumns` passou a aceitar `onDelete` e `disableActions`
+- implementado `AlertDialog` de confirmacao antes da exclusao
+- conectada mutacao `useEmailTemplatesDestroy` para `DELETE /api/email-templates/{id}/`
+- apos excluir, a listagem de templates e invalidada no TanStack Query
+- erros de permissao ou contrato sao exibidos pelo normalizador de erros da plataforma
+- observacao de contrato: exclusao de templates globais tambem depende da permissao de superuser no backend
+
+Validacao:
+
+- `bun run lint` passou; permanecem warnings preexistentes que nao bloqueiam a execucao
+- `bun run build` passou
+
+### TODO FE-306 - Editor HTML de templates
+
+Status: Backlog em 2026-06-28.
+
+Motivacao:
+
+- o CRUD atual de templates usa `textarea` para `html_content`, suficiente para o MVP tecnico
+- para operadores nao tecnicos, editar HTML manualmente aumenta risco de erro visual e retrabalho
+
+Escopo v1 reduzido:
+
+- melhorar o campo `html_content` com ajuda contextual, snippets de placeholders e preview lado a lado
+- manter o payload como HTML simples no contrato atual (`html_content`)
+- evitar dependencia pesada ate validar fluxo real de criacao de campanhas
+
+Escopo v2:
+
+- substituir o `textarea` por editor rich text/HTML controlado
+- avaliar biblioteca dedicada com suporte a HTML, toolbar basica, links, listas e placeholders
+- manter sanitizacao compatível com o backend, que hoje permite tags HTML limitadas
+- preservar validacao de placeholders `{{ variable }}` e `required_variables`
+
+Criterios de aceite futuros:
+
+- usuario consegue criar template visualmente sem escrever HTML bruto
+- placeholders continuam inseriveis e validaveis
+- preview mostra resultado aproximado antes do envio
+- HTML gerado respeita as tags aceitas pelo serializer do backend
