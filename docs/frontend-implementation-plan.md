@@ -300,6 +300,17 @@ Formato de colunas:
 - FE-704 Smoke test ponta a ponta
 - FE-705 Checklist de release
 
+## Epic FE-09 - Identidade Visual Premium
+
+- FE-801 Discovery visual e auditoria de layout atual
+- FE-802 Definir direcao de arte premium da plataforma
+- FE-803 Criar tokens visuais para espacamento, sombra, borda, cor e tipografia
+- FE-804 Padronizar componentes base com acabamento premium
+- FE-805 Planejar e implementar micro animacoes consistentes
+- FE-806 Refinar layouts dos modulos principais
+- FE-807 Criar checklist de QA visual e acessibilidade para motion
+- FE-808 Rollout incremental da nova identidade por modulo
+
 ## 7. Dependencias Criticas
 
 - FE-001 antes de qualquer entrega de modulo
@@ -308,6 +319,7 @@ Formato de colunas:
 - FE-301..305 antes de FE-402 (campanha depende de template)
 - FE-402/403 antes de FE-606
 - FE-501..503 antes de confiabilidade de metricas finais
+- FE-701..705 antes do rollout completo de FE-09, para evitar polir telas ainda instaveis
 
 ## 8. Criterios de Aceite Globais
 
@@ -1135,3 +1147,62 @@ Validacao:
 - smoke test pelo proxy Next: `GET http://localhost:3000/api/public/surveys/_YwySjnWUxdjiYqcwvgCsqpjllCUdF8BKCjmOB-tcwI` retornou `200`
 - `bun run lint` passou; permanecem warnings preexistentes que nao bloqueiam a execucao
 - `bun run build` passou
+
+### TODO FE-801..FE-808 - Identidade Visual Premium
+
+Status: Backlog em 2026-06-28.
+
+Motivacao:
+
+- a plataforma ja possui fluxos funcionais importantes, mas varias telas ainda usam uma composicao simples de dashboard
+- a proxima evolucao visual deve transformar o produto em uma experiencia mais premium, com identidade propria, sem comprometer clareza operacional
+- a melhoria precisa ser transversal: layout, tokens, componentes, motion, estados de feedback e consistencia entre modulos
+
+Principios de direcao:
+
+- manter o produto com cara de ferramenta de trabalho: denso, claro, escaneavel e eficiente
+- elevar o acabamento com hierarquia visual, contraste, espacamento, estados refinados e micro interacoes discretas
+- evitar decoracao gratuita; motion e visual devem ajudar orientacao, feedback e percepcao de qualidade
+- preservar acessibilidade, responsividade e performance
+
+Escopo planejado:
+
+- FE-801 Discovery visual e auditoria:
+  - revisar telas atuais de surveys, contatos, templates, campanhas, analytics e resposta publica
+  - mapear inconsistencias de alinhamento, densidade, estados, botoes, tabelas, dialogs e headers
+  - separar problemas funcionais de problemas puramente visuais
+- FE-802 Direcao de arte premium:
+  - definir referencias visuais e tom do produto
+  - consolidar paleta, uso de superficies, sombras, bordas, icones e linguagem de status
+  - definir onde a experiencia deve ser mais operacional e onde pode ser mais expressiva
+- FE-803 Tokens visuais:
+  - revisar tokens de cor, radius, borda, sombra, focus ring, espacamento e tipografia
+  - criar padroes de elevacao e superficies para app shell, paginas, tabelas, formularios e cards
+  - documentar variacoes light/dark se aplicavel
+- FE-804 Componentes base premium:
+  - refinar botoes, inputs, selects, badges, alerts, dialogs, tables, tabs, skeletons e empty states
+  - padronizar headers de pagina, barras de acao, cards de metrica e paineis laterais
+  - manter APIs de componentes estaveis sempre que possivel
+- FE-805 Micro animacoes:
+  - planejar transicoes de hover, press, focus, loading, skeleton, dialogs, dropdowns, toasts e troca de etapas
+  - usar duracoes curtas e easing consistente
+  - respeitar `prefers-reduced-motion`
+- FE-806 Refinamento por modulo:
+  - aplicar a identidade em surveys, contatos, templates, campanhas, analytics e pagina publica
+  - priorizar telas de maior frequencia e maior impacto comercial
+  - evitar reescrever CRUDs enquanto o foco for acabamento visual
+- FE-807 QA visual e acessibilidade:
+  - validar desktop/mobile, contraste, navegação por teclado, focus states e motion reduzido
+  - criar checklist reutilizavel para cada modulo
+- FE-808 Rollout incremental:
+  - aplicar primeiro nos componentes compartilhados
+  - depois migrar modulos por lote
+  - documentar antes/depois e riscos de regressao visual
+
+Criterios de aceite futuros:
+
+- plataforma possui linguagem visual consistente entre modulos
+- componentes compartilhados cobrem os padroes principais sem duplicacao local
+- micro animacoes melhoram feedback sem atrasar fluxos operacionais
+- todas as telas refinadas continuam responsivas, acessiveis e com estados de loading/erro/vazio
+- `bun run lint` e `bun run build` passam apos cada lote de rollout
