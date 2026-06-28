@@ -9,6 +9,7 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { useAppForm } from '@/components/ui/tanstack-form';
 import { EmailTemplateFormFields } from '@/features/email-templates/components/email-template-form-fields';
+import { EmailTemplatePreview } from '@/features/email-templates/components/email-template-preview';
 import {
   emailTemplateFormSchema,
   getEmailTemplateFormValues,
@@ -105,34 +106,40 @@ function EmailTemplateEditor({ template }: EmailTemplateEditorProps) {
   const isPending = updateMutation.isPending;
 
   return (
-    <ModuleFormCard
-      title='Editar template'
-      description='Atualize assunto, conteudo e variaveis obrigatorias do template.'
-      footer={
-        <ModuleFormActions
-          mode='edit'
-          formId={EDIT_EMAIL_TEMPLATE_FORM_ID}
-          isPending={isPending}
-          submitLabel='Salvar alteracoes'
-          onCancel={() => router.push('/dashboard/email-templates')}
-        />
-      }
-    >
-      <Alert>
-        <Icons.info className='h-4 w-4' />
-        <AlertTitle>{template.is_default ? 'Template padrao' : 'Template customizado'}</AlertTitle>
-        <AlertDescription>
-          Criado em {formatDateTime(template.created_at)}. Ultima atualizacao em{' '}
-          {formatDateTime(template.updated_at)}.
-        </AlertDescription>
-      </Alert>
+    <div className='space-y-6'>
+      <ModuleFormCard
+        title='Editar template'
+        description='Atualize assunto, conteudo e variaveis obrigatorias do template.'
+        footer={
+          <ModuleFormActions
+            mode='edit'
+            formId={EDIT_EMAIL_TEMPLATE_FORM_ID}
+            isPending={isPending}
+            submitLabel='Salvar alteracoes'
+            onCancel={() => router.push('/dashboard/email-templates')}
+          />
+        }
+      >
+        <Alert>
+          <Icons.info className='h-4 w-4' />
+          <AlertTitle>
+            {template.is_default ? 'Template padrao' : 'Template customizado'}
+          </AlertTitle>
+          <AlertDescription>
+            Criado em {formatDateTime(template.created_at)}. Ultima atualizacao em{' '}
+            {formatDateTime(template.updated_at)}.
+          </AlertDescription>
+        </Alert>
 
-      <form.AppForm>
-        <form.Form id={EDIT_EMAIL_TEMPLATE_FORM_ID} className='space-y-4 p-0 md:p-0'>
-          <EmailTemplateFormFields disabled={isPending} />
-        </form.Form>
-      </form.AppForm>
-    </ModuleFormCard>
+        <form.AppForm>
+          <form.Form id={EDIT_EMAIL_TEMPLATE_FORM_ID} className='space-y-4 p-0 md:p-0'>
+            <EmailTemplateFormFields disabled={isPending} />
+          </form.Form>
+        </form.AppForm>
+      </ModuleFormCard>
+
+      <EmailTemplatePreview template={template} />
+    </div>
   );
 }
 

@@ -122,3 +122,29 @@ export function getMissingRequiredVariableDeclarations(payload: EmailTemplatePay
     .filter((variableName) => !declaredVariables.has(variableName))
     .toSorted();
 }
+
+export function getEmailTemplateRequiredVariables(template: EmailTemplate) {
+  return Array.isArray(template.required_variables)
+    ? template.required_variables.filter((item): item is string => typeof item === 'string')
+    : [];
+}
+
+function getPreviewVariableFallback(variableName: string) {
+  const lowerName = variableName.toLowerCase();
+
+  if (lowerName.includes('name')) return 'Ana Souza';
+  if (lowerName.includes('link') || lowerName.includes('url')) return 'https://pergunta.ai/s/demo';
+  if (lowerName.includes('email')) return 'ana@example.com';
+  if (lowerName.includes('company') || lowerName.includes('empresa')) return 'Pergunta.ai';
+
+  return `Valor de ${variableName}`;
+}
+
+export function buildEmailTemplatePreviewVariables(requiredVariables: string[]) {
+  return Object.fromEntries(
+    requiredVariables.map((variableName) => [
+      variableName,
+      getPreviewVariableFallback(variableName)
+    ])
+  );
+}

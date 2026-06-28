@@ -923,6 +923,47 @@ Validacao:
 - `bun run lint` passou; permanecem warnings preexistentes que nao bloqueiam a execucao
 - `bun run build` passou
 
+### FE-305 - Preview de template
+
+Status: Implementado em 2026-06-28.
+
+Resumo:
+
+- adicionada area de preview na tela `/dashboard/email-templates/[id]/edit`
+- criado `EmailTemplatePreview` em `src/features/email-templates/components/email-template-preview.tsx`
+- conectado `useEmailTemplatesPreviewCreate` para `POST /api/email-templates/{id}/preview/`
+- variaveis obrigatorias sao carregadas de `required_variables` e exibidas como inputs editaveis
+- valores de exemplo sao sugeridos automaticamente para variaveis comuns como nome, link, email e empresa
+- preview renderiza:
+  - assunto final
+  - HTML renderizado
+  - texto puro renderizado
+- erros de preview usam o normalizador de erro da plataforma
+- erros com `missing_variables` recebem mensagem especifica listando variaveis pendentes
+- adicionados helpers em `src/features/email-templates/schemas/email-template.ts` para extrair variaveis e gerar valores de exemplo
+- observacao de contrato: o modelo Orval `EmailTemplatePreview` representa o body da request (`variables`), mas o backend retorna `subject`, `html_content` e `plain_text_content`; por isso o componente usa um tipo local para a resposta renderizada
+
+Validacao:
+
+- `bun run lint` passou; permanecem warnings preexistentes que nao bloqueiam a execucao
+- `bun run build` passou
+
+### Ajuste de UX - Alinhamento da edicao de template
+
+Status: Implementado em 2026-06-28.
+
+Resumo:
+
+- a rota `/dashboard/email-templates/[id]/edit` passou a usar `PageContainer`
+- adicionados titulo, descricao e acao "Voltar" no mesmo padrao visual da edicao de formularios em `/dashboard/surveys/forms/[id]`
+- corrigido o desalinhamento causado pela renderizacao direta do componente de edicao sem o container padrao de pagina
+- nenhum contrato de API, schema ou comportamento de mutacao foi alterado
+
+Validacao:
+
+- `bun run lint` passou; permanecem warnings preexistentes que nao bloqueiam a execucao
+- `bun run build` passou
+
 ### TODO FE-306 - Editor HTML de templates
 
 Status: Backlog em 2026-06-28.
