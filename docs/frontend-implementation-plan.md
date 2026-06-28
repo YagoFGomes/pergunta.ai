@@ -823,3 +823,27 @@ Validacao:
 
 - `bun run lint` passou; permanecem warnings preexistentes que nao bloqueiam a execucao
 - `bun run build` passou
+
+### FE-301 - Listar templates de email
+
+Status: Implementado em 2026-06-28.
+
+Resumo:
+
+- substituido o shell de `/dashboard/email-templates` por uma tela real de listagem de templates
+- criada a feature `src/features/email-templates/components/templates-table/`
+- conectada listagem real via `useEmailTemplatesList`
+- adicionadas colunas de template, tipo, idioma, variaveis obrigatorias, status, ultima atualizacao e acao de editar
+- adicionados filtros sincronizados com a URL:
+  - `search`
+  - `status`
+  - `template_type`
+- adicionados estados de loading, erro, vazio e indicacao de atualizacao durante refetch
+- a acao de editar aponta para o shell ja existente `/dashboard/email-templates/{id}/edit`
+- observacao de contrato: `GET /api/email-templates/` expoe `search`, `status` e `template_type`, mas ainda nao expoe `page`/`page_size`; por isso a paginacao backend fica para uma evolucao de contrato
+- CRUD de criacao/edicao/exclusao e preview permanecem para `FE-302`..`FE-305`
+
+Validacao:
+
+- `bun run lint` passou; permanecem warnings preexistentes que nao bloqueiam a execucao
+- `bun run build` passou
