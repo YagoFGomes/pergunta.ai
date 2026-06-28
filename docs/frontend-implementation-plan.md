@@ -284,10 +284,10 @@ Formato de colunas:
 ## Epic FE-07 - Analytics e Operacao
 
 - FE-601 Dashboard overview - implementado
-- FE-602 Dashboard NPS
-- FE-603 Dashboard CSAT
-- FE-604 Dashboard CES
-- FE-605 Dashboard CSI
+- FE-602 Dashboard NPS - implementado
+- FE-603 Dashboard CSAT - implementado
+- FE-604 Dashboard CES - implementado
+- FE-605 Dashboard CSI - implementado
 - FE-606 Analytics por campanha - implementado
 - FE-607 Analytics por formulario - implementado
 - FE-608 Logs de envio - implementado
@@ -1304,3 +1304,56 @@ Smoke test manual:
 - acessar `/dashboard/delivery/logs`
 - filtrar por status e por campanha
 - em um log `FAILED`, clicar em `Retry` e confirmar toast de sucesso ou mensagem de erro do backend
+
+### FE-602..FE-605 - Dashboards por Indicador
+
+Status: Implementado em 2026-06-28.
+
+Resumo:
+
+- substituidos os shells de:
+  - `/dashboard/analytics/nps`
+  - `/dashboard/analytics/csat`
+  - `/dashboard/analytics/ces`
+  - `/dashboard/analytics/csi`
+- criado client local `src/features/analytics/api/analytics-metric.ts` para consumir:
+  - `GET /api/analytics/nps`
+  - `GET /api/analytics/csat`
+  - `GET /api/analytics/ces`
+  - `GET /api/analytics/csi`
+- criado helper `src/features/analytics/schemas/analytics-metric.ts`
+- criado componente compartilhado `src/features/analytics/components/analytics-metric-dashboard.tsx`
+- cada dashboard agora exibe:
+  - score atual
+  - media simples dos registros filtrados
+  - variacao entre os dois periodos mais recentes
+  - quantidade de formularios e campanhas no recorte
+  - filtro por periodo
+  - filtro por ID de formulario
+  - filtro por ID de campanha
+  - linha de tendencia compacta dos ultimos registros
+  - tabela de historico com atalhos para analytics por formulario e por campanha
+  - estados de loading, erro e vazio
+- o FE-07 ficou fechado com overview, dashboards por indicador, analytics detalhado por campanha/formulario e logs de envio implementados
+
+Observacoes de contrato:
+
+- os endpoints de lista por indicador ja estao descritos pelo Orval com `MetricResult[]`
+- foi usado client local para manter URLs sem barra final e padronizar os quatro dashboards em um unico componente
+- distribuicoes avancadas, como promotores/neutros/detratores, dependem de payloads agregados futuros; o MVP atual trabalha com `MetricResult`
+
+Validacao:
+
+- `bun run lint` passou; permanecem warnings preexistentes que nao bloqueiam a execucao
+- `bun run build` passou
+
+Smoke test manual:
+
+- acessar `/dashboard/analytics/nps`
+- acessar `/dashboard/analytics/csat`
+- acessar `/dashboard/analytics/ces`
+- acessar `/dashboard/analytics/csi`
+- validar cards de score atual, media, variacao e escopo
+- aplicar filtros por periodo, formulario e campanha
+- validar linha de tendencia e tabela de historico
+- abrir atalhos para analytics por formulario e por campanha

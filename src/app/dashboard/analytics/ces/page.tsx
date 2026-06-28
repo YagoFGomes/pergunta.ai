@@ -1,4 +1,6 @@
-import ModuleShellPage from '@/features/platform/components/module-shell-page';
+import PageContainer from '@/components/layout/page-container';
+import { AnalyticsMetricDashboard } from '@/features/analytics/components/analytics-metric-dashboard';
+import { MetricTypeEnum } from '@/lib/api/generated/model/metricTypeEnum';
 
 export const metadata = {
   title: 'Dashboard: Analytics CES'
@@ -6,16 +8,11 @@ export const metadata = {
 
 export default function AnalyticsCesPage() {
   return (
-    <ModuleShellPage
+    <PageContainer
       pageTitle='Analytics CES'
       pageDescription='Acompanhamento de Customer Effort Score.'
-      scope='FE-604'
-      nextSteps={[
-        'Implementar tendencias de esforco por periodo.',
-        'Permitir corte por formulario e campanha.',
-        'Destacar areas de friccao com pior nota.'
-      ]}
-      endpointReferences={['GET /api/analytics/ces/']}
-    />
+    >
+      <AnalyticsMetricDashboard metricType={MetricTypeEnum.CES} />
+    </PageContainer>
   );
 }

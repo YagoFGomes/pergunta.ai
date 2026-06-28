@@ -1,4 +1,6 @@
-import ModuleShellPage from '@/features/platform/components/module-shell-page';
+import PageContainer from '@/components/layout/page-container';
+import { AnalyticsMetricDashboard } from '@/features/analytics/components/analytics-metric-dashboard';
+import { MetricTypeEnum } from '@/lib/api/generated/model/metricTypeEnum';
 
 export const metadata = {
   title: 'Dashboard: Analytics CSI'
@@ -6,16 +8,11 @@ export const metadata = {
 
 export default function AnalyticsCsiPage() {
   return (
-    <ModuleShellPage
+    <PageContainer
       pageTitle='Analytics CSI'
       pageDescription='Acompanhamento de Customer Satisfaction Index.'
-      scope='FE-605'
-      nextSteps={[
-        'Implementar score consolidado por dimensao.',
-        'Permitir comparacao entre campanhas.',
-        'Adicionar cortes por periodo e formulario.'
-      ]}
-      endpointReferences={['GET /api/analytics/csi/']}
-    />
+    >
+      <AnalyticsMetricDashboard metricType={MetricTypeEnum.CSI} />
+    </PageContainer>
   );
 }

@@ -1,4 +1,6 @@
-import ModuleShellPage from '@/features/platform/components/module-shell-page';
+import PageContainer from '@/components/layout/page-container';
+import { AnalyticsMetricDashboard } from '@/features/analytics/components/analytics-metric-dashboard';
+import { MetricTypeEnum } from '@/lib/api/generated/model/metricTypeEnum';
 
 export const metadata = {
   title: 'Dashboard: Analytics NPS'
@@ -6,16 +8,11 @@ export const metadata = {
 
 export default function AnalyticsNpsPage() {
   return (
-    <ModuleShellPage
+    <PageContainer
       pageTitle='Analytics NPS'
       pageDescription='Acompanhamento de Net Promoter Score.'
-      scope='FE-602'
-      nextSteps={[
-        'Implementar serie temporal de NPS.',
-        'Permitir filtros por campanha e formulario.',
-        'Exibir distribuicao promotores/neutros/detratores.'
-      ]}
-      endpointReferences={['GET /api/analytics/nps/']}
-    />
+    >
+      <AnalyticsMetricDashboard metricType={MetricTypeEnum.NPS} />
+    </PageContainer>
   );
 }
