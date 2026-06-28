@@ -264,15 +264,15 @@ Formato de colunas:
 
 ## Epic FE-05 - Campanhas
 
-- FE-401 Listar campanhas
-- FE-402 Wizard criar campanha (5 passos)
-- FE-403 Tela detalhes da campanha
-- FE-404 Listar steps da campanha
-- FE-405 Criar/editar/remover step
-- FE-406 Agendar campanha
-- FE-407 Pausar campanha
-- FE-408 Retomar campanha
-- FE-409 Cancelar campanha
+- FE-401 Listar campanhas - implementado
+- FE-402 Wizard criar campanha (5 passos) - implementado
+- FE-403 Tela detalhes da campanha - implementado
+- FE-404 Listar steps da campanha - implementado
+- FE-405 Criar/editar/remover step - implementado
+- FE-406 Agendar campanha - implementado
+- FE-407 Pausar campanha - implementado
+- FE-408 Retomar campanha - implementado
+- FE-409 Cancelar campanha - implementado
 
 ## Epic FE-06 - Public Survey
 
@@ -992,3 +992,41 @@ Criterios de aceite futuros:
 - placeholders continuam inseriveis e validaveis
 - preview mostra resultado aproximado antes do envio
 - HTML gerado respeita as tags aceitas pelo serializer do backend
+
+### FE-401..FE-409 - Campanhas
+
+Status: Implementado em 2026-06-28.
+
+Resumo:
+
+- substituidos os shells de `/dashboard/campaigns`, `/dashboard/campaigns/new`, `/dashboard/campaigns/[id]` e `/dashboard/campaigns/[id]/steps` por telas reais
+- criada a feature `src/features/campaigns/` com utilitarios, schemas e componentes dedicados
+- FE-401: listagem de campanhas com filtros por busca/status usando `ModuleDataTable`
+- FE-402: wizard de criacao em 5 etapas:
+  - dados base e formulario
+  - publico/canal de entrega
+  - template e step inicial
+  - agendamento opcional
+  - revisao
+- o wizard cria a campanha em `POST /api/campaigns/`, cria step inicial em `POST /api/campaigns/{id}/steps/` quando o canal e email e agenda em `POST /api/campaigns/{id}/schedule/` quando data/hora forem preenchidas
+- FE-403: tela de detalhe com status, canal, metricas basicas, IDs de relacionamento, links para steps e analytics
+- FE-404: listagem dos steps da campanha com ordem, tipo, template, delay e condicao
+- FE-405: dialog para criar/editar step e confirmacao para remover step
+- FE-406: formulario de agendamento operacional na tela de detalhe
+- FE-407: acao de pausar campanha via `POST /api/campaigns/{id}/pause/`
+- FE-408: acao de retomar campanha via `POST /api/campaigns/{id}/resume/`
+- FE-409: acao de cancelar campanha com confirmacao via `POST /api/campaigns/{id}/cancel/`
+- as consultas e mutacoes invalidam as query keys relacionadas no TanStack Query para atualizar listagem, detalhe e steps
+- observacao de contrato: o frontend trata respostas paginadas e arrays simples para listagens, pois o backend pode retornar `{ count, results }` mesmo quando o tipo Orval aparece como array
+
+Validacao:
+
+- `bun run lint` passou; permanecem warnings preexistentes que nao bloqueiam a execucao
+- `bun run build` passou
+
+Smoke test manual:
+
+- acessar `/dashboard/campaigns` e validar listagem/filtros
+- acessar `/dashboard/campaigns/new` e criar campanha com formulario, lista e template ativos
+- acessar `/dashboard/campaigns/{id}` e validar detalhe, agendamento, pausa, retomada e cancelamento conforme status permitido pelo backend
+- acessar `/dashboard/campaigns/{id}/steps` e validar criar, editar e remover steps

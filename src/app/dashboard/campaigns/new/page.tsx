@@ -1,4 +1,10 @@
-import ModuleShellPage from '@/features/platform/components/module-shell-page';
+import Link from 'next/link';
+
+import { Icons } from '@/components/icons';
+import PageContainer from '@/components/layout/page-container';
+import { buttonVariants } from '@/components/ui/button';
+import { CampaignCreateWizard } from '@/features/campaigns/components/campaign-create-wizard';
+import { cn } from '@/lib/utils';
 
 export const metadata = {
   title: 'Dashboard: Nova Campanha'
@@ -6,21 +12,20 @@ export const metadata = {
 
 export default function NewCampaignPage() {
   return (
-    <ModuleShellPage
+    <PageContainer
       pageTitle='Nova Campanha'
-      pageDescription='Wizard para criacao de campanha (formulario, lista e template).'
-      scope='FE-402'
-      nextSteps={[
-        'Implementar stepper com 5 etapas.',
-        'Persistir dados parciais entre etapas.',
-        'Publicar campanha ao finalizar com validacao completa.'
-      ]}
-      endpointReferences={[
-        'POST /api/campaigns/',
-        'GET /api/surveys/forms/',
-        'GET /api/contacts/lists/',
-        'GET /api/email-templates/'
-      ]}
-    />
+      pageDescription='Wizard para criacao de campanha com formulario, lista, template e agendamento.'
+      pageHeaderAction={
+        <Link
+          href='/dashboard/campaigns'
+          className={cn(buttonVariants({ variant: 'outline' }), 'text-xs md:text-sm')}
+        >
+          <Icons.chevronLeft className='mr-2 h-4 w-4' />
+          Voltar
+        </Link>
+      }
+    >
+      <CampaignCreateWizard />
+    </PageContainer>
   );
 }

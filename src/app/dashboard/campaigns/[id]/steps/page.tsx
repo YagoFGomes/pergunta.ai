@@ -1,4 +1,10 @@
-import ModuleShellPage from '@/features/platform/components/module-shell-page';
+import Link from 'next/link';
+
+import { Icons } from '@/components/icons';
+import PageContainer from '@/components/layout/page-container';
+import { buttonVariants } from '@/components/ui/button';
+import { CampaignStepsManager } from '@/features/campaigns/components/campaign-steps-manager';
+import { cn } from '@/lib/utils';
 
 export const metadata = {
   title: 'Dashboard: Campaign Steps'
@@ -12,21 +18,20 @@ export default async function CampaignStepsPage({ params }: CampaignStepsPagePro
   const { id } = await params;
 
   return (
-    <ModuleShellPage
+    <PageContainer
       pageTitle='Steps da Campanha'
-      pageDescription={`Campanha ${id}: sequencia de envios e regras de step.`}
-      scope='FE-404..FE-405'
-      nextSteps={[
-        'Listar steps vinculados a campanha.',
-        'Criar e editar regras de envio por step.',
-        'Remover steps com confirmacao e feedback visual.'
-      ]}
-      endpointReferences={[
-        'GET /api/campaigns/{campaignId}/steps/',
-        'POST /api/campaigns/{campaignId}/steps/',
-        'PATCH /api/campaigns/{campaignId}/steps/{stepId}/',
-        'DELETE /api/campaigns/{campaignId}/steps/{stepId}/'
-      ]}
-    />
+      pageDescription='Sequencia de envios, templates, delays e condicoes.'
+      pageHeaderAction={
+        <Link
+          href={`/dashboard/campaigns/${id}`}
+          className={cn(buttonVariants({ variant: 'outline' }), 'text-xs md:text-sm')}
+        >
+          <Icons.chevronLeft className='mr-2 h-4 w-4' />
+          Voltar
+        </Link>
+      }
+    >
+      <CampaignStepsManager campaignId={id} />
+    </PageContainer>
   );
 }
