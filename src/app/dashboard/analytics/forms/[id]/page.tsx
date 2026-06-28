@@ -1,4 +1,5 @@
-import ModuleShellPage from '@/features/platform/components/module-shell-page';
+import PageContainer from '@/components/layout/page-container';
+import { AnalyticsDetail } from '@/features/analytics/components/analytics-detail';
 
 export const metadata = {
   title: 'Dashboard: Form Analytics'
@@ -12,16 +13,11 @@ export default async function FormAnalyticsPage({ params }: FormAnalyticsPagePro
   const { id } = await params;
 
   return (
-    <ModuleShellPage
+    <PageContainer
       pageTitle='Analytics do Formulario'
-      pageDescription={`Formulario ${id}: metricas agregadas e resultados por pergunta.`}
-      scope='FE-607'
-      nextSteps={[
-        'Carregar metricas consolidadas por formulario.',
-        'Exibir resultados por pergunta e tipo de metrica.',
-        'Permitir filtros por periodo e campanha quando aplicavel.'
-      ]}
-      endpointReferences={['GET /api/analytics/forms/{formId}/']}
-    />
+      pageDescription='Metricas agregadas, indicadores e historico por formulario.'
+    >
+      <AnalyticsDetail id={id} scope='form' />
+    </PageContainer>
   );
 }

@@ -1,4 +1,5 @@
-import ModuleShellPage from '@/features/platform/components/module-shell-page';
+import PageContainer from '@/components/layout/page-container';
+import { AnalyticsOverview } from '@/features/analytics/components/analytics-overview';
 
 export const metadata = {
   title: 'Dashboard: Analytics Overview'
@@ -6,16 +7,11 @@ export const metadata = {
 
 export default function AnalyticsOverviewPage() {
   return (
-    <ModuleShellPage
+    <PageContainer
       pageTitle='Analytics Overview'
-      pageDescription='Resumo consolidado de desempenho das pesquisas e campanhas.'
-      scope='FE-601'
-      nextSteps={[
-        'Montar cards principais com filtros por periodo, campanha e formulario.',
-        'Conectar graficos com consultas agregadas.',
-        'Adicionar estados de loading, vazio e erro padronizados.'
-      ]}
-      endpointReferences={['GET /api/analytics/overview/']}
-    />
+      pageDescription='Resumo consolidado de campanhas, respostas, entregas e indicadores.'
+    >
+      <AnalyticsOverview />
+    </PageContainer>
   );
 }

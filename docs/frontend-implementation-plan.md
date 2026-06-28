@@ -283,14 +283,14 @@ Formato de colunas:
 
 ## Epic FE-07 - Analytics e Operacao
 
-- FE-601 Dashboard overview
+- FE-601 Dashboard overview - implementado
 - FE-602 Dashboard NPS
 - FE-603 Dashboard CSAT
 - FE-604 Dashboard CES
 - FE-605 Dashboard CSI
-- FE-606 Analytics por campanha
-- FE-607 Analytics por formulario
-- FE-608 Logs de envio
+- FE-606 Analytics por campanha - implementado
+- FE-607 Analytics por formulario - implementado
+- FE-608 Logs de envio - implementado
 
 ## Epic FE-08 - Quality Gate
 
@@ -1206,3 +1206,101 @@ Criterios de aceite futuros:
 - micro animacoes melhoram feedback sem atrasar fluxos operacionais
 - todas as telas refinadas continuam responsivas, acessiveis e com estados de loading/erro/vazio
 - `bun run lint` e `bun run build` passam apos cada lote de rollout
+
+### FE-601 - Dashboard Overview
+
+Status: Implementado em 2026-06-28.
+
+Resumo:
+
+- substituido o shell de `/dashboard/analytics/overview` por uma tela real em `src/features/analytics/components/analytics-overview.tsx`
+- criada a feature `src/features/analytics/` com:
+  - client local `api/analytics-overview.ts`
+  - schema/helpers `schemas/analytics-overview.ts`
+  - componente de dashboard `components/analytics-overview.tsx`
+- o overview consome dados reais de:
+  - `GET /api/analytics/overview`
+  - `GET /api/campaigns/`
+  - `GET /api/email-delivery/logs/`
+- adicionados cards operacionais para:
+  - campanhas
+  - respostas
+  - taxa de resposta
+  - entregas/falhas/pendentes
+- adicionados cards de indicadores para NPS, CSAT, CES e CSI com valor mais recente, periodo e atalho para a serie do indicador
+- adicionado filtro simples por `period` usando data exata, alinhado ao parametro aceito pelo backend
+- adicionados estados de loading, erro e vazio
+- adicionados atalhos para campanhas, logs de entrega e formularios
+- observacao de contrato: o OpenAPI/Orval ainda gera `analyticsOverviewRetrieve` com `data: void`; por isso a FE-601 usa client local tipado ate o schema do backend descrever o payload do overview
+
+Validacao:
+
+- `bun run lint` passou; permanecem warnings preexistentes que nao bloqueiam a execucao
+- `bun run build` passou
+
+Smoke test manual:
+
+- acessar `/dashboard/analytics/overview`
+- validar cards de campanhas, respostas, taxa de resposta e entregas
+- validar cards de NPS, CSAT, CES e CSI
+- aplicar um periodo no filtro e confirmar atualizacao dos dados
+- abrir os atalhos de metricas, campanhas, logs e formularios
+- simular backend indisponivel ou token invalido e confirmar estado de erro com acao "Tentar novamente"
+
+### FE-606, FE-607 e FE-608 - Analytics Detalhado e Logs de Envio
+
+Status: Implementado em 2026-06-28.
+
+Resumo:
+
+- substituidos os shells de:
+  - `/dashboard/analytics/campaigns/[id]`
+  - `/dashboard/analytics/forms/[id]`
+  - `/dashboard/delivery/logs`
+- criado client local `src/features/analytics/api/analytics-detail.ts` para consumir:
+  - `GET /api/analytics/campaigns/{campaignId}`
+  - `GET /api/analytics/forms/{formId}`
+- criado schema/helper `src/features/analytics/schemas/analytics-detail.ts`
+- criado componente compartilhado `src/features/analytics/components/analytics-detail.tsx`
+- analytics por campanha e formulario agora exibem:
+  - cabecalho com recurso atual
+  - total de registros de metricas
+  - total filtrado
+  - quantidade de indicadores disponiveis
+  - cards de NPS, CSAT, CES e CSI
+  - filtro local por periodo
+  - tabela de historico de metricas
+  - atalhos para campanha/formulario e logs quando aplicavel
+- criada feature de delivery em `src/features/delivery/`
+- criado client local `src/features/delivery/api/delivery-logs.ts` para `POST /api/email-delivery/logs/{id}/retry`
+- criado schema/helper `src/features/delivery/schemas/delivery-log.ts`
+- criada tela `src/features/delivery/components/delivery-logs-manager.tsx`
+- logs de envio agora exibem:
+  - resumo de total, pendentes, enviados, falhas e bounces
+  - filtro por status
+  - filtro por ID de campanha
+  - suporte a abrir filtrado via `/dashboard/delivery/logs?campaign={id}`
+  - tabela com destinatario, assunto, erro, tentativas e data
+  - acao de retry habilitada apenas para logs `FAILED`
+
+Observacoes de contrato:
+
+- os endpoints de analytics detalhado ainda aparecem no Orval como `data: void`, entao foram criados clients locais tipados ate o OpenAPI descrever esses payloads
+- o endpoint de retry no backend ignora corpo da requisicao; por isso a UI usa um client local sem body em vez do hook gerado pelo Orval, que exige `EmailSendLog`
+
+Validacao:
+
+- `bun run lint` passou; permanecem warnings preexistentes que nao bloqueiam a execucao
+- `bun run build` passou
+
+Smoke test manual:
+
+- acessar `/dashboard/analytics/campaigns/{id}` com campanha existente
+- validar cards de NPS, CSAT, CES e CSI e tabela de historico
+- aplicar filtro por periodo e limpar filtro
+- abrir o atalho "Logs de entrega" e confirmar `/dashboard/delivery/logs?campaign={id}`
+- acessar `/dashboard/analytics/forms/{id}` com formulario existente
+- validar historico e atalho para o formulario
+- acessar `/dashboard/delivery/logs`
+- filtrar por status e por campanha
+- em um log `FAILED`, clicar em `Retry` e confirmar toast de sucesso ou mensagem de erro do backend

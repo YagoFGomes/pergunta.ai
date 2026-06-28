@@ -1,21 +1,23 @@
-import ModuleShellPage from '@/features/platform/components/module-shell-page';
+import PageContainer from '@/components/layout/page-container';
+import { DeliveryLogsManager } from '@/features/delivery/components/delivery-logs-manager';
 
 export const metadata = {
   title: 'Dashboard: Delivery Logs'
 };
 
-export default function DeliveryLogsPage() {
+type DeliveryLogsPageProps = {
+  searchParams: Promise<{ campaign?: string }>;
+};
+
+export default async function DeliveryLogsPage({ searchParams }: DeliveryLogsPageProps) {
+  const { campaign } = await searchParams;
+
   return (
-    <ModuleShellPage
+    <PageContainer
       pageTitle='Logs de Entrega'
-      pageDescription='Monitoramento de status de envio e falhas de entrega.'
-      scope='FE-608'
-      nextSteps={[
-        'Implementar listagem de logs de envio com filtros.',
-        'Adicionar detalhes de erro por registro.',
-        'Criar acoes de investigacao para falhas recorrentes.'
-      ]}
-      endpointReferences={['GET /api/email-delivery/logs/']}
-    />
+      pageDescription='Monitoramento de status de envio, falhas e tentativas de entrega.'
+    >
+      <DeliveryLogsManager initialCampaign={campaign} />
+    </PageContainer>
   );
 }

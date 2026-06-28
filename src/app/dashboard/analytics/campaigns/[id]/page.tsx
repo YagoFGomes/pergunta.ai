@@ -1,4 +1,5 @@
-import ModuleShellPage from '@/features/platform/components/module-shell-page';
+import PageContainer from '@/components/layout/page-container';
+import { AnalyticsDetail } from '@/features/analytics/components/analytics-detail';
 
 export const metadata = {
   title: 'Dashboard: Campaign Analytics'
@@ -12,16 +13,11 @@ export default async function CampaignAnalyticsPage({ params }: CampaignAnalytic
   const { id } = await params;
 
   return (
-    <ModuleShellPage
+    <PageContainer
       pageTitle='Analytics da Campanha'
-      pageDescription={`Campanha ${id}: respostas, metricas e desempenho de envio.`}
-      scope='FE-606'
-      nextSteps={[
-        'Carregar metricas consolidadas por campanha.',
-        'Exibir distribuicao de respostas e indicadores de satisfacao.',
-        'Relacionar resultados com entregas e falhas de email.'
-      ]}
-      endpointReferences={['GET /api/analytics/campaigns/{campaignId}/']}
-    />
+      pageDescription='Respostas, indicadores e historico de metricas por campanha.'
+    >
+      <AnalyticsDetail id={id} scope='campaign' />
+    </PageContainer>
   );
 }
