@@ -847,3 +847,37 @@ Validacao:
 
 - `bun run lint` passou; permanecem warnings preexistentes que nao bloqueiam a execucao
 - `bun run build` passou
+
+### FE-302 - Criar template
+
+Status: Implementado em 2026-06-28.
+
+Resumo:
+
+- adicionada acao "Novo template" na tela `/dashboard/email-templates`
+- implementado dialog de criacao dentro de `EmailTemplatesManager`
+- conectado `useEmailTemplatesCreate` para `POST /api/email-templates/`
+- criado schema `src/features/email-templates/schemas/email-template.ts`
+- formulario cobre:
+  - nome
+  - slug
+  - tipo
+  - status
+  - assunto
+  - conteudo HTML
+  - conteudo texto
+  - variaveis obrigatorias
+  - idioma
+- `required_variables` e informado como texto separado por virgula/espaco/quebra de linha e enviado para a API como `string[]`
+- adicionada validacao client-side para:
+  - padrao de slug aceito pelo backend
+  - nomes de variaveis validos
+  - variaveis duplicadas
+  - placeholders `{{ variable }}` usados em assunto/corpo sem declaracao em `required_variables`
+- apos sucesso, a listagem de templates e invalidada e o dialog e fechado
+- feedback de sucesso/falha usa toast e o normalizador de erros da plataforma
+
+Validacao:
+
+- `bun run lint` passou; permanecem warnings preexistentes que nao bloqueiam a execucao
+- `bun run build` passou
