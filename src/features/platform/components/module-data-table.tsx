@@ -25,7 +25,10 @@ export function ModuleDataTable<TData>({
   ...props
 }: ModuleDataTableProps<TData>) {
   return (
-    <div className={cn('flex min-h-[480px] flex-1 flex-col', className)} {...props}>
+    <div
+      className={cn('flex min-h-[360px] min-w-0 flex-1 flex-col sm:min-h-[480px]', className)}
+      {...props}
+    >
       <DataTable table={table} actionBar={actionBar}>
         {showToolbar ? (
           <DataTableToolbar table={table} className={toolbarClassName}>

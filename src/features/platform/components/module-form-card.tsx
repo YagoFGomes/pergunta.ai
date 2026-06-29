@@ -21,15 +21,17 @@ export function ModuleFormCard({
   ...props
 }: ModuleFormCardProps) {
   return (
-    <Card className={cn('mx-auto w-full', className)} {...props}>
+    <Card className={cn('mx-auto w-full min-w-0 overflow-hidden', className)} {...props}>
       <CardHeader>
-        <CardTitle className='text-left text-2xl font-bold'>{title}</CardTitle>
+        <CardTitle className='text-left text-xl font-bold sm:text-2xl'>{title}</CardTitle>
         {description ? <CardDescription>{description}</CardDescription> : null}
       </CardHeader>
-      <CardContent className={cn('space-y-8', contentClassName)}>
+      <CardContent className={cn('space-y-6 sm:space-y-8', contentClassName)}>
         {children}
         {footer ? (
-          <div className='flex flex-col-reverse gap-2 sm:flex-row sm:justify-end'>{footer}</div>
+          <div className='flex flex-col-reverse gap-2 sm:flex-row sm:justify-end [&_button]:w-full sm:[&_button]:w-auto'>
+            {footer}
+          </div>
         ) : null}
       </CardContent>
     </Card>

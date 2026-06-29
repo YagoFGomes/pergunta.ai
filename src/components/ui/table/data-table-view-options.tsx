@@ -44,7 +44,7 @@ export function DataTableViewOptions<TData>({ table }: DataTableViewOptionsProps
           <CaretSortIcon className='ml-auto opacity-50' />
         </Button>
       </PopoverTrigger>
-      <PopoverContent align='end' className='w-44 p-0'>
+      <PopoverContent align='end' className='w-[min(calc(100vw-2rem),14rem)] p-0'>
         <Command>
           <CommandInput placeholder='Search columns...' />
           <CommandList>

@@ -79,7 +79,11 @@ export function DataTableFacetedFilter<TData, TValue>({
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
-        <Button variant='outline' size='sm' className='border-dashed'>
+        <Button
+          variant='outline'
+          size='sm'
+          className='max-w-full min-w-0 justify-start border-dashed'
+        >
           {selectedValues?.size > 0 ? (
             <span
               aria-hidden='true'
@@ -92,7 +96,7 @@ export function DataTableFacetedFilter<TData, TValue>({
           ) : (
             <Icons.plusCircle />
           )}
-          {title}
+          <span className='truncate'>{title}</span>
           {selectedValues?.size > 0 && (
             <>
               <Separator
@@ -114,9 +118,9 @@ export function DataTableFacetedFilter<TData, TValue>({
                       <Badge
                         variant='secondary'
                         key={option.value}
-                        className='rounded-sm px-1 font-normal'
+                        className='max-w-32 rounded-sm px-1 font-normal'
                       >
-                        {option.label}
+                        <span className='truncate'>{option.label}</span>
                       </Badge>
                     ))
                 )}
@@ -125,7 +129,7 @@ export function DataTableFacetedFilter<TData, TValue>({
           )}
         </Button>
       </PopoverTrigger>
-      <PopoverContent className='w-[12.5rem] p-0' align='start'>
+      <PopoverContent className='w-[min(calc(100vw-2rem),16rem)] p-0' align='start'>
         <Command>
           <CommandInput placeholder={title} />
           <CommandList className='max-h-full'>
@@ -135,7 +139,11 @@ export function DataTableFacetedFilter<TData, TValue>({
                 const isSelected = selectedValues.has(option.value);
 
                 return (
-                  <CommandItem key={option.value} onSelect={() => onItemSelect(option, isSelected)}>
+                  <CommandItem
+                    key={option.value}
+                    className='min-w-0'
+                    onSelect={() => onItemSelect(option, isSelected)}
+                  >
                     <div
                       className={cn(
                         'border-primary flex size-4 items-center justify-center rounded-sm border',
@@ -147,7 +155,7 @@ export function DataTableFacetedFilter<TData, TValue>({
                     {option.icon && <option.icon />}
                     <span className='truncate'>{option.label}</span>
                     {option.count && (
-                      <span className='ml-auto font-mono text-xs'>{option.count}</span>
+                      <span className='ml-auto shrink-0 font-mono text-xs'>{option.count}</span>
                     )}
                   </CommandItem>
                 );

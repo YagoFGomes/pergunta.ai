@@ -132,15 +132,15 @@ export function DataTableDateFilter<TData>({
       const dateText = hasSelectedDates ? formatDateRange(selectedDates) : 'Select date range';
 
       return (
-        <span className='flex items-center gap-2'>
-          <span>{title}</span>
+        <span className='flex min-w-0 items-center gap-2'>
+          <span className='truncate'>{title}</span>
           {hasSelectedDates && (
             <>
               <Separator
                 orientation='vertical'
                 className='mx-0.5 data-[orientation=vertical]:h-4'
               />
-              <span>{dateText}</span>
+              <span className='max-w-36 truncate'>{dateText}</span>
             </>
           )}
         </span>
@@ -153,12 +153,12 @@ export function DataTableDateFilter<TData>({
     const dateText = hasSelectedDate ? formatDate(selectedDates[0]) : 'Select date';
 
     return (
-      <span className='flex items-center gap-2'>
-        <span>{title}</span>
+      <span className='flex min-w-0 items-center gap-2'>
+        <span className='truncate'>{title}</span>
         {hasSelectedDate && (
           <>
             <Separator orientation='vertical' className='mx-0.5 data-[orientation=vertical]:h-4' />
-            <span>{dateText}</span>
+            <span className='max-w-36 truncate'>{dateText}</span>
           </>
         )}
       </span>
@@ -168,7 +168,11 @@ export function DataTableDateFilter<TData>({
   return (
     <Popover>
       <PopoverTrigger asChild>
-        <Button variant='outline' size='sm' className='border-dashed'>
+        <Button
+          variant='outline'
+          size='sm'
+          className='max-w-full min-w-0 justify-start border-dashed'
+        >
           {hasValue ? (
             <span
               aria-hidden='true'
@@ -184,7 +188,7 @@ export function DataTableDateFilter<TData>({
           {label}
         </Button>
       </PopoverTrigger>
-      <PopoverContent className='w-auto p-0' align='start'>
+      <PopoverContent className='max-w-[calc(100vw-2rem)] overflow-auto p-0' align='start'>
         {multiple ? (
           <Calendar
             initialFocus

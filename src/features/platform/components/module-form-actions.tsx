@@ -28,7 +28,10 @@ export function ModuleFormActions({
 
   return (
     <div
-      className={cn('flex flex-col-reverse gap-2 sm:flex-row sm:justify-end', className)}
+      className={cn(
+        'flex w-full flex-col-reverse gap-2 sm:w-auto sm:flex-row sm:justify-end [&_button]:w-full sm:[&_button]:w-auto',
+        className
+      )}
       {...props}
     >
       {onCancel ? (

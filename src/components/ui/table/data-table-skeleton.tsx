@@ -36,20 +36,20 @@ export function DataTableSkeleton({
   );
 
   return (
-    <div className={cn('flex flex-1 flex-col space-y-4', className)} {...props}>
-      <div className='flex w-full items-center justify-between gap-2 overflow-auto p-1'>
-        <div className='flex flex-1 items-center gap-2'>
+    <div className={cn('flex min-w-0 flex-1 flex-col space-y-4', className)} {...props}>
+      <div className='flex w-full min-w-0 flex-col items-stretch justify-between gap-2 p-1 sm:flex-row sm:items-center'>
+        <div className='flex min-w-0 flex-1 flex-wrap items-center gap-2'>
           {filterCount > 0
             ? Array.from({ length: filterCount }).map((_, i) => (
-                <Skeleton key={i} className='h-7 w-[4.5rem] border-dashed' />
+                <Skeleton key={i} className='h-7 w-28 max-w-full border-dashed sm:w-[4.5rem]' />
               ))
             : null}
         </div>
         {withViewOptions ? <Skeleton className='ml-auto hidden h-7 w-[4.5rem] lg:flex' /> : null}
       </div>
 
-      <div className='flex-1 rounded-md border'>
-        <Table>
+      <div className='min-h-[320px] flex-1 overflow-x-auto rounded-md border'>
+        <Table className='min-w-max'>
           <TableHeader>
             {Array.from({ length: 1 }).map((_, i) => (
               <TableRow key={i} className='hover:bg-transparent'>
@@ -87,9 +87,9 @@ export function DataTableSkeleton({
         </Table>
       </div>
       {withPagination ? (
-        <div className='flex w-full items-center justify-between gap-4 overflow-auto p-1 sm:gap-8'>
+        <div className='flex w-full min-w-0 flex-col items-stretch justify-between gap-3 p-1 sm:flex-row sm:items-center sm:gap-8'>
           <Skeleton className='h-7 w-40 shrink-0' />
-          <div className='flex items-center gap-4 sm:gap-6 lg:gap-8'>
+          <div className='flex flex-wrap items-center justify-between gap-4 sm:justify-end sm:gap-6 lg:gap-8'>
             <div className='flex items-center gap-2'>
               <Skeleton className='h-7 w-24' />
               <Skeleton className='h-7 w-[4.5rem]' />

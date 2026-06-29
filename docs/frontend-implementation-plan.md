@@ -295,7 +295,7 @@ Formato de colunas:
 ## Epic FE-08 - Quality Gate
 
 - FE-701 Empty/loading/error states globais - implementado
-- FE-702 Revisão de responsividade
+- FE-702 Revisão de responsividade - implementado
 - FE-703 Revisão de acessibilidade mínima
 - FE-704 Smoke test ponta a ponta
 - FE-705 Checklist de release
@@ -1385,3 +1385,36 @@ Smoke test manual:
 - abrir `/dashboard/overview` e confirmar mensagens de erro em português caso algum slot falhe
 - abrir dashboards de analytics e delivery sem dados e confirmar estados vazios com copy acentuada
 - testar `/s/{token}` com token inválido e confirmar mensagem de erro pública em português
+
+### FE-702 - Revisão de responsividade
+
+Status: Implementado em 2026-06-28.
+
+Resumo:
+
+- revisados componentes compartilhados que afetam mobile, tablet e desktop
+- `PageContainer` e `Heading` agora quebram header, descrição e ações sem estourar largura em telas pequenas
+- cards base ganharam contenção de texto e espaçamento horizontal responsivo
+- `DataTable`, `ModuleDataTable` e skeletons passaram a ter largura mínima segura, scroll horizontal e altura mínima menor em mobile
+- toolbar, filtros, popovers e paginação de tabela agora empilham/quebram linha em mobile e mantêm controles escaneáveis em tablet/desktop
+- `DialogContent` e `AlertDialogContent` ganharam `max-height`, scroll interno e padding responsivo para telas baixas
+- ações de forms e footers de dialogs usam botões em largura cheia no mobile e voltam ao layout inline em telas maiores
+- `InputGroup` recebeu `min-w-0`, contenção de overflow e ícones/botões com shrink controlado
+- wizard de campanha recebeu ajuste de stepper, ações e previews para IDs longos/listas/templates em mobile
+- gerenciador de perguntas recebeu ajustes em badges, botões de toolbar e listas de opções dentro de dialogs
+- shell de módulo recebeu contenção de texto e correção de acentuação em copy visível
+
+Validação:
+
+- `git diff --check` sem erros de whitespace
+- `bun run lint` passou; permanecem warnings preexistentes que não bloqueiam a execução
+- `bun run build` passou
+
+Smoke test manual:
+
+- mobile 360x800: validar listagens em `/dashboard/surveys/forms`, `/dashboard/contacts/lists`, `/dashboard/campaigns`, `/dashboard/email-templates` e `/dashboard/delivery/logs`
+- tablet 768x1024: validar toolbar de filtros, paginação, view options e cards de analytics
+- desktop 1440x900: validar que tabelas continuam densas e não perdem alinhamento
+- abrir dialogs de criar/editar/remover em contatos, surveys, campanhas e perguntas
+- no wizard `/dashboard/campaigns/new`, navegar por todas as etapas e confirmar que botões, selects, previews e IDs longos não estouram o layout
+- em `/dashboard/surveys/forms/{id}/questions`, abrir o modal de opções e validar scroll em telas baixas

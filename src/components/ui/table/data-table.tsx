@@ -20,12 +20,12 @@ interface DataTableProps<TData> extends React.ComponentProps<'div'> {
 
 export function DataTable<TData>({ table, actionBar, children }: DataTableProps<TData>) {
   return (
-    <div className='flex flex-1 flex-col space-y-4'>
+    <div className='flex min-w-0 flex-1 flex-col space-y-4'>
       {children}
-      <div className='relative flex flex-1'>
+      <div className='relative flex min-h-[320px] min-w-0 flex-1'>
         <div className='absolute inset-0 flex overflow-hidden rounded-lg border'>
           <ScrollArea className='h-full w-full'>
-            <Table>
+            <Table className='min-w-max'>
               <TableHeader className='bg-muted sticky top-0 z-10'>
                 {table.getHeaderGroups().map((headerGroup) => (
                   <TableRow key={headerGroup.id}>
@@ -64,7 +64,7 @@ export function DataTable<TData>({ table, actionBar, children }: DataTableProps<
                 ) : (
                   <TableRow>
                     <TableCell colSpan={table.getAllColumns().length} className='h-24 text-center'>
-                      No results.
+                      Nenhum resultado.
                     </TableCell>
                   </TableRow>
                 )}
@@ -74,7 +74,7 @@ export function DataTable<TData>({ table, actionBar, children }: DataTableProps<
           </ScrollArea>
         </div>
       </div>
-      <div className='flex flex-col gap-2.5'>
+      <div className='flex min-w-0 flex-col gap-2.5'>
         <DataTablePagination table={table} />
         {actionBar && table.getFilteredSelectedRowModel().rows.length > 0 && actionBar}
       </div>

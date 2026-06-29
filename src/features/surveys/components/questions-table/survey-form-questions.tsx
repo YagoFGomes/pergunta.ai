@@ -517,8 +517,10 @@ export function SurveyFormQuestions({ formId }: SurveyFormQuestionsProps) {
           />
         }
       >
-        <div className='flex flex-wrap items-center gap-2'>
-          <Badge variant='outline'>Formulário: {formDetails?.title ?? formId}</Badge>
+        <div className='flex min-w-0 flex-wrap items-center gap-2'>
+          <Badge variant='outline' className='max-w-full'>
+            <span className='truncate'>Formulário: {formDetails?.title ?? formId}</span>
+          </Badge>
           <Badge variant='outline'>Total: {questions.length} perguntas</Badge>
           {isFormArchived ? <Badge variant='outline'>Formulário arquivado</Badge> : null}
         </div>
@@ -598,6 +600,7 @@ export function SurveyFormQuestions({ formId }: SurveyFormQuestionsProps) {
                 type='button'
                 variant='outline'
                 size='sm'
+                className='w-full sm:w-auto'
                 onClick={() => setOrderedQuestionIds(currentOrderIds)}
                 disabled={!hasOrderChanges || isMutating}
               >
@@ -606,6 +609,7 @@ export function SurveyFormQuestions({ formId }: SurveyFormQuestionsProps) {
               <Button
                 type='button'
                 size='sm'
+                className='w-full sm:w-auto'
                 onClick={() => void handleSaveReorder()}
                 isLoading={reorderMutation.isPending}
                 disabled={!hasOrderChanges || isFormArchived}
@@ -672,6 +676,7 @@ export function SurveyFormQuestions({ formId }: SurveyFormQuestionsProps) {
                   <Button
                     type='button'
                     size='sm'
+                    className='w-full sm:w-auto'
                     onClick={() => void handleCreateOption()}
                     isLoading={optionCreateMutation.isPending}
                     disabled={isFormArchived}
@@ -702,7 +707,7 @@ export function SurveyFormQuestions({ formId }: SurveyFormQuestionsProps) {
                       disabled={optionUpdateMutation.isPending}
                     />
                   </div>
-                  <div className='flex justify-end gap-2'>
+                  <div className='flex flex-col justify-end gap-2 sm:flex-row [&_button]:w-full sm:[&_button]:w-auto'>
                     <Button
                       type='button'
                       variant='outline'
@@ -741,7 +746,7 @@ export function SurveyFormQuestions({ formId }: SurveyFormQuestionsProps) {
                   {questionOptions.map((option) => (
                     <li
                       key={option.id}
-                      className='bg-background flex items-center justify-between gap-3 rounded-md border px-3 py-2'
+                      className='bg-background flex min-w-0 items-center justify-between gap-3 rounded-md border px-3 py-2'
                     >
                       <div className='min-w-0'>
                         <p className='truncate text-sm font-medium'>

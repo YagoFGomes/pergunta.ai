@@ -95,7 +95,7 @@ function NativeSelect({
       value={value}
       onChange={(event) => onChange(event.target.value)}
       disabled={disabled}
-      className='border-input bg-background ring-offset-background focus-visible:ring-ring flex h-9 w-full rounded-md border px-3 py-1 text-sm shadow-xs outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50'
+      className='border-input bg-background ring-offset-background focus-visible:ring-ring flex h-9 w-full min-w-0 rounded-md border px-3 py-1 text-sm shadow-xs outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50'
     >
       {children}
     </select>
@@ -118,13 +118,17 @@ function ResourcePreview({
   actions?: React.ReactNode;
 }) {
   return (
-    <Card className='md:col-span-2'>
+    <Card className='min-w-0 md:col-span-2'>
       <CardHeader className='flex flex-col gap-3 md:flex-row md:items-start md:justify-between'>
-        <div className='space-y-1'>
+        <div className='min-w-0 space-y-1'>
           <CardTitle className='text-base'>{title}</CardTitle>
           {description ? <CardDescription>{description}</CardDescription> : null}
         </div>
-        {actions ? <div className='flex flex-wrap gap-2'>{actions}</div> : null}
+        {actions ? (
+          <div className='flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:flex-wrap sm:justify-end [&>*]:w-full sm:[&>*]:w-auto'>
+            {actions}
+          </div>
+        ) : null}
       </CardHeader>
       <CardContent>{children}</CardContent>
     </Card>
@@ -300,14 +304,14 @@ export function CampaignCreateWizard() {
       description='Configure o envio em cinco etapas antes de criar a campanha.'
       contentClassName='space-y-6'
     >
-      <div className='grid gap-2 md:grid-cols-5'>
+      <div className='grid gap-2 sm:grid-cols-2 lg:grid-cols-5'>
         {STEPS.map((item, index) => (
           <button
             key={item}
             type='button'
             onClick={() => setStep(index)}
             className={cn(
-              'rounded-md border px-3 py-2 text-left text-sm transition-colors',
+              'min-w-0 rounded-md border px-3 py-2 text-left text-sm transition-colors',
               step === index
                 ? 'border-primary bg-primary text-primary-foreground'
                 : 'hover:bg-muted'
@@ -396,7 +400,7 @@ export function CampaignCreateWizard() {
                 </div>
                 <div>
                   <span className='text-muted-foreground block'>ID</span>
-                  <span className='font-mono text-xs'>{selectedForm.id}</span>
+                  <span className='break-all font-mono text-xs'>{selectedForm.id}</span>
                 </div>
               </div>
             </ResourcePreview>
@@ -472,7 +476,7 @@ export function CampaignCreateWizard() {
                 </div>
                 <div>
                   <span className='text-muted-foreground block'>ID</span>
-                  <span className='font-mono text-xs'>{selectedList.id}</span>
+                  <span className='break-all font-mono text-xs'>{selectedList.id}</span>
                 </div>
               </div>
             </ResourcePreview>
@@ -627,7 +631,7 @@ export function CampaignCreateWizard() {
         </div>
       ) : null}
 
-      <div className='flex flex-col-reverse gap-2 border-t pt-4 sm:flex-row sm:justify-between'>
+      <div className='flex flex-col-reverse gap-2 border-t pt-4 sm:flex-row sm:justify-between [&_button]:w-full sm:[&_button]:w-auto'>
         <Button
           type='button'
           variant='outline'
@@ -636,7 +640,7 @@ export function CampaignCreateWizard() {
         >
           Voltar
         </Button>
-        <div className='flex justify-end gap-2'>
+        <div className='flex flex-col justify-end gap-2 sm:flex-row'>
           {step < STEPS.length - 1 ? (
             <Button
               type='button'

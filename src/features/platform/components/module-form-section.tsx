@@ -21,15 +21,15 @@ export function ModuleFormSection({
   ...props
 }: ModuleFormSectionProps) {
   return (
-    <section className={cn('space-y-4', className)} {...props}>
+    <section className={cn('min-w-0 space-y-4', className)} {...props}>
       {separated ? <FieldSeparator /> : null}
       {title || description ? (
-        <div className='space-y-1'>
+        <div className='min-w-0 space-y-1'>
           {title ? <FieldLegend>{title}</FieldLegend> : null}
           {description ? <FieldDescription>{description}</FieldDescription> : null}
         </div>
       ) : null}
-      <FieldGroup className={columns === 1 ? 'grid gap-6' : MODULE_FORM_GRID_CLASSNAME}>
+      <FieldGroup className={columns === 1 ? 'grid min-w-0 gap-6' : MODULE_FORM_GRID_CLASSNAME}>
         {children}
       </FieldGroup>
     </section>
