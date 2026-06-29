@@ -129,7 +129,7 @@ export function DataTableDateFilter<TData>({
       if (!getIsDateRange(selectedDates)) return null;
 
       const hasSelectedDates = selectedDates.from || selectedDates.to;
-      const dateText = hasSelectedDates ? formatDateRange(selectedDates) : 'Select date range';
+      const dateText = hasSelectedDates ? formatDateRange(selectedDates) : 'Selecionar período';
 
       return (
         <span className='flex min-w-0 items-center gap-2'>
@@ -150,7 +150,7 @@ export function DataTableDateFilter<TData>({
     if (getIsDateRange(selectedDates)) return null;
 
     const hasSelectedDate = selectedDates.length > 0;
-    const dateText = hasSelectedDate ? formatDate(selectedDates[0]) : 'Select date';
+    const dateText = hasSelectedDate ? formatDate(selectedDates[0]) : 'Selecionar data';
 
     return (
       <span className='flex min-w-0 items-center gap-2'>
@@ -172,11 +172,12 @@ export function DataTableDateFilter<TData>({
           variant='outline'
           size='sm'
           className='max-w-full min-w-0 justify-start border-dashed'
+          aria-label={`${title ?? 'Data'}: ${hasValue ? 'filtro aplicado' : 'abrir calendário'}`}
         >
           {hasValue ? (
             <span
               aria-hidden='true'
-              title={`Clear ${title} filter`}
+              title={`Limpar filtro ${title}`}
               onPointerDown={onResetPointerDown}
               className='focus-visible:ring-ring rounded-sm opacity-70 transition-opacity hover:opacity-100 focus-visible:ring-1 focus-visible:outline-none'
             >

@@ -83,11 +83,12 @@ export function DataTableFacetedFilter<TData, TValue>({
           variant='outline'
           size='sm'
           className='max-w-full min-w-0 justify-start border-dashed'
+          aria-label={`${title ?? 'Filtro'}: ${selectedValues.size > 0 ? `${selectedValues.size} selecionado(s)` : 'abrir opções'}`}
         >
           {selectedValues?.size > 0 ? (
             <span
               aria-hidden='true'
-              title={`Clear ${title} filter`}
+              title={`Limpar filtro ${title}`}
               onPointerDown={onResetPointerDown}
               className='focus-visible:ring-ring rounded-sm opacity-70 transition-opacity hover:opacity-100 focus-visible:ring-1 focus-visible:outline-none'
             >
@@ -109,7 +110,7 @@ export function DataTableFacetedFilter<TData, TValue>({
               <div className='hidden items-center gap-1 lg:flex'>
                 {selectedValues.size > 2 ? (
                   <Badge variant='secondary' className='rounded-sm px-1 font-normal'>
-                    {selectedValues.size} selected
+                    {selectedValues.size} selecionado(s)
                   </Badge>
                 ) : (
                   options
@@ -133,7 +134,7 @@ export function DataTableFacetedFilter<TData, TValue>({
         <Command>
           <CommandInput placeholder={title} />
           <CommandList className='max-h-full'>
-            <CommandEmpty>No results found.</CommandEmpty>
+            <CommandEmpty>Nenhum resultado encontrado.</CommandEmpty>
             <CommandGroup className='max-h-[18.75rem] overflow-x-hidden overflow-y-auto'>
               {options.map((option) => {
                 const isSelected = selectedValues.has(option.value);
@@ -166,7 +167,7 @@ export function DataTableFacetedFilter<TData, TValue>({
                 <CommandSeparator />
                 <CommandGroup>
                   <CommandItem onSelect={() => onReset()} className='justify-center text-center'>
-                    Clear filters
+                    Limpar filtros
                   </CommandItem>
                 </CommandGroup>
               </>

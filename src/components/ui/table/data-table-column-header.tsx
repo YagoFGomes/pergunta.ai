@@ -33,6 +33,7 @@ export function DataTableColumnHeader<TData, TValue>({
   return (
     <DropdownMenu>
       <DropdownMenuTrigger
+        aria-label={`Opções da coluna ${title}`}
         className={cn(
           'hover:bg-accent focus:ring-ring data-[state=open]:bg-accent [&_svg]:text-muted-foreground -ml-1.5 flex h-8 max-w-full items-center gap-1.5 rounded-md px-2 py-1.5 focus:ring-1 focus:outline-none [&_svg]:size-4 [&_svg]:shrink-0',
           className
@@ -74,7 +75,7 @@ export function DataTableColumnHeader<TData, TValue>({
                 onClick={() => column.clearSorting()}
               >
                 <Cross2Icon />
-                Reset
+                Limpar
               </DropdownMenuItem>
             )}
           </>
@@ -86,7 +87,7 @@ export function DataTableColumnHeader<TData, TValue>({
             onClick={() => column.toggleVisibility(false)}
           >
             <Icons.eyeOff />
-            Hide
+            Ocultar
           </DropdownMenuCheckboxItem>
         )}
       </DropdownMenuContent>

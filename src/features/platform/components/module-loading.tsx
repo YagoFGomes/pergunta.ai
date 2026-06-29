@@ -10,7 +10,7 @@ type ModuleLoadingProps = {
 export default function ModuleLoading({ pageTitle, pageDescription }: ModuleLoadingProps) {
   return (
     <PageContainer pageTitle={pageTitle} pageDescription={pageDescription}>
-      <Card>
+      <Card role='status' aria-live='polite' aria-label='Carregando módulo'>
         <CardHeader className='space-y-2'>
           <Skeleton className='h-6 w-48' />
           <Skeleton className='h-4 w-full max-w-md' />

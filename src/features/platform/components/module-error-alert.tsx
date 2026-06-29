@@ -16,7 +16,7 @@ export function ModuleErrorAlert({
   fallbackMessage = 'Ocorreu um erro inesperado ao carregar esta página.'
 }: ModuleErrorAlertProps) {
   return (
-    <Alert variant='destructive'>
+    <Alert variant='destructive' role='alert'>
       <Icons.alertCircle className='h-4 w-4' />
       <AlertTitle>{title}</AlertTitle>
       <AlertDescription>{message ?? getErrorMessage(error, fallbackMessage)}</AlertDescription>

@@ -296,7 +296,7 @@ Formato de colunas:
 
 - FE-701 Empty/loading/error states globais - implementado
 - FE-702 Revisão de responsividade - implementado
-- FE-703 Revisão de acessibilidade mínima
+- FE-703 Revisão de acessibilidade mínima - implementado
 - FE-704 Smoke test ponta a ponta
 - FE-705 Checklist de release
 
@@ -1418,3 +1418,34 @@ Smoke test manual:
 - abrir dialogs de criar/editar/remover em contatos, surveys, campanhas e perguntas
 - no wizard `/dashboard/campaigns/new`, navegar por todas as etapas e confirmar que botões, selects, previews e IDs longos não estouram o layout
 - em `/dashboard/surveys/forms/{id}/questions`, abrir o modal de opções e validar scroll em telas baixas
+
+### FE-703 - Revisão de Acessibilidade Mínima
+
+Status: Implementado em 2026-06-29.
+
+Resumo:
+
+- revisados controles compartilhados de tabela para nomes acessíveis em filtros, seleção de colunas, cabeçalhos ordenáveis e paginação
+- traduzidos rótulos acessíveis de paginação, filtros, estado vazio da tabela e menu de colunas
+- `DialogContent` agora expõe o botão de fechar como `aria-label="Fechar"` com texto `sr-only` em português
+- `ModuleLoading` ganhou `role="status"` e `aria-live="polite"` para anunciar carregamento de módulo
+- `ModuleErrorAlert` ganhou `role="alert"` e fallback com acentuação correta
+- adicionados nomes acessíveis em botões de ícone sem label no trigger da sidebar, handle do Kanban e remoção de membro no exemplo de formulário avançado
+- `NotificationCenter` passou a anunciar a quantidade de notificações novas no botão
+- wizard de campanha passou a associar `Label` aos campos via `htmlFor`/`id` e descrições via `aria-describedby`
+- mantidos os ajustes sem alterar contratos de API ou fluxos funcionais
+
+Validação:
+
+- `git diff --check` sem erros de whitespace
+- `bun run lint` passou; permanecem warnings preexistentes que não bloqueiam a execução
+- `bun run build` passou
+
+Smoke test manual:
+
+- navegar por teclado em `/dashboard/campaigns/new`, passando por etapas, campos, selects e botões
+- abrir e fechar dialogs em contatos, templates, campanhas e perguntas usando teclado
+- validar que botões de ícone têm nome acessível em ações de tabela e toolbar
+- abrir filtros de tabela por teclado e confirmar nomes de filtro, limpar filtro e seleção de colunas
+- validar paginação de tabela com leitor de tela ou inspector de acessibilidade
+- abrir `/dashboard/surveys/forms/{id}/questions` e confirmar labels de ações como mover, editar, remover e gerenciar opções

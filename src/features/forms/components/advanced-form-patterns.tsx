@@ -305,6 +305,7 @@ export default function AdvancedFormPatterns() {
                         type='button'
                         variant='ghost'
                         size='icon'
+                        aria-label='Remover membro'
                         onClick={() => field.removeValue(i)}
                       >
                         <Icons.close className='h-4 w-4' />

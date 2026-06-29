@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useMemo, useState } from 'react';
+import { cloneElement, isValidElement, useId, useMemo, useState } from 'react';
 import { toast } from 'sonner';
 
 import { Icons } from '@/components/icons';
@@ -61,41 +61,64 @@ const DEFAULT_VALUES: CampaignWizardValues = {
   send_condition: SendConditionEnum.ALWAYS
 };
 
-const STEPS = ['Base', 'Público', 'Template', 'Agendamento', 'Revisao'] as const;
+const STEPS = ['Base', 'Público', 'Template', 'Agendamento', 'Revisão'] as const;
+
+type FieldControlProps = {
+  id?: string;
+  'aria-describedby'?: string;
+};
 
 type FieldProps = {
   label: string;
-  children: React.ReactNode;
+  children: React.ReactElement<FieldControlProps>;
   description?: string;
 };
 
 function Field({ label, children, description }: FieldProps) {
+  const generatedId = useId();
+  const fieldId =
+    isValidElement<FieldControlProps>(children) && children.props.id
+      ? children.props.id
+      : generatedId;
+  const descriptionId = description ? `${fieldId}-description` : undefined;
+  const control = isValidElement<FieldControlProps>(children)
+    ? cloneElement(children, {
+        id: fieldId,
+        'aria-describedby': descriptionId
+      })
+    : children;
+
   return (
     <div className='space-y-2'>
-      <Label>{label}</Label>
-      {children}
-      {description ? <p className='text-muted-foreground text-xs'>{description}</p> : null}
+      <Label htmlFor={fieldId}>{label}</Label>
+      {control}
+      {description ? (
+        <p id={descriptionId} className='text-muted-foreground text-xs'>
+          {description}
+        </p>
+      ) : null}
     </div>
   );
 }
 
-function NativeSelect({
-  value,
-  onChange,
-  disabled,
-  children
-}: {
+type NativeSelectProps = Omit<
+  React.SelectHTMLAttributes<HTMLSelectElement>,
+  'children' | 'onChange' | 'value'
+> & {
   value: string;
   onChange: (value: string) => void;
   disabled?: boolean;
   children: React.ReactNode;
-}) {
+};
+
+function NativeSelect({ value, onChange, disabled, children, ...props }: NativeSelectProps) {
   return (
     <select
       value={value}
       onChange={(event) => onChange(event.target.value)}
       disabled={disabled}
       className='border-input bg-background ring-offset-background focus-visible:ring-ring flex h-9 w-full min-w-0 rounded-md border px-3 py-1 text-sm shadow-xs outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50'
+      {...props}
     >
       {children}
     </select>
