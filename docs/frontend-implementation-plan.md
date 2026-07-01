@@ -297,7 +297,7 @@ Formato de colunas:
 - FE-701 Empty/loading/error states globais - implementado
 - FE-702 Revisão de responsividade - implementado
 - FE-703 Revisão de acessibilidade mínima - implementado
-- FE-704 Smoke test ponta a ponta
+- FE-704 Smoke test ponta a ponta - implementado
 - FE-705 Checklist de release
 
 ## Epic FE-09 - Identidade Visual Premium
@@ -1449,3 +1449,33 @@ Smoke test manual:
 - abrir filtros de tabela por teclado e confirmar nomes de filtro, limpar filtro e seleção de colunas
 - validar paginação de tabela com leitor de tela ou inspector de acessibilidade
 - abrir `/dashboard/surveys/forms/{id}/questions` e confirmar labels de ações como mover, editar, remover e gerenciar opções
+
+### FE-704 - Smoke test ponta a ponta
+
+Status: Implementado em 2026-06-29.
+
+Resumo:
+
+- criado `scripts/smoke-e2e.mjs` para validar o fluxo principal pelo app Next e proxy `/api`
+- adicionado script `smoke:e2e` em `package.json`
+- criada documentacao de operacao em `docs/smoke-e2e.md`
+- o smoke autentica um usuario existente, valida paginas protegidas com cookies e executa o workflow de negocio:
+  - cria formulario, pergunta obrigatoria e publica o formulario
+  - cria lista de contatos e contato ativo
+  - cria template de email e valida preview
+  - cria campanha, step inicial e agenda a campanha
+  - valida detalhes de campanha, analytics por campanha/formulario e logs de entrega
+- a etapa publica aceita `SMOKE_PUBLIC_SURVEY_TOKEN` para validar `/api/public/surveys/{token}`
+- o submit publico exige `SMOKE_SUBMIT_PUBLIC_SURVEY=true` para evitar consumo acidental de token unico
+
+Validacao:
+
+- `node --check scripts/smoke-e2e.mjs`
+- `npm run smoke:e2e -- --help`
+
+Execucao em ambiente integrado:
+
+- iniciar backend Django configurado em `.env.local`
+- iniciar app Next em `SMOKE_BASE_URL` ou `http://localhost:3000`
+- executar `SMOKE_EMAIL="..." SMOKE_PASSWORD="..." npm run smoke:e2e`
+- opcionalmente informar `SMOKE_PUBLIC_SURVEY_TOKEN` e `SMOKE_SUBMIT_PUBLIC_SURVEY=true` com token descartavel para cobrir submissao publica
