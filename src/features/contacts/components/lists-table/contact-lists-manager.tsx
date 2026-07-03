@@ -220,7 +220,6 @@ export function ContactListsManager() {
 
       <ModuleDataTable
         table={table}
-        showToolbar={false}
         toolbarChildren={<Badge variant='outline'>{lists.length} listas</Badge>}
       />
 

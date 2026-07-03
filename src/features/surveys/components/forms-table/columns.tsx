@@ -117,6 +117,9 @@ export function getSurveyFormsColumns({
       id: 'actions',
       enableSorting: false,
       enableHiding: false,
+      size: 56,
+      minSize: 56,
+      maxSize: 56,
       cell: ({ row }) => <SurveyFormCellAction data={row.original} />
     }
   ];

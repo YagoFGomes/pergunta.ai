@@ -5,8 +5,8 @@ import type { Column, ColumnDef } from '@tanstack/react-table';
 
 import { Icons } from '@/components/icons';
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
 import { DataTableColumnHeader } from '@/components/ui/table/data-table-column-header';
+import { ModuleRowActions } from '@/features/platform/components/module-row-actions';
 import type { Campaign } from '@/lib/api/generated/model/campaign';
 import { cn } from '@/lib/utils';
 
@@ -126,29 +126,37 @@ export function getCampaignsColumns({
       id: 'actions',
       enableSorting: false,
       enableHiding: false,
+      size: 56,
+      minSize: 56,
+      maxSize: 56,
       cell: ({ row }) => (
-        <div className='flex items-center justify-end gap-1'>
-          <Button variant='ghost' size='icon' asChild aria-label='Detalhes da campanha'>
-            <Link href={`/dashboard/campaigns/${row.original.id}`}>
-              <Icons.externalLink className='h-4 w-4' />
-            </Link>
-          </Button>
-          <Button variant='ghost' size='icon' asChild aria-label='Steps da campanha'>
-            <Link href={`/dashboard/campaigns/${row.original.id}/steps`}>
-              <Icons.forms className='h-4 w-4' />
-            </Link>
-          </Button>
-          <Button
-            type='button'
-            variant='ghost'
-            size='icon'
-            className='text-destructive hover:text-destructive'
-            aria-label='Excluir campanha'
-            disabled={disableActions || !onDelete}
-            onClick={() => onDelete?.(row.original)}
-          >
-            <Icons.trash className='h-4 w-4' />
-          </Button>
+        <div className='flex justify-end'>
+          <ModuleRowActions
+            triggerAriaLabel='Abrir ações da campanha'
+            items={[
+              {
+                key: 'details',
+                label: 'Detalhes',
+                icon: Icons.externalLink,
+                href: `/dashboard/campaigns/${row.original.id}`
+              },
+              {
+                key: 'steps',
+                label: 'Steps',
+                icon: Icons.forms,
+                href: `/dashboard/campaigns/${row.original.id}/steps`
+              },
+              {
+                key: 'delete',
+                label: 'Excluir campanha',
+                icon: Icons.trash,
+                onSelect: () => onDelete?.(row.original),
+                disabled: disableActions || !onDelete,
+                destructive: true,
+                separatorBefore: true
+              }
+            ]}
+          />
         </div>
       )
     }

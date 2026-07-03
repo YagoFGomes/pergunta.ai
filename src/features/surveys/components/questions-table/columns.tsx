@@ -4,8 +4,8 @@ import type { Column, ColumnDef } from '@tanstack/react-table';
 
 import { Icons } from '@/components/icons';
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
 import { DataTableColumnHeader } from '@/components/ui/table/data-table-column-header';
+import { ModuleRowActions } from '@/features/platform/components/module-row-actions';
 import type { FormQuestion } from '@/lib/api/generated/model/formQuestion';
 
 import { getQuestionTypeLabel } from '../../schemas/survey-question';
@@ -87,61 +87,54 @@ export function getSurveyQuestionsColumns({
       id: 'actions',
       enableSorting: false,
       enableHiding: false,
+      size: 56,
+      minSize: 56,
+      maxSize: 56,
       cell: ({ row }) => (
-        <div className='flex items-center justify-end gap-1'>
-          <Button
-            type='button'
-            variant='ghost'
-            size='icon'
-            onClick={() => onMoveUp?.(row.original)}
-            disabled={disableActions || !onMoveUp || !(canMoveUp?.(row.original) ?? false)}
-            aria-label='Mover pergunta para cima'
-          >
-            <Icons.chevronUp className='h-4 w-4' />
-          </Button>
-          <Button
-            type='button'
-            variant='ghost'
-            size='icon'
-            onClick={() => onMoveDown?.(row.original)}
-            disabled={disableActions || !onMoveDown || !(canMoveDown?.(row.original) ?? false)}
-            aria-label='Mover pergunta para baixo'
-          >
-            <Icons.chevronDown className='h-4 w-4' />
-          </Button>
-          <Button
-            type='button'
-            variant='ghost'
-            size='icon'
-            onClick={() => onManageOptions?.(row.original)}
-            disabled={
-              disableActions || !onManageOptions || !(canManageOptions?.(row.original) ?? false)
-            }
-            aria-label='Gerenciar opções da pergunta'
-          >
-            <Icons.adjustments className='h-4 w-4' />
-          </Button>
-          <Button
-            type='button'
-            variant='ghost'
-            size='icon'
-            onClick={() => onEdit?.(row.original)}
-            disabled={disableActions || !onEdit}
-            aria-label='Editar pergunta'
-          >
-            <Icons.edit className='h-4 w-4' />
-          </Button>
-          <Button
-            type='button'
-            variant='ghost'
-            size='icon'
-            className='text-destructive hover:text-destructive'
-            onClick={() => onDelete?.(row.original)}
-            disabled={disableActions || !onDelete}
-            aria-label='Remover pergunta'
-          >
-            <Icons.trash className='h-4 w-4' />
-          </Button>
+        <div className='flex justify-end'>
+          <ModuleRowActions
+            triggerAriaLabel='Abrir ações da pergunta'
+            items={[
+              {
+                key: 'move-up',
+                label: 'Mover para cima',
+                icon: Icons.chevronUp,
+                onSelect: () => onMoveUp?.(row.original),
+                disabled: disableActions || !onMoveUp || !(canMoveUp?.(row.original) ?? false)
+              },
+              {
+                key: 'move-down',
+                label: 'Mover para baixo',
+                icon: Icons.chevronDown,
+                onSelect: () => onMoveDown?.(row.original),
+                disabled: disableActions || !onMoveDown || !(canMoveDown?.(row.original) ?? false)
+              },
+              {
+                key: 'manage-options',
+                label: 'Gerenciar opções',
+                icon: Icons.adjustments,
+                onSelect: () => onManageOptions?.(row.original),
+                disabled:
+                  disableActions || !onManageOptions || !(canManageOptions?.(row.original) ?? false)
+              },
+              {
+                key: 'edit',
+                label: 'Editar pergunta',
+                icon: Icons.edit,
+                onSelect: () => onEdit?.(row.original),
+                disabled: disableActions || !onEdit
+              },
+              {
+                key: 'delete',
+                label: 'Remover pergunta',
+                icon: Icons.trash,
+                onSelect: () => onDelete?.(row.original),
+                disabled: disableActions || !onDelete,
+                destructive: true,
+                separatorBefore: true
+              }
+            ]}
+          />
         </div>
       )
     }

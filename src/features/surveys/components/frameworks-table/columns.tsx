@@ -4,8 +4,8 @@ import type { Column, ColumnDef } from '@tanstack/react-table';
 
 import { Icons } from '@/components/icons';
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
 import { DataTableColumnHeader } from '@/components/ui/table/data-table-column-header';
+import { ModuleRowActions } from '@/features/platform/components/module-row-actions';
 import type { SurveyFramework } from '@/lib/api/generated/model/surveyFramework';
 
 type GetSurveyFrameworksColumnsConfig = {
@@ -87,48 +87,44 @@ export function getSurveyFrameworksColumns({
       id: 'actions',
       enableSorting: false,
       enableHiding: false,
+      size: 56,
+      minSize: 56,
+      maxSize: 56,
       cell: ({ row }) => {
         const framework = row.original;
         const canEdit = !framework.is_seed;
         const canDeactivateAsDelete = !framework.is_seed && Boolean(framework.is_active);
 
         return (
-          <div className='flex items-center justify-end gap-1'>
-            <Button
-              type='button'
-              variant='ghost'
-              size='icon'
-              onClick={() => onToggleActive?.(framework)}
-              disabled={disableActions || !onToggleActive}
-              aria-label={framework.is_active ? 'Desativar framework' : 'Ativar framework'}
-            >
-              {framework.is_active ? (
-                <Icons.lock className='h-4 w-4' />
-              ) : (
-                <Icons.check className='h-4 w-4' />
-              )}
-            </Button>
-            <Button
-              type='button'
-              variant='ghost'
-              size='icon'
-              onClick={() => onEdit?.(framework)}
-              disabled={disableActions || !onEdit || !canEdit}
-              aria-label='Editar framework'
-            >
-              <Icons.edit className='h-4 w-4' />
-            </Button>
-            <Button
-              type='button'
-              variant='ghost'
-              size='icon'
-              className='text-destructive hover:text-destructive'
-              onClick={() => onDeactivateAsDelete?.(framework)}
-              disabled={disableActions || !onDeactivateAsDelete || !canDeactivateAsDelete}
-              aria-label='Excluir framework'
-            >
-              <Icons.trash className='h-4 w-4' />
-            </Button>
+          <div className='flex justify-end'>
+            <ModuleRowActions
+              triggerAriaLabel='Abrir ações do framework'
+              items={[
+                {
+                  key: 'toggle-active',
+                  label: framework.is_active ? 'Desativar framework' : 'Ativar framework',
+                  icon: framework.is_active ? Icons.lock : Icons.check,
+                  onSelect: () => onToggleActive?.(framework),
+                  disabled: disableActions || !onToggleActive
+                },
+                {
+                  key: 'edit',
+                  label: 'Editar framework',
+                  icon: Icons.edit,
+                  onSelect: () => onEdit?.(framework),
+                  disabled: disableActions || !onEdit || !canEdit
+                },
+                {
+                  key: 'delete',
+                  label: 'Excluir framework',
+                  icon: Icons.trash,
+                  onSelect: () => onDeactivateAsDelete?.(framework),
+                  disabled: disableActions || !onDeactivateAsDelete || !canDeactivateAsDelete,
+                  destructive: true,
+                  separatorBefore: true
+                }
+              ]}
+            />
           </div>
         );
       }

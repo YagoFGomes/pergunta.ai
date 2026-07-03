@@ -5,8 +5,8 @@ import type { Column, ColumnDef } from '@tanstack/react-table';
 
 import { Icons } from '@/components/icons';
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
 import { DataTableColumnHeader } from '@/components/ui/table/data-table-column-header';
+import { ModuleRowActions } from '@/features/platform/components/module-row-actions';
 import type { EmailTemplate } from '@/lib/api/generated/model/emailTemplate';
 import { Status372Enum } from '@/lib/api/generated/model/status372Enum';
 import { cn } from '@/lib/utils';
@@ -154,24 +154,31 @@ export function getEmailTemplatesColumns({
       id: 'actions',
       enableSorting: false,
       enableHiding: false,
+      size: 56,
+      minSize: 56,
+      maxSize: 56,
       cell: ({ row }) => (
-        <div className='flex items-center justify-end gap-1'>
-          <Button variant='ghost' size='icon' asChild aria-label='Editar template'>
-            <Link href={`/dashboard/email-templates/${row.original.id}/edit`}>
-              <Icons.edit className='h-4 w-4' />
-            </Link>
-          </Button>
-          <Button
-            type='button'
-            variant='ghost'
-            size='icon'
-            className='text-destructive hover:text-destructive'
-            aria-label='Excluir template'
-            disabled={disableActions || !onDelete}
-            onClick={() => onDelete?.(row.original)}
-          >
-            <Icons.trash className='h-4 w-4' />
-          </Button>
+        <div className='flex justify-end'>
+          <ModuleRowActions
+            triggerAriaLabel='Abrir ações do template'
+            items={[
+              {
+                key: 'edit',
+                label: 'Editar template',
+                icon: Icons.edit,
+                href: `/dashboard/email-templates/${row.original.id}/edit`
+              },
+              {
+                key: 'delete',
+                label: 'Excluir template',
+                icon: Icons.trash,
+                onSelect: () => onDelete?.(row.original),
+                disabled: disableActions || !onDelete,
+                destructive: true,
+                separatorBefore: true
+              }
+            ]}
+          />
         </div>
       )
     }

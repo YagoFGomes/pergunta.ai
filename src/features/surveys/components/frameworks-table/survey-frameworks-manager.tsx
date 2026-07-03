@@ -246,7 +246,6 @@ export function SurveyFrameworksManager() {
 
       <ModuleDataTable
         table={table}
-        showToolbar={false}
         toolbarChildren={<Badge variant='outline'>{frameworks.length} frameworks</Badge>}
       />
 
