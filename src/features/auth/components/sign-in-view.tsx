@@ -26,7 +26,7 @@ export default function SignInViewPage() {
   const loginMutation = useLoginCreate();
   const router = useRouter();
   const searchParams = useSearchParams();
-  const redirectTo = searchParams.get('redirectTo') || '/dashboard/overview';
+  const redirectTo = searchParams.get('redirectTo') || '/dashboard/analytics/overview';
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);

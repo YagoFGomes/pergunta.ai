@@ -12,5 +12,5 @@ export default async function Page() {
     return redirect('/auth/sign-in');
   }
 
-  redirect('/dashboard/overview');
+  redirect('/dashboard/analytics/overview');
 }

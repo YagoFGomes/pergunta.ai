@@ -39,11 +39,38 @@ export const navGroups: NavGroup[] = [
     items: [
       {
         title: 'Dashboard',
-        url: '/dashboard/overview',
+        url: '#',
         icon: 'dashboard',
         isActive: false,
         shortcut: ['d', 'd'],
-        items: []
+        items: [
+          {
+            title: 'Resumo',
+            url: '/dashboard/analytics/overview',
+            icon: 'dashboard',
+            shortcut: ['d', 'o']
+          },
+          {
+            title: 'NPS',
+            url: '/dashboard/analytics/nps',
+            icon: 'trendingUp'
+          },
+          {
+            title: 'CSAT',
+            url: '/dashboard/analytics/csat',
+            icon: 'trendingUp'
+          },
+          {
+            title: 'CES',
+            url: '/dashboard/analytics/ces',
+            icon: 'trendingUp'
+          },
+          {
+            title: 'CSI',
+            url: '/dashboard/analytics/csi',
+            icon: 'trendingUp'
+          }
+        ]
       },
       {
         title: 'Campanhas',
@@ -87,40 +114,6 @@ export const navGroups: NavGroup[] = [
         shortcut: ['e', 't'],
         isActive: false,
         items: []
-      },
-      {
-        title: 'Analytics',
-        url: '#',
-        icon: 'trendingUp',
-        isActive: false,
-        items: [
-          {
-            title: 'Overview',
-            url: '/dashboard/analytics/overview',
-            icon: 'dashboard',
-            shortcut: ['a', 'o']
-          },
-          {
-            title: 'NPS',
-            url: '/dashboard/analytics/nps',
-            icon: 'trendingUp'
-          },
-          {
-            title: 'CSAT',
-            url: '/dashboard/analytics/csat',
-            icon: 'trendingUp'
-          },
-          {
-            title: 'CES',
-            url: '/dashboard/analytics/ces',
-            icon: 'trendingUp'
-          },
-          {
-            title: 'CSI',
-            url: '/dashboard/analytics/csi',
-            icon: 'trendingUp'
-          }
-        ]
       },
       {
         title: 'Logs de Entrega',

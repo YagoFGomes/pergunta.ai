@@ -291,7 +291,7 @@ export default function SignUpViewPage() {
         // /api/auth/refresh-claims/ re-queries the DB for memberships and returns a fresh token pair.
         await refreshClaims();
 
-        router.replace('/dashboard/overview');
+        router.replace('/dashboard/analytics/overview');
       } catch (error) {
         skipOnboarding.current = false;
         setServerError(
