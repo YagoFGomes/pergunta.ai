@@ -3,14 +3,24 @@ import { Status37cEnum } from '@/lib/api/generated/model/status37cEnum';
 import type { SurveyFramework } from '@/lib/api/generated/model/surveyFramework';
 import type { Option } from '@/types/data-table';
 
+export const SURVEY_FORM_STATUS_FILTER_VALUE = {
+  OPERATIONAL: 'OPERATIONAL',
+  ALL: 'ALL'
+} as const;
+
 export const SURVEY_FORM_STATUS_OPTIONS = [
+  {
+    label: 'Operacionais',
+    value: SURVEY_FORM_STATUS_FILTER_VALUE.OPERATIONAL,
+    icon: Icons.adjustments
+  },
   {
     label: 'Rascunho',
     value: Status37cEnum.DRAFT,
     icon: Icons.clock
   },
   {
-    label: 'Ativo',
+    label: 'Ativo/Publicado',
     value: Status37cEnum.ACTIVE,
     icon: Icons.circleCheck
   },
@@ -18,6 +28,10 @@ export const SURVEY_FORM_STATUS_OPTIONS = [
     label: 'Arquivado',
     value: Status37cEnum.ARCHIVED,
     icon: Icons.slash
+  },
+  {
+    label: 'Todos',
+    value: SURVEY_FORM_STATUS_FILTER_VALUE.ALL
   }
 ] satisfies Option[];
 

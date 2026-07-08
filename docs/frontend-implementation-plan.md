@@ -1148,6 +1148,36 @@ Validacao:
 - `bun run lint` passou; permanecem warnings preexistentes que nao bloqueiam a execucao
 - `bun run build` passou
 
+### Ajuste - Regra de listagem para arquivados
+
+Status: Implementado em 2026-07-03.
+
+Decisao:
+
+- listagens com suporte a `ARCHIVED` devem ocultar arquivados por padrao
+- o estado padrao de status passa a ser `Operacionais`
+- o usuario pode alternar explicitamente para `Arquivados` ou `Todos` no filtro
+
+Mapeamento de status por modulo (estado atual dos enums/contratos):
+
+- formularios (`status37c`): `DRAFT`, `ACTIVE`, `ARCHIVED`
+- campanhas (`campaignStatusEnum`): sem `ARCHIVED`
+- listas de contatos (`status372`): sem `ARCHIVED`
+- templates de email (`status372`): sem `ARCHIVED`
+- frameworks (`is_active`): sem `ARCHIVED`
+
+Implementacao aplicada:
+
+- rota `/dashboard/surveys/forms` recebeu opcoes explicitas de filtro de status:
+  - `Operacionais`
+  - `Rascunho`
+  - `Ativo/Publicado`
+  - `Arquivado`
+  - `Todos`
+- quando nenhum status e informado na URL, o frontend assume `Operacionais`
+- como o endpoint atual aceita apenas um `status` por request, o modo `Operacionais` usa fallback de filtro no client para mostrar `DRAFT` + `ACTIVE`
+- status selecionado continua sincronizado com query params do data table
+
 ### TODO FE-801..FE-808 - Identidade Visual Premium
 
 Status: Backlog em 2026-06-28.

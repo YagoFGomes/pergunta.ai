@@ -20,15 +20,20 @@ import { useDataTable } from '@/hooks/use-data-table';
 import { useSurveysFormsList, useSurveysFrameworksList } from '@/lib/api/generated/endpoints';
 import type { Form } from '@/lib/api/generated/model/form';
 import type { PaginatedFormList } from '@/lib/api/generated/model/paginatedFormList';
+import { Status37cEnum } from '@/lib/api/generated/model/status37cEnum';
 import type { SurveyFramework } from '@/lib/api/generated/model/surveyFramework';
 import type { SurveysFormsListParams } from '@/lib/api/generated/model/surveysFormsListParams';
 import { cn } from '@/lib/utils';
 
 import { getSurveyFormsColumns } from './columns';
-import { buildSurveyFrameworkOptions } from './options';
+import { buildSurveyFrameworkOptions, SURVEY_FORM_STATUS_FILTER_VALUE } from './options';
 
 const FORM_FILTER_KEYS = ['status', 'framework'] as const;
 const EMPTY_FRAMEWORKS: SurveyFramework[] = [];
+const OPERATIONAL_FORM_STATUSES: ReadonlySet<Status37cEnum> = new Set([
+  Status37cEnum.DRAFT,
+  Status37cEnum.ACTIVE
+]);
 
 function normalizeSingleFilter(value: unknown) {
   if (Array.isArray(value)) return value[0];
@@ -85,18 +90,27 @@ export function SurveyFormsTable() {
     filterKeys: FORM_FILTER_KEYS
   });
 
+  const rawStatusFilter = normalizeSingleFilter(params.status);
+  const effectiveStatusFilter = rawStatusFilter ?? SURVEY_FORM_STATUS_FILTER_VALUE.OPERATIONAL;
+  const statusForApi =
+    effectiveStatusFilter === Status37cEnum.DRAFT ||
+    effectiveStatusFilter === Status37cEnum.ACTIVE ||
+    effectiveStatusFilter === Status37cEnum.ARCHIVED
+      ? effectiveStatusFilter
+      : undefined;
+
   const apiParams = React.useMemo<SurveysFormsListParams>(
     () => ({
       page: String(params.page),
       page_size: String(params.perPage),
-      ...(normalizeSingleFilter(params.status) && {
-        status: normalizeSingleFilter(params.status)
+      ...(statusForApi && {
+        status: statusForApi
       }),
       ...(normalizeSingleFilter(params.framework) && {
         framework: normalizeSingleFilter(params.framework)
       })
     }),
-    [params.framework, params.page, params.perPage, params.status]
+    [params.framework, params.page, params.perPage, statusForApi]
   );
 
   const formsQuery = useSurveysFormsList(apiParams, {
@@ -106,10 +120,36 @@ export function SurveyFormsTable() {
   });
 
   const paginatedForms = getOrvalResponseData<PaginatedFormList>(formsQuery.data);
-  const forms = paginatedForms?.results ?? [];
-  const totalItems = paginatedForms?.count ?? 0;
+  const formsFromApi = paginatedForms?.results ?? [];
+  const forms = formsFromApi.filter((form) => {
+    if (effectiveStatusFilter === SURVEY_FORM_STATUS_FILTER_VALUE.OPERATIONAL) {
+      return OPERATIONAL_FORM_STATUSES.has(form.status ?? Status37cEnum.DRAFT);
+    }
+
+    if (effectiveStatusFilter === SURVEY_FORM_STATUS_FILTER_VALUE.ALL) {
+      return true;
+    }
+
+    if (
+      effectiveStatusFilter === Status37cEnum.DRAFT ||
+      effectiveStatusFilter === Status37cEnum.ACTIVE ||
+      effectiveStatusFilter === Status37cEnum.ARCHIVED
+    ) {
+      return form.status === effectiveStatusFilter;
+    }
+
+    return true;
+  });
+
+  const totalItems =
+    effectiveStatusFilter === SURVEY_FORM_STATUS_FILTER_VALUE.OPERATIONAL
+      ? forms.length
+      : (paginatedForms?.count ?? forms.length);
   const pageCount = getModuleTablePageCount(totalItems, params.perPage);
-  const hasFilters = Boolean(params.status || params.framework);
+  const hasFilters = Boolean(
+    params.framework ||
+    (rawStatusFilter && rawStatusFilter !== SURVEY_FORM_STATUS_FILTER_VALUE.OPERATIONAL)
+  );
   const hasNoFrameworkFilterOptions = frameworksQuery.isSuccess && frameworkOptions.length === 0;
 
   const { table } = useDataTable({
@@ -119,6 +159,7 @@ export function SurveyFormsTable() {
     shallow: true,
     debounceMs: MODULE_TABLE_DEFAULT_DEBOUNCE_MS,
     initialState: {
+      columnFilters: [{ id: 'status', value: SURVEY_FORM_STATUS_FILTER_VALUE.OPERATIONAL }],
       columnPinning: { right: ['actions'] }
     }
   });
