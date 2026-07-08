@@ -5,6 +5,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import * as React from 'react';
 
 import { Icons } from '@/components/icons';
+import { Checkbox } from '@/components/ui/checkbox';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -52,10 +53,12 @@ import {
   useSurveysFormsQuestionsOptionsPartialUpdate,
   useSurveysFormsQuestionsPartialUpdate,
   useSurveysFormsQuestionsReorderCreate,
-  useSurveysFormsRetrieve
+  useSurveysFormsRetrieve,
+  useSurveysFrameworksList
 } from '@/lib/api/generated/endpoints';
 import type { FormQuestion } from '@/lib/api/generated/model/formQuestion';
 import type { FormQuestionOption } from '@/lib/api/generated/model/formQuestionOption';
+import type { SurveyFramework } from '@/lib/api/generated/model/surveyFramework';
 import { QuestionTypeEnum } from '@/lib/api/generated/model/questionTypeEnum';
 import { Status37cEnum } from '@/lib/api/generated/model/status37cEnum';
 
@@ -113,6 +116,8 @@ export function SurveyFormQuestions({ formId }: SurveyFormQuestionsProps) {
   const [editOptionLabel, setEditOptionLabel] = React.useState('');
   const [editOptionValue, setEditOptionValue] = React.useState('');
   const [orderedQuestionIds, setOrderedQuestionIds] = React.useState<string[]>([]);
+  const [selectedIndicators, setSelectedIndicators] = React.useState<string[]>([]);
+  const [editIndicators, setEditIndicators] = React.useState<string[]>([]);
 
   const formQuery = useSurveysFormsRetrieve(formId, {
     query: {
@@ -121,6 +126,11 @@ export function SurveyFormQuestions({ formId }: SurveyFormQuestionsProps) {
   });
 
   const questionsQuery = useSurveysFormsQuestionsList(formId);
+  const indicatorsQuery = useSurveysFrameworksList(
+    { is_active: 'true' },
+    { query: { staleTime: 60_000 } }
+  );
+  const indicators = getOrvalResponseData<SurveyFramework[]>(indicatorsQuery.data) ?? [];
   const selectedQuestionId = manageOptionsQuestion?.id ?? '';
   const optionsQuery = useSurveysFormsQuestionsOptionsList(formId, selectedQuestionId, {
     query: {
@@ -268,10 +278,12 @@ export function SurveyFormQuestions({ formId }: SurveyFormQuestionsProps) {
         data: {
           label: value.label.trim(),
           question_type: value.question_type,
-          is_required: value.is_required
+          is_required: value.is_required,
+          indicators: selectedIndicators
         } as never
       });
       form.reset();
+      setSelectedIndicators([]);
     }
   });
 
@@ -293,8 +305,9 @@ export function SurveyFormQuestions({ formId }: SurveyFormQuestionsProps) {
         data: {
           label: value.label.trim(),
           question_type: value.question_type,
-          is_required: value.is_required
-        }
+          is_required: value.is_required,
+          indicators: editIndicators
+        } as never
       });
     }
   });
@@ -453,6 +466,10 @@ export function SurveyFormQuestions({ formId }: SurveyFormQuestionsProps) {
       question_type: editQuestion.question_type,
       is_required: Boolean(editQuestion.is_required)
     });
+    setEditIndicators(
+      ((editQuestion as unknown as Record<string, unknown>).indicators as string[] | undefined) ??
+        []
+    );
   }, [editForm, editQuestion]);
 
   React.useEffect(() => {
@@ -568,6 +585,45 @@ export function SurveyFormQuestions({ formId }: SurveyFormQuestionsProps) {
                   onBlur: surveyQuestionCreateFieldSchemas.is_required
                 }}
               />
+            </ModuleFormSection>
+
+            <ModuleFormSection
+              title='Indicadores'
+              description='Selecione os indicadores de satisfação que esta pergunta vai alimentar (opcional).'
+              columns={1}
+              separated
+            >
+              <div className='flex flex-wrap gap-x-6 gap-y-3'>
+                {indicators.map((indicator) => (
+                  <div key={indicator.id} className='flex items-center gap-2'>
+                    <Checkbox
+                      id={`new-ind-${indicator.code}`}
+                      checked={selectedIndicators.includes(indicator.code)}
+                      onCheckedChange={(checked) =>
+                        setSelectedIndicators((prev) =>
+                          checked
+                            ? [...prev, indicator.code]
+                            : prev.filter((c) => c !== indicator.code)
+                        )
+                      }
+                      disabled={isFormArchived}
+                    />
+                    <Label htmlFor={`new-ind-${indicator.code}`} className='cursor-pointer'>
+                      <span className='font-medium'>{indicator.code}</span>
+                      {indicator.name ? (
+                        <span className='text-muted-foreground ml-1 font-normal text-xs'>
+                          — {indicator.name}
+                        </span>
+                      ) : null}
+                    </Label>
+                  </div>
+                ))}
+                {indicators.length === 0 ? (
+                  <p className='text-muted-foreground text-sm'>
+                    Nenhum indicador ativo disponível.
+                  </p>
+                ) : null}
+              </div>
             </ModuleFormSection>
 
             {isFormArchived ? (
@@ -847,6 +903,41 @@ export function SurveyFormQuestions({ formId }: SurveyFormQuestionsProps) {
               />
             </editForm.Form>
           </editForm.AppForm>
+
+          <div className='space-y-2 px-1'>
+            <p className='text-sm font-medium'>Indicadores</p>
+            <p className='text-muted-foreground text-xs'>
+              Quais indicadores de satisfação esta pergunta alimenta.
+            </p>
+            <div className='flex flex-wrap gap-x-6 gap-y-3 pt-1'>
+              {indicators.map((indicator) => (
+                <div key={indicator.id} className='flex items-center gap-2'>
+                  <Checkbox
+                    id={`edit-ind-${indicator.code}`}
+                    checked={editIndicators.includes(indicator.code)}
+                    onCheckedChange={(checked) =>
+                      setEditIndicators((prev) =>
+                        checked
+                          ? [...prev, indicator.code]
+                          : prev.filter((c) => c !== indicator.code)
+                      )
+                    }
+                  />
+                  <Label htmlFor={`edit-ind-${indicator.code}`} className='cursor-pointer'>
+                    <span className='font-medium'>{indicator.code}</span>
+                    {indicator.name ? (
+                      <span className='text-muted-foreground ml-1 font-normal text-xs'>
+                        — {indicator.name}
+                      </span>
+                    ) : null}
+                  </Label>
+                </div>
+              ))}
+              {indicators.length === 0 ? (
+                <p className='text-muted-foreground text-sm'>Nenhum indicador disponível.</p>
+              ) : null}
+            </div>
+          </div>
 
           <DialogFooter>
             <Button
