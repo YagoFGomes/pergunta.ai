@@ -1,4 +1,4 @@
-import { NavGroup } from '@/types';
+﻿import { NavGroup } from '@/types';
 
 /**
  * Navigation configuration with RBAC support
@@ -39,38 +39,11 @@ export const navGroups: NavGroup[] = [
     items: [
       {
         title: 'Dashboard',
-        url: '#',
+        url: '/dashboard/analytics/overview',
         icon: 'dashboard',
         isActive: false,
         shortcut: ['d', 'd'],
-        items: [
-          {
-            title: 'Resumo',
-            url: '/dashboard/analytics/overview',
-            icon: 'dashboard',
-            shortcut: ['d', 'o']
-          },
-          {
-            title: 'NPS',
-            url: '/dashboard/analytics/nps',
-            icon: 'trendingUp'
-          },
-          {
-            title: 'CSAT',
-            url: '/dashboard/analytics/csat',
-            icon: 'trendingUp'
-          },
-          {
-            title: 'CES',
-            url: '/dashboard/analytics/ces',
-            icon: 'trendingUp'
-          },
-          {
-            title: 'CSI',
-            url: '/dashboard/analytics/csi',
-            icon: 'trendingUp'
-          }
-        ]
+        items: []
       },
       {
         title: 'Campanhas',
@@ -121,80 +94,6 @@ export const navGroups: NavGroup[] = [
         icon: 'notification',
         isActive: false,
         items: []
-      }
-    ]
-  },
-  {
-    label: 'Workspace',
-    items: [
-      {
-        title: 'Workspaces',
-        url: '/dashboard/workspaces',
-        icon: 'workspace',
-        isActive: false,
-        items: []
-      },
-      {
-        title: 'Teams',
-        url: '/dashboard/workspaces/team',
-        icon: 'teams',
-        isActive: false,
-        items: [],
-        access: { requireOrg: true }
-      },
-      {
-        title: 'Usuarios',
-        url: '/dashboard/users',
-        icon: 'teams',
-        shortcut: ['u', 'u'],
-        isActive: false,
-        items: []
-      },
-      {
-        title: 'Kanban',
-        url: '/dashboard/kanban',
-        icon: 'kanban',
-        shortcut: ['k', 'k'],
-        isActive: false,
-        items: []
-      }
-    ]
-  },
-  {
-    label: 'Conta',
-    items: [
-      {
-        title: 'Account',
-        url: '#',
-        icon: 'account',
-        isActive: true,
-        items: [
-          {
-            title: 'Profile',
-            url: '/dashboard/profile',
-            icon: 'profile',
-            shortcut: ['m', 'm']
-          },
-          {
-            title: 'Notifications',
-            url: '/dashboard/notifications',
-            icon: 'notification',
-            shortcut: ['n', 'n']
-          },
-          {
-            title: 'Billing',
-            url: '/dashboard/billing',
-            icon: 'billing',
-            shortcut: ['b', 'b'],
-            access: { requireOrg: true }
-          },
-          {
-            title: 'Login',
-            shortcut: ['l', 'l'],
-            url: '/',
-            icon: 'login'
-          }
-        ]
       }
     ]
   }
