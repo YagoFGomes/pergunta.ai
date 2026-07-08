@@ -8,6 +8,25 @@ export type AnalyticsOverview = {
   metrics_count: number;
   forms_count: number;
   campaigns_count: number;
+  operational_campaigns_count?: number;
+  responses_count?: number;
+  recipients?: {
+    total?: number;
+    pending?: number;
+    sent?: number;
+    delivered?: number;
+    responded?: number;
+    failed?: number;
+    contacted?: number;
+  };
+  deliveries?: {
+    total?: number;
+    pending?: number;
+    sent?: number;
+    delivered?: number;
+    failed?: number;
+    successful?: number;
+  };
   latest: Partial<Record<MetricTypeEnum, MetricResult>>;
 };
 
@@ -123,16 +142,50 @@ export function getAnsweredMetricsCount(overview?: AnalyticsOverview) {
   return ANALYTICS_METRIC_CARDS.filter((metric) => Boolean(overview.latest[metric.type])).length;
 }
 
-export function getCampaignResponseSummary(campaigns: Campaign[]) {
-  const sent = campaigns.reduce((total, campaign) => total + campaign.recipients_sent, 0);
-  const responded = campaigns.reduce((total, campaign) => total + campaign.recipients_responded, 0);
-  const rate = sent > 0 ? (responded / sent) * 100 : 0;
-
-  return { sent, responded, rate };
+function safeCount(value: unknown) {
+  const numericValue = Number(value ?? 0);
+  return Number.isFinite(numericValue) ? numericValue : 0;
 }
 
-export function getDeliverySummary(logs: EmailSendLog[]) {
-  return logs.reduce(
+export function getCampaignResponseSummary(campaigns: Campaign[], overview?: AnalyticsOverview) {
+  const fallbackSent = campaigns.reduce(
+    (total, campaign) => total + safeCount(campaign.recipients_sent),
+    0
+  );
+  const fallbackResponded = campaigns.reduce(
+    (total, campaign) => total + safeCount(campaign.recipients_responded),
+    0
+  );
+  const sent = safeCount(overview?.recipients?.contacted ?? fallbackSent);
+  const responded = safeCount(
+    overview?.responses_count ?? overview?.recipients?.responded ?? fallbackResponded
+  );
+  const rate = sent > 0 ? (responded / sent) * 100 : 0;
+
+  return {
+    failed: safeCount(overview?.recipients?.failed),
+    pending: safeCount(overview?.recipients?.pending),
+    rate,
+    responded,
+    sent,
+    total: safeCount(overview?.recipients?.total)
+  };
+}
+
+export function getDeliverySummary(logs: EmailSendLog[], overview?: AnalyticsOverview) {
+  if (overview?.deliveries) {
+    return {
+      failed: safeCount(overview.deliveries.failed),
+      pending: safeCount(overview.deliveries.pending),
+      sent: safeCount(
+        overview.deliveries.successful ??
+          safeCount(overview.deliveries.sent) + safeCount(overview.deliveries.delivered)
+      ),
+      total: safeCount(overview.deliveries.total)
+    };
+  }
+
+  const fallback = logs.reduce(
     (summary, log) => {
       if (
         log.status === EmailSendLogStatusEnum.SENT ||
@@ -154,8 +207,10 @@ export function getDeliverySummary(logs: EmailSendLog[]) {
 
       return summary;
     },
-    { failed: 0, pending: 0, sent: 0 }
+    { failed: 0, pending: 0, sent: 0, total: logs.length }
   );
+
+  return fallback;
 }
 
 export function formatRate(value: number) {

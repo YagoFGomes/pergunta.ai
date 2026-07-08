@@ -163,9 +163,10 @@ export function AnalyticsOverview() {
   );
   const campaigns = getCollectionItems(campaignResponse);
   const deliveryLogs = getCollectionItems(deliveryResponse);
-  const campaignCount = getCollectionCount(campaignResponse);
-  const responseSummary = getCampaignResponseSummary(campaigns);
-  const deliverySummary = getDeliverySummary(deliveryLogs);
+  const campaignCount =
+    overview?.operational_campaigns_count ?? getCollectionCount(campaignResponse);
+  const responseSummary = getCampaignResponseSummary(campaigns, overview);
+  const deliverySummary = getDeliverySummary(deliveryLogs, overview);
   const metricCoverage = getAnsweredMetricsCount(overview);
   const metricCoveragePercent = (metricCoverage / ANALYTICS_METRIC_CARDS.length) * 100;
 
@@ -177,7 +178,8 @@ export function AnalyticsOverview() {
     !hasError &&
     (overview?.metrics_count ?? 0) === 0 &&
     campaignCount === 0 &&
-    deliveryLogs.length === 0;
+    responseSummary.responded === 0 &&
+    deliverySummary.total === 0;
 
   if (isLoading) {
     return <OverviewSkeleton />;
