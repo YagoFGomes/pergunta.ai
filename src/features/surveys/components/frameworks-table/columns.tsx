@@ -62,7 +62,7 @@ export function getSurveyFrameworksColumns({
       ),
       cell: ({ row }) =>
         row.original.is_seed ? (
-          <Badge variant='outline'>Seed</Badge>
+          <Badge variant='outline'>Sistema</Badge>
         ) : (
           <Badge variant='outline'>Custom</Badge>
         )

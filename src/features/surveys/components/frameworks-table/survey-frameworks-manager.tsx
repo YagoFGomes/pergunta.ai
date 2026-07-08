@@ -65,12 +65,12 @@ export function SurveyFrameworksManager() {
   const createMutation = useSurveysFrameworksCreate({
     mutation: {
       onSuccess: () => {
-        toast.success('Framework criado com sucesso.');
+        toast.success('Indicador criado com sucesso.');
         void queryClient.invalidateQueries({ queryKey: getSurveysFrameworksListQueryKey() });
         setIsDialogOpen(false);
       },
       onError: () => {
-        toast.error('Não foi possível criar o framework.');
+        toast.error('Não foi possível criar o indicador.');
       }
     }
   });
@@ -78,12 +78,12 @@ export function SurveyFrameworksManager() {
   const updateMutation = useSurveysFrameworksPartialUpdate({
     mutation: {
       onSuccess: () => {
-        toast.success('Framework atualizado com sucesso.');
+        toast.success('Indicador atualizado com sucesso.');
         void queryClient.invalidateQueries({ queryKey: getSurveysFrameworksListQueryKey() });
         setIsDialogOpen(false);
       },
       onError: () => {
-        toast.error('Não foi possível atualizar o framework.');
+        toast.error('Não foi possível atualizar o indicador.');
       }
     }
   });
@@ -91,12 +91,12 @@ export function SurveyFrameworksManager() {
   const deactivateMutation = useSurveysFrameworksPartialUpdate({
     mutation: {
       onSuccess: () => {
-        toast.success('Framework desativado.');
+        toast.success('Indicador desativado.');
         void queryClient.invalidateQueries({ queryKey: getSurveysFrameworksListQueryKey() });
         setIsDialogOpen(false);
       },
       onError: () => {
-        toast.error('Não foi possível desativar o framework.');
+        toast.error('Não foi possível desativar o indicador.');
       }
     }
   });
@@ -149,7 +149,7 @@ export function SurveyFrameworksManager() {
 
   function openEditDialog(framework: SurveyFramework) {
     if (framework.is_seed) {
-      toast.error('Framework seed não pode ser editado neste perfil.');
+      toast.error('Indicador de sistema não pode ser editado.');
       return;
     }
 
@@ -166,7 +166,7 @@ export function SurveyFrameworksManager() {
 
   async function toggleActive(framework: SurveyFramework) {
     if (framework.is_seed) {
-      toast.error('Framework seed não pode ser alterado neste perfil.');
+      toast.error('Indicador de sistema não pode ser alterado.');
       return;
     }
 
@@ -180,7 +180,7 @@ export function SurveyFrameworksManager() {
 
   function openDeactivateAsDeleteDialog(framework: SurveyFramework) {
     if (framework.is_seed) {
-      toast.error('Framework seed não pode ser excluido.');
+      toast.error('Indicador de sistema não pode ser excluído.');
       return;
     }
 
@@ -218,35 +218,34 @@ export function SurveyFrameworksManager() {
     <div className='space-y-4'>
       <div className='flex flex-wrap items-center justify-between gap-2'>
         <div className='space-y-1'>
-          <h2 className='text-xl font-semibold'>Frameworks</h2>
+          <h2 className='text-xl font-semibold'>Indicadores de Satisfação</h2>
           <p className='text-muted-foreground text-sm'>
-            Gerencie os frameworks de pesquisa disponíveis para os formulários.
+            NPS, CSI e CXI são indicadores do sistema. Você também pode criar indicadores
+            customizados.
           </p>
         </div>
-        <Button onClick={openCreateDialog}>Novo framework</Button>
+        <Button onClick={openCreateDialog}>Novo indicador</Button>
       </div>
 
       {listQuery.isError ? (
         <Alert variant='destructive'>
-          <AlertTitle>Erro ao carregar frameworks</AlertTitle>
+          <AlertTitle>Erro ao carregar indicadores</AlertTitle>
           <AlertDescription>
-            Não foi possível carregar os frameworks. Atualize a página e tente novamente.
+            Não foi possível carregar os indicadores. Atualize a página e tente novamente.
           </AlertDescription>
         </Alert>
       ) : null}
 
       {listQuery.isSuccess && frameworks.length === 0 ? (
         <Alert>
-          <AlertTitle>Nenhum framework encontrado</AlertTitle>
-          <AlertDescription>
-            Crie o primeiro framework para começar a organizar os formulários.
-          </AlertDescription>
+          <AlertTitle>Nenhum indicador encontrado</AlertTitle>
+          <AlertDescription>Crie o primeiro indicador customizado para começar.</AlertDescription>
         </Alert>
       ) : null}
 
       <ModuleDataTable
         table={table}
-        toolbarChildren={<Badge variant='outline'>{frameworks.length} frameworks</Badge>}
+        toolbarChildren={<Badge variant='outline'>{frameworks.length} indicadores</Badge>}
       />
 
       <Dialog
@@ -263,17 +262,17 @@ export function SurveyFrameworksManager() {
           <DialogHeader>
             <DialogTitle>
               {mode === 'create'
-                ? 'Novo framework'
+                ? 'Novo indicador'
                 : mode === 'edit'
-                  ? 'Editar framework'
-                  : 'Excluir framework'}
+                  ? 'Editar indicador'
+                  : 'Excluir indicador'}
             </DialogTitle>
             <DialogDescription>
               {mode === 'create'
-                ? 'Preencha os dados para criar um framework.'
+                ? 'Preencha os dados para criar um indicador customizado.'
                 : mode === 'edit'
-                  ? 'Atualize os dados do framework selecionado.'
-                  : 'A API não possui endpoint DELETE para frameworks. Esta ação vai desativar o registro.'}
+                  ? 'Atualize os dados do indicador selecionado.'
+                  : 'A API não possui endpoint DELETE para indicadores. Esta ação vai desativar o registro.'}
             </DialogDescription>
           </DialogHeader>
 

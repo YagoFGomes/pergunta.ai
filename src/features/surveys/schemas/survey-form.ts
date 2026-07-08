@@ -3,7 +3,6 @@ import * as z from 'zod';
 import { createModuleFormConfig } from '@/features/platform/lib/module-form';
 
 export const surveyFormCreateSchema = z.object({
-  framework: z.string().min(1, 'Selecione um framework.'),
   title: z
     .string()
     .trim()
@@ -19,7 +18,6 @@ export const surveyFormCreateFieldSchemas = surveyFormCreateSchema.shape;
 export const surveyFormCreateFormConfig = createModuleFormConfig<SurveyFormCreateValues>({
   schema: surveyFormCreateSchema,
   defaultValues: {
-    framework: '',
     title: '',
     description: ''
   }

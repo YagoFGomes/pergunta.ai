@@ -54,19 +54,19 @@ export const navGroups: NavGroup[] = [
         items: []
       },
       {
-        title: 'Surveys',
+        title: 'Pesquisas',
         url: '#',
         icon: 'forms',
         isActive: false,
         items: [
           {
-            title: 'Forms',
+            title: 'Formulários',
             url: '/dashboard/surveys/forms',
             icon: 'forms',
             shortcut: ['s', 'f']
           },
           {
-            title: 'Frameworks',
+            title: 'Indicadores',
             url: '/dashboard/surveys/frameworks',
             icon: 'adjustments'
           }

@@ -1,13 +1,11 @@
 'use client';
-
 import { useQueryClient } from '@tanstack/react-query';
-import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import * as React from 'react';
 
 import { Icons } from '@/components/icons';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { Button, buttonVariants } from '@/components/ui/button';
+import { Button } from '@/components/ui/button';
 import { useAppForm, useFormFields } from '@/components/ui/tanstack-form';
 import { ModuleErrorAlert } from '@/features/platform/components/module-error-alert';
 import { ModuleFormActions } from '@/features/platform/components/module-form-actions';
@@ -35,16 +33,11 @@ import {
   useSurveysFormsPartialUpdate,
   useSurveysFormsPublishCreate,
   useSurveysFormsRetrieve,
-  useSurveysFrameworksList,
   type SurveysFormsCreateMutationBody,
   type SurveysFormsPartialUpdateMutationBody
 } from '@/lib/api/generated/endpoints';
 import type { Form } from '@/lib/api/generated/model/form';
 import { Status37cEnum } from '@/lib/api/generated/model/status37cEnum';
-import type { SurveyFramework } from '@/lib/api/generated/model/surveyFramework';
-import { cn } from '@/lib/utils';
-
-import { buildSurveyFrameworkSelectOptions } from './forms-table/options';
 import {
   surveyFormCreateFieldSchemas,
   surveyFormCreateFormConfig,
@@ -53,13 +46,11 @@ import {
 
 const CREATE_SURVEY_FORM_ID = 'survey-form-create';
 const EDIT_SURVEY_FORM_ID = 'survey-form-edit';
-const EMPTY_FRAMEWORKS: SurveyFramework[] = [];
 
 function toCreatePayload(values: SurveyFormCreateValues): SurveysFormsCreateMutationBody {
   const description = values.description.trim();
 
   return {
-    framework: values.framework,
     title: values.title.trim(),
     ...(description && { description })
   } as SurveysFormsCreateMutationBody;
@@ -67,7 +58,6 @@ function toCreatePayload(values: SurveyFormCreateValues): SurveysFormsCreateMuta
 
 function toUpdatePayload(values: SurveyFormCreateValues): SurveysFormsPartialUpdateMutationBody {
   return {
-    framework: values.framework,
     title: values.title.trim(),
     description: values.description.trim()
   };
@@ -79,7 +69,6 @@ function getFormDefaultValues(form?: Form): SurveyFormCreateValues {
   }
 
   return {
-    framework: form.framework,
     title: form.title,
     description: form.description ?? ''
   };
@@ -111,22 +100,6 @@ function SurveyFormEditor({ mode, initialForm }: SurveyFormEditorProps) {
   const isEdit = mode === 'edit';
   const formId = isEdit ? EDIT_SURVEY_FORM_ID : CREATE_SURVEY_FORM_ID;
   const [confirmAction, setConfirmAction] = React.useState<'publish' | 'archive' | null>(null);
-
-  const frameworksQuery = useSurveysFrameworksList(
-    { is_active: 'true' },
-    {
-      query: {
-        staleTime: 60_000
-      }
-    }
-  );
-
-  const frameworks =
-    getOrvalResponseData<SurveyFramework[]>(frameworksQuery.data) ?? EMPTY_FRAMEWORKS;
-  const frameworkOptions = React.useMemo(
-    () => buildSurveyFrameworkSelectOptions(frameworks),
-    [frameworks]
-  );
 
   const updateMutation = useSurveysFormsPartialUpdate({
     mutation: {
@@ -245,50 +218,7 @@ function SurveyFormEditor({ mode, initialForm }: SurveyFormEditorProps) {
     }
   });
 
-  const { FormTextField, FormSelectField, FormTextareaField } =
-    useFormFields<SurveyFormCreateValues>();
-
-  if (frameworksQuery.isPending) {
-    return <ModuleFormSkeleton />;
-  }
-
-  if (frameworksQuery.isError) {
-    return (
-      <div className='grid gap-4'>
-        <ModuleErrorAlert
-          error={frameworksQuery.error}
-          title='Erro ao carregar frameworks'
-          fallbackMessage='Não foi possível carregar os frameworks disponíveis para este tenant.'
-        />
-        <div>
-          <Button variant='outline' onClick={() => frameworksQuery.refetch()}>
-            Tentar novamente
-          </Button>
-        </div>
-      </div>
-    );
-  }
-
-  if (frameworkOptions.length === 0) {
-    return (
-      <Alert>
-        <Icons.info className='h-4 w-4' />
-        <AlertTitle>Nenhum framework ativo</AlertTitle>
-        <AlertDescription className='space-y-3'>
-          <p>
-            Este tenant ainda não possui frameworks ativos para criar formulários. Ative ou crie um
-            framework antes de iniciar um novo formulário.
-          </p>
-          <Link
-            href='/dashboard/surveys/frameworks'
-            className={cn(buttonVariants({ variant: 'outline', size: 'sm' }))}
-          >
-            Abrir frameworks
-          </Link>
-        </AlertDescription>
-      </Alert>
-    );
-  }
+  const { FormTextField, FormTextareaField } = useFormFields<SurveyFormCreateValues>();
 
   return (
     <>
@@ -351,20 +281,9 @@ function SurveyFormEditor({ mode, initialForm }: SurveyFormEditorProps) {
         <form.AppForm>
           <form.Form id={formId} className='space-y-8 p-0 md:p-0'>
             <ModuleFormSection
-              title='Configuração base'
-              description='Escolha o framework e defina como este formulário aparecera no dashboard.'
+              title='Identificação'
+              description='Defina o titulo e descricao para identificar este formulário no dashboard.'
             >
-              <FormSelectField
-                name='framework'
-                label='Framework'
-                required
-                options={frameworkOptions}
-                placeholder='Selecione um framework'
-                validators={{
-                  onBlur: surveyFormCreateFieldSchemas.framework
-                }}
-              />
-
               <FormTextField
                 name='title'
                 label='Titulo'
