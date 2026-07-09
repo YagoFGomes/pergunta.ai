@@ -16,7 +16,8 @@ const METRIC_ENDPOINTS: Record<MetricTypeEnum, string> = {
   [MetricTypeEnum.CES]: '/api/analytics/ces',
   [MetricTypeEnum.CSAT]: '/api/analytics/csat',
   [MetricTypeEnum.CSI]: '/api/analytics/csi',
-  [MetricTypeEnum.NPS]: '/api/analytics/nps'
+  [MetricTypeEnum.NPS]: '/api/analytics/nps',
+  [MetricTypeEnum.CXI]: '/api/analytics/cxi'
 };
 
 export function analyticsMetricQueryKey(
