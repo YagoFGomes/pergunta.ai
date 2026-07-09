@@ -3,6 +3,8 @@ import Link from 'next/link';
 import { Icons } from '@/components/icons';
 import PageContainer from '@/components/layout/page-container';
 import { buttonVariants } from '@/components/ui/button';
+import { Separator } from '@/components/ui/separator';
+import { SurveyFormTemplates } from '@/features/surveys/components/forms-table/survey-form-templates';
 import { SurveyFormsTable } from '@/features/surveys/components/forms-table/survey-forms-table';
 import { cn } from '@/lib/utils';
 
@@ -25,6 +27,8 @@ export default function SurveyFormsPage() {
         </Link>
       }
     >
+      <SurveyFormTemplates />
+      <Separator />
       <SurveyFormsTable />
     </PageContainer>
   );

@@ -5,11 +5,7 @@
  * API documentation for the Django Continuous Integration project with tenant-aware access rules.
  * OpenAPI spec version: 1.0.0
  */
-import {
-  useInfiniteQuery,
-  useMutation,
-  useQuery
-} from '@tanstack/react-query';
+import { useInfiniteQuery, useMutation, useQuery } from '@tanstack/react-query';
 import type {
   DataTag,
   DefinedInitialDataOptions,
@@ -93,11236 +89,15082 @@ import type {
 import { customFetch } from '../orval-fetcher';
 
 // https://stackoverflow.com/questions/49579094/typescript-conditional-types-filter-out-readonly-properties-pick-only-requir/49579497#49579497
-type IfEquals<X, Y, A = X, B = never> = (<T>() => T extends X ? 1 : 2) extends <
-T,
->() => T extends Y ? 1 : 2
-? A
-: B;
+type IfEquals<X, Y, A = X, B = never> =
+  (<T>() => T extends X ? 1 : 2) extends <T>() => T extends Y ? 1 : 2 ? A : B;
 
 type WritableKeys<T> = {
-[P in keyof T]-?: IfEquals<
-  { [Q in P]: T[P] },
-  { -readonly [Q in P]: T[P] },
-  P
->;
+  [P in keyof T]-?: IfEquals<{ [Q in P]: T[P] }, { -readonly [Q in P]: T[P] }, P>;
 }[keyof T];
 
-type UnionToIntersection<U> =
-  (U extends any ? (k: U)=>void : never) extends ((k: infer I)=>void) ? I : never;
+type UnionToIntersection<U> = (U extends any ? (k: U) => void : never) extends (k: infer I) => void
+  ? I
+  : never;
 type DistributeReadOnlyOverUnions<T> = T extends any ? NonReadonly<T> : never;
 
 type Writable<T> = Pick<T, WritableKeys<T>>;
-type NonReadonly<T> = [T] extends [UnionToIntersection<T>] ? {
-  [P in keyof Writable<T>]: T[P] extends object
-    ? NonReadonly<NonNullable<T[P]>>
-    : T[P];
-} : DistributeReadOnlyOverUnions<T>;
-
-
+type NonReadonly<T> = [T] extends [UnionToIntersection<T>]
+  ? {
+      [P in keyof Writable<T>]: T[P] extends object ? NonReadonly<NonNullable<T[P]>> : T[P];
+    }
+  : DistributeReadOnlyOverUnions<T>;
 
 type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
-
-
 
 /**
  * @summary Get analytics for a specific campaign
  */
 export type analyticsCampaignsRetrieveResponse200 = {
-  data: void
-  status: 200
-}
-    
-export type analyticsCampaignsRetrieveResponseSuccess = (analyticsCampaignsRetrieveResponse200) & {
+  data: void;
+  status: 200;
+};
+
+export type analyticsCampaignsRetrieveResponseSuccess = analyticsCampaignsRetrieveResponse200 & {
   headers: Headers;
 };
-;
 
-export type analyticsCampaignsRetrieveResponse = (analyticsCampaignsRetrieveResponseSuccess)
+export type analyticsCampaignsRetrieveResponse = analyticsCampaignsRetrieveResponseSuccess;
 
-export const getAnalyticsCampaignsRetrieveUrl = (campaignId: string,) => {
+export const getAnalyticsCampaignsRetrieveUrl = (campaignId: string) => {
+  return `/api/analytics/campaigns/${campaignId}/`;
+};
 
+export const analyticsCampaignsRetrieve = async (
+  campaignId: string,
+  options?: RequestInit
+): Promise<analyticsCampaignsRetrieveResponse> => {
+  return customFetch<analyticsCampaignsRetrieveResponse>(
+    getAnalyticsCampaignsRetrieveUrl(campaignId),
+    {
+      ...options,
+      method: 'GET'
+    }
+  );
+};
 
-  
+export const getAnalyticsCampaignsRetrieveInfiniteQueryKey = (campaignId?: string) => {
+  return ['infinite', `/api/analytics/campaigns/${campaignId}/`] as const;
+};
 
-  return `/api/analytics/campaigns/${campaignId}/`
-}
+export const getAnalyticsCampaignsRetrieveQueryKey = (campaignId?: string) => {
+  return [`/api/analytics/campaigns/${campaignId}/`] as const;
+};
 
-export const analyticsCampaignsRetrieve = async (campaignId: string, options?: RequestInit): Promise<analyticsCampaignsRetrieveResponse> => {
-  
-  return customFetch<analyticsCampaignsRetrieveResponse>(getAnalyticsCampaignsRetrieveUrl(campaignId),
-  {      
-    ...options,
-    method: 'GET'
-    
-    
+export const getAnalyticsCampaignsRetrieveInfiniteQueryOptions = <
+  TData = InfiniteData<Awaited<ReturnType<typeof analyticsCampaignsRetrieve>>>,
+  TError = unknown
+>(
+  campaignId: string,
+  options?: {
+    query?: Partial<
+      UseInfiniteQueryOptions<Awaited<ReturnType<typeof analyticsCampaignsRetrieve>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof customFetch>;
   }
-);}
-
-
-
-
-
-export const getAnalyticsCampaignsRetrieveInfiniteQueryKey = (campaignId?: string,) => {
-    return [
-    'infinite', `/api/analytics/campaigns/${campaignId}/`
-    ] as const;
-    }
-
-export const getAnalyticsCampaignsRetrieveQueryKey = (campaignId?: string,) => {
-    return [
-    `/api/analytics/campaigns/${campaignId}/`
-    ] as const;
-    }
-
-    
-export const getAnalyticsCampaignsRetrieveInfiniteQueryOptions = <TData = InfiniteData<Awaited<ReturnType<typeof analyticsCampaignsRetrieve>>>, TError = unknown>(campaignId: string, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof analyticsCampaignsRetrieve>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
 ) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
 
-const {query: queryOptions, request: requestOptions} = options ?? {};
+  const queryKey =
+    queryOptions?.queryKey ?? getAnalyticsCampaignsRetrieveInfiniteQueryKey(campaignId);
 
-  const queryKey =  queryOptions?.queryKey ?? getAnalyticsCampaignsRetrieveInfiniteQueryKey(campaignId);
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof analyticsCampaignsRetrieve>>> = ({
+    signal
+  }) => analyticsCampaignsRetrieve(campaignId, { signal, ...requestOptions });
 
-  
+  return { queryKey, queryFn, enabled: !!campaignId, ...queryOptions } as UseInfiniteQueryOptions<
+    Awaited<ReturnType<typeof analyticsCampaignsRetrieve>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof analyticsCampaignsRetrieve>>> = ({ signal }) => analyticsCampaignsRetrieve(campaignId, { signal, ...requestOptions });
+export type AnalyticsCampaignsRetrieveInfiniteQueryResult = NonNullable<
+  Awaited<ReturnType<typeof analyticsCampaignsRetrieve>>
+>;
+export type AnalyticsCampaignsRetrieveInfiniteQueryError = unknown;
 
-      
-
-      
-
-   return  { queryKey, queryFn, enabled: !!(campaignId), ...queryOptions} as UseInfiniteQueryOptions<Awaited<ReturnType<typeof analyticsCampaignsRetrieve>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type AnalyticsCampaignsRetrieveInfiniteQueryResult = NonNullable<Awaited<ReturnType<typeof analyticsCampaignsRetrieve>>>
-export type AnalyticsCampaignsRetrieveInfiniteQueryError = unknown
-
-
-export function useAnalyticsCampaignsRetrieveInfinite<TData = InfiniteData<Awaited<ReturnType<typeof analyticsCampaignsRetrieve>>>, TError = unknown>(
- campaignId: string, options: { query:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof analyticsCampaignsRetrieve>>, TError, TData>> & Pick<
+export function useAnalyticsCampaignsRetrieveInfinite<
+  TData = InfiniteData<Awaited<ReturnType<typeof analyticsCampaignsRetrieve>>>,
+  TError = unknown
+>(
+  campaignId: string,
+  options: {
+    query: Partial<
+      UseInfiniteQueryOptions<Awaited<ReturnType<typeof analyticsCampaignsRetrieve>>, TError, TData>
+    > &
+      Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof analyticsCampaignsRetrieve>>,
           TError,
           Awaited<ReturnType<typeof analyticsCampaignsRetrieve>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  DefinedUseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useAnalyticsCampaignsRetrieveInfinite<TData = InfiniteData<Awaited<ReturnType<typeof analyticsCampaignsRetrieve>>>, TError = unknown>(
- campaignId: string, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof analyticsCampaignsRetrieve>>, TError, TData>> & Pick<
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): DefinedUseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useAnalyticsCampaignsRetrieveInfinite<
+  TData = InfiniteData<Awaited<ReturnType<typeof analyticsCampaignsRetrieve>>>,
+  TError = unknown
+>(
+  campaignId: string,
+  options?: {
+    query?: Partial<
+      UseInfiniteQueryOptions<Awaited<ReturnType<typeof analyticsCampaignsRetrieve>>, TError, TData>
+    > &
+      Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof analyticsCampaignsRetrieve>>,
           TError,
           Awaited<ReturnType<typeof analyticsCampaignsRetrieve>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useAnalyticsCampaignsRetrieveInfinite<TData = InfiniteData<Awaited<ReturnType<typeof analyticsCampaignsRetrieve>>>, TError = unknown>(
- campaignId: string, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof analyticsCampaignsRetrieve>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useAnalyticsCampaignsRetrieveInfinite<
+  TData = InfiniteData<Awaited<ReturnType<typeof analyticsCampaignsRetrieve>>>,
+  TError = unknown
+>(
+  campaignId: string,
+  options?: {
+    query?: Partial<
+      UseInfiniteQueryOptions<Awaited<ReturnType<typeof analyticsCampaignsRetrieve>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 /**
  * @summary Get analytics for a specific campaign
  */
 
-export function useAnalyticsCampaignsRetrieveInfinite<TData = InfiniteData<Awaited<ReturnType<typeof analyticsCampaignsRetrieve>>>, TError = unknown>(
- campaignId: string, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof analyticsCampaignsRetrieve>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient 
- ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+export function useAnalyticsCampaignsRetrieveInfinite<
+  TData = InfiniteData<Awaited<ReturnType<typeof analyticsCampaignsRetrieve>>>,
+  TError = unknown
+>(
+  campaignId: string,
+  options?: {
+    query?: Partial<
+      UseInfiniteQueryOptions<Awaited<ReturnType<typeof analyticsCampaignsRetrieve>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+  const queryOptions = getAnalyticsCampaignsRetrieveInfiniteQueryOptions(campaignId, options);
 
-  const queryOptions = getAnalyticsCampaignsRetrieveInfiniteQueryOptions(campaignId,options)
+  const query = useInfiniteQuery(queryOptions, queryClient) as UseInfiniteQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
 
-  const query = useInfiniteQuery(queryOptions, queryClient) as  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-
-  query.queryKey = queryOptions.queryKey ;
+  query.queryKey = queryOptions.queryKey;
 
   return query;
 }
 
-
-
-
-export const getAnalyticsCampaignsRetrieveQueryOptions = <TData = Awaited<ReturnType<typeof analyticsCampaignsRetrieve>>, TError = unknown>(campaignId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof analyticsCampaignsRetrieve>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+export const getAnalyticsCampaignsRetrieveQueryOptions = <
+  TData = Awaited<ReturnType<typeof analyticsCampaignsRetrieve>>,
+  TError = unknown
+>(
+  campaignId: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof analyticsCampaignsRetrieve>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  }
 ) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
 
-const {query: queryOptions, request: requestOptions} = options ?? {};
+  const queryKey = queryOptions?.queryKey ?? getAnalyticsCampaignsRetrieveQueryKey(campaignId);
 
-  const queryKey =  queryOptions?.queryKey ?? getAnalyticsCampaignsRetrieveQueryKey(campaignId);
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof analyticsCampaignsRetrieve>>> = ({
+    signal
+  }) => analyticsCampaignsRetrieve(campaignId, { signal, ...requestOptions });
 
-  
+  return { queryKey, queryFn, enabled: !!campaignId, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof analyticsCampaignsRetrieve>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof analyticsCampaignsRetrieve>>> = ({ signal }) => analyticsCampaignsRetrieve(campaignId, { signal, ...requestOptions });
+export type AnalyticsCampaignsRetrieveQueryResult = NonNullable<
+  Awaited<ReturnType<typeof analyticsCampaignsRetrieve>>
+>;
+export type AnalyticsCampaignsRetrieveQueryError = unknown;
 
-      
-
-      
-
-   return  { queryKey, queryFn, enabled: !!(campaignId), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof analyticsCampaignsRetrieve>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type AnalyticsCampaignsRetrieveQueryResult = NonNullable<Awaited<ReturnType<typeof analyticsCampaignsRetrieve>>>
-export type AnalyticsCampaignsRetrieveQueryError = unknown
-
-
-export function useAnalyticsCampaignsRetrieve<TData = Awaited<ReturnType<typeof analyticsCampaignsRetrieve>>, TError = unknown>(
- campaignId: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof analyticsCampaignsRetrieve>>, TError, TData>> & Pick<
+export function useAnalyticsCampaignsRetrieve<
+  TData = Awaited<ReturnType<typeof analyticsCampaignsRetrieve>>,
+  TError = unknown
+>(
+  campaignId: string,
+  options: {
+    query: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof analyticsCampaignsRetrieve>>, TError, TData>
+    > &
+      Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof analyticsCampaignsRetrieve>>,
           TError,
           Awaited<ReturnType<typeof analyticsCampaignsRetrieve>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useAnalyticsCampaignsRetrieve<TData = Awaited<ReturnType<typeof analyticsCampaignsRetrieve>>, TError = unknown>(
- campaignId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof analyticsCampaignsRetrieve>>, TError, TData>> & Pick<
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useAnalyticsCampaignsRetrieve<
+  TData = Awaited<ReturnType<typeof analyticsCampaignsRetrieve>>,
+  TError = unknown
+>(
+  campaignId: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof analyticsCampaignsRetrieve>>, TError, TData>
+    > &
+      Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof analyticsCampaignsRetrieve>>,
           TError,
           Awaited<ReturnType<typeof analyticsCampaignsRetrieve>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useAnalyticsCampaignsRetrieve<TData = Awaited<ReturnType<typeof analyticsCampaignsRetrieve>>, TError = unknown>(
- campaignId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof analyticsCampaignsRetrieve>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useAnalyticsCampaignsRetrieve<
+  TData = Awaited<ReturnType<typeof analyticsCampaignsRetrieve>>,
+  TError = unknown
+>(
+  campaignId: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof analyticsCampaignsRetrieve>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 /**
  * @summary Get analytics for a specific campaign
  */
 
-export function useAnalyticsCampaignsRetrieve<TData = Awaited<ReturnType<typeof analyticsCampaignsRetrieve>>, TError = unknown>(
- campaignId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof analyticsCampaignsRetrieve>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient 
- ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+export function useAnalyticsCampaignsRetrieve<
+  TData = Awaited<ReturnType<typeof analyticsCampaignsRetrieve>>,
+  TError = unknown
+>(
+  campaignId: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof analyticsCampaignsRetrieve>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+  const queryOptions = getAnalyticsCampaignsRetrieveQueryOptions(campaignId, options);
 
-  const queryOptions = getAnalyticsCampaignsRetrieveQueryOptions(campaignId,options)
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+  };
 
-  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-
-  query.queryKey = queryOptions.queryKey ;
+  query.queryKey = queryOptions.queryKey;
 
   return query;
 }
-
-
-
-
 
 /**
  * @summary List CES metrics
  */
 export type analyticsCesListResponse200 = {
-  data: MetricResult[]
-  status: 200
-}
-    
-export type analyticsCesListResponseSuccess = (analyticsCesListResponse200) & {
+  data: MetricResult[];
+  status: 200;
+};
+
+export type analyticsCesListResponseSuccess = analyticsCesListResponse200 & {
   headers: Headers;
 };
-;
 
-export type analyticsCesListResponse = (analyticsCesListResponseSuccess)
+export type analyticsCesListResponse = analyticsCesListResponseSuccess;
 
-export const getAnalyticsCesListUrl = (params?: AnalyticsCesListParams,) => {
+export const getAnalyticsCesListUrl = (params?: AnalyticsCesListParams) => {
   const normalizedParams = new URLSearchParams();
 
   Object.entries(params || {}).forEach(([key, value]) => {
-    
     if (value !== undefined) {
-      normalizedParams.append(key, value === null ? 'null' : value.toString())
+      normalizedParams.append(key, value === null ? 'null' : value.toString());
     }
   });
 
   const stringifiedParams = normalizedParams.toString();
 
-  return stringifiedParams.length > 0 ? `/api/analytics/ces/?${stringifiedParams}` : `/api/analytics/ces/`
-}
+  return stringifiedParams.length > 0
+    ? `/api/analytics/ces/?${stringifiedParams}`
+    : `/api/analytics/ces/`;
+};
 
-export const analyticsCesList = async (params?: AnalyticsCesListParams, options?: RequestInit): Promise<analyticsCesListResponse> => {
-  
-  return customFetch<analyticsCesListResponse>(getAnalyticsCesListUrl(params),
-  {      
+export const analyticsCesList = async (
+  params?: AnalyticsCesListParams,
+  options?: RequestInit
+): Promise<analyticsCesListResponse> => {
+  return customFetch<analyticsCesListResponse>(getAnalyticsCesListUrl(params), {
     ...options,
     method: 'GET'
-    
-    
+  });
+};
+
+export const getAnalyticsCesListInfiniteQueryKey = (params?: AnalyticsCesListParams) => {
+  return ['infinite', `/api/analytics/ces/`, ...(params ? [params] : [])] as const;
+};
+
+export const getAnalyticsCesListQueryKey = (params?: AnalyticsCesListParams) => {
+  return [`/api/analytics/ces/`, ...(params ? [params] : [])] as const;
+};
+
+export const getAnalyticsCesListInfiniteQueryOptions = <
+  TData = InfiniteData<Awaited<ReturnType<typeof analyticsCesList>>>,
+  TError = unknown
+>(
+  params?: AnalyticsCesListParams,
+  options?: {
+    query?: Partial<
+      UseInfiniteQueryOptions<Awaited<ReturnType<typeof analyticsCesList>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof customFetch>;
   }
-);}
-
-
-
-
-
-export const getAnalyticsCesListInfiniteQueryKey = (params?: AnalyticsCesListParams,) => {
-    return [
-    'infinite', `/api/analytics/ces/`, ...(params ? [params]: [])
-    ] as const;
-    }
-
-export const getAnalyticsCesListQueryKey = (params?: AnalyticsCesListParams,) => {
-    return [
-    `/api/analytics/ces/`, ...(params ? [params]: [])
-    ] as const;
-    }
-
-    
-export const getAnalyticsCesListInfiniteQueryOptions = <TData = InfiniteData<Awaited<ReturnType<typeof analyticsCesList>>>, TError = unknown>(params?: AnalyticsCesListParams, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof analyticsCesList>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
 ) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
 
-const {query: queryOptions, request: requestOptions} = options ?? {};
+  const queryKey = queryOptions?.queryKey ?? getAnalyticsCesListInfiniteQueryKey(params);
 
-  const queryKey =  queryOptions?.queryKey ?? getAnalyticsCesListInfiniteQueryKey(params);
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof analyticsCesList>>> = ({ signal }) =>
+    analyticsCesList(params, { signal, ...requestOptions });
 
-  
+  return { queryKey, queryFn, ...queryOptions } as UseInfiniteQueryOptions<
+    Awaited<ReturnType<typeof analyticsCesList>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof analyticsCesList>>> = ({ signal }) => analyticsCesList(params, { signal, ...requestOptions });
+export type AnalyticsCesListInfiniteQueryResult = NonNullable<
+  Awaited<ReturnType<typeof analyticsCesList>>
+>;
+export type AnalyticsCesListInfiniteQueryError = unknown;
 
-      
-
-      
-
-   return  { queryKey, queryFn, ...queryOptions} as UseInfiniteQueryOptions<Awaited<ReturnType<typeof analyticsCesList>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type AnalyticsCesListInfiniteQueryResult = NonNullable<Awaited<ReturnType<typeof analyticsCesList>>>
-export type AnalyticsCesListInfiniteQueryError = unknown
-
-
-export function useAnalyticsCesListInfinite<TData = InfiniteData<Awaited<ReturnType<typeof analyticsCesList>>>, TError = unknown>(
- params: undefined |  AnalyticsCesListParams, options: { query:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof analyticsCesList>>, TError, TData>> & Pick<
+export function useAnalyticsCesListInfinite<
+  TData = InfiniteData<Awaited<ReturnType<typeof analyticsCesList>>>,
+  TError = unknown
+>(
+  params: undefined | AnalyticsCesListParams,
+  options: {
+    query: Partial<
+      UseInfiniteQueryOptions<Awaited<ReturnType<typeof analyticsCesList>>, TError, TData>
+    > &
+      Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof analyticsCesList>>,
           TError,
           Awaited<ReturnType<typeof analyticsCesList>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  DefinedUseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useAnalyticsCesListInfinite<TData = InfiniteData<Awaited<ReturnType<typeof analyticsCesList>>>, TError = unknown>(
- params?: AnalyticsCesListParams, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof analyticsCesList>>, TError, TData>> & Pick<
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): DefinedUseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useAnalyticsCesListInfinite<
+  TData = InfiniteData<Awaited<ReturnType<typeof analyticsCesList>>>,
+  TError = unknown
+>(
+  params?: AnalyticsCesListParams,
+  options?: {
+    query?: Partial<
+      UseInfiniteQueryOptions<Awaited<ReturnType<typeof analyticsCesList>>, TError, TData>
+    > &
+      Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof analyticsCesList>>,
           TError,
           Awaited<ReturnType<typeof analyticsCesList>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useAnalyticsCesListInfinite<TData = InfiniteData<Awaited<ReturnType<typeof analyticsCesList>>>, TError = unknown>(
- params?: AnalyticsCesListParams, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof analyticsCesList>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useAnalyticsCesListInfinite<
+  TData = InfiniteData<Awaited<ReturnType<typeof analyticsCesList>>>,
+  TError = unknown
+>(
+  params?: AnalyticsCesListParams,
+  options?: {
+    query?: Partial<
+      UseInfiniteQueryOptions<Awaited<ReturnType<typeof analyticsCesList>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 /**
  * @summary List CES metrics
  */
 
-export function useAnalyticsCesListInfinite<TData = InfiniteData<Awaited<ReturnType<typeof analyticsCesList>>>, TError = unknown>(
- params?: AnalyticsCesListParams, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof analyticsCesList>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient 
- ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+export function useAnalyticsCesListInfinite<
+  TData = InfiniteData<Awaited<ReturnType<typeof analyticsCesList>>>,
+  TError = unknown
+>(
+  params?: AnalyticsCesListParams,
+  options?: {
+    query?: Partial<
+      UseInfiniteQueryOptions<Awaited<ReturnType<typeof analyticsCesList>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+  const queryOptions = getAnalyticsCesListInfiniteQueryOptions(params, options);
 
-  const queryOptions = getAnalyticsCesListInfiniteQueryOptions(params,options)
+  const query = useInfiniteQuery(queryOptions, queryClient) as UseInfiniteQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
 
-  const query = useInfiniteQuery(queryOptions, queryClient) as  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-
-  query.queryKey = queryOptions.queryKey ;
+  query.queryKey = queryOptions.queryKey;
 
   return query;
 }
 
-
-
-
-export const getAnalyticsCesListQueryOptions = <TData = Awaited<ReturnType<typeof analyticsCesList>>, TError = unknown>(params?: AnalyticsCesListParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof analyticsCesList>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+export const getAnalyticsCesListQueryOptions = <
+  TData = Awaited<ReturnType<typeof analyticsCesList>>,
+  TError = unknown
+>(
+  params?: AnalyticsCesListParams,
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof analyticsCesList>>, TError, TData>>;
+    request?: SecondParameter<typeof customFetch>;
+  }
 ) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
 
-const {query: queryOptions, request: requestOptions} = options ?? {};
+  const queryKey = queryOptions?.queryKey ?? getAnalyticsCesListQueryKey(params);
 
-  const queryKey =  queryOptions?.queryKey ?? getAnalyticsCesListQueryKey(params);
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof analyticsCesList>>> = ({ signal }) =>
+    analyticsCesList(params, { signal, ...requestOptions });
 
-  
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof analyticsCesList>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof analyticsCesList>>> = ({ signal }) => analyticsCesList(params, { signal, ...requestOptions });
+export type AnalyticsCesListQueryResult = NonNullable<Awaited<ReturnType<typeof analyticsCesList>>>;
+export type AnalyticsCesListQueryError = unknown;
 
-      
-
-      
-
-   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof analyticsCesList>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type AnalyticsCesListQueryResult = NonNullable<Awaited<ReturnType<typeof analyticsCesList>>>
-export type AnalyticsCesListQueryError = unknown
-
-
-export function useAnalyticsCesList<TData = Awaited<ReturnType<typeof analyticsCesList>>, TError = unknown>(
- params: undefined |  AnalyticsCesListParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof analyticsCesList>>, TError, TData>> & Pick<
+export function useAnalyticsCesList<
+  TData = Awaited<ReturnType<typeof analyticsCesList>>,
+  TError = unknown
+>(
+  params: undefined | AnalyticsCesListParams,
+  options: {
+    query: Partial<UseQueryOptions<Awaited<ReturnType<typeof analyticsCesList>>, TError, TData>> &
+      Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof analyticsCesList>>,
           TError,
           Awaited<ReturnType<typeof analyticsCesList>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useAnalyticsCesList<TData = Awaited<ReturnType<typeof analyticsCesList>>, TError = unknown>(
- params?: AnalyticsCesListParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof analyticsCesList>>, TError, TData>> & Pick<
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useAnalyticsCesList<
+  TData = Awaited<ReturnType<typeof analyticsCesList>>,
+  TError = unknown
+>(
+  params?: AnalyticsCesListParams,
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof analyticsCesList>>, TError, TData>> &
+      Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof analyticsCesList>>,
           TError,
           Awaited<ReturnType<typeof analyticsCesList>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useAnalyticsCesList<TData = Awaited<ReturnType<typeof analyticsCesList>>, TError = unknown>(
- params?: AnalyticsCesListParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof analyticsCesList>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useAnalyticsCesList<
+  TData = Awaited<ReturnType<typeof analyticsCesList>>,
+  TError = unknown
+>(
+  params?: AnalyticsCesListParams,
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof analyticsCesList>>, TError, TData>>;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 /**
  * @summary List CES metrics
  */
 
-export function useAnalyticsCesList<TData = Awaited<ReturnType<typeof analyticsCesList>>, TError = unknown>(
- params?: AnalyticsCesListParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof analyticsCesList>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient 
- ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+export function useAnalyticsCesList<
+  TData = Awaited<ReturnType<typeof analyticsCesList>>,
+  TError = unknown
+>(
+  params?: AnalyticsCesListParams,
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof analyticsCesList>>, TError, TData>>;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+  const queryOptions = getAnalyticsCesListQueryOptions(params, options);
 
-  const queryOptions = getAnalyticsCesListQueryOptions(params,options)
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+  };
 
-  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-
-  query.queryKey = queryOptions.queryKey ;
+  query.queryKey = queryOptions.queryKey;
 
   return query;
 }
-
-
-
-
 
 /**
  * @summary List CSAT metrics
  */
 export type analyticsCsatListResponse200 = {
-  data: MetricResult[]
-  status: 200
-}
-    
-export type analyticsCsatListResponseSuccess = (analyticsCsatListResponse200) & {
+  data: MetricResult[];
+  status: 200;
+};
+
+export type analyticsCsatListResponseSuccess = analyticsCsatListResponse200 & {
   headers: Headers;
 };
-;
 
-export type analyticsCsatListResponse = (analyticsCsatListResponseSuccess)
+export type analyticsCsatListResponse = analyticsCsatListResponseSuccess;
 
-export const getAnalyticsCsatListUrl = (params?: AnalyticsCsatListParams,) => {
+export const getAnalyticsCsatListUrl = (params?: AnalyticsCsatListParams) => {
   const normalizedParams = new URLSearchParams();
 
   Object.entries(params || {}).forEach(([key, value]) => {
-    
     if (value !== undefined) {
-      normalizedParams.append(key, value === null ? 'null' : value.toString())
+      normalizedParams.append(key, value === null ? 'null' : value.toString());
     }
   });
 
   const stringifiedParams = normalizedParams.toString();
 
-  return stringifiedParams.length > 0 ? `/api/analytics/csat/?${stringifiedParams}` : `/api/analytics/csat/`
-}
+  return stringifiedParams.length > 0
+    ? `/api/analytics/csat/?${stringifiedParams}`
+    : `/api/analytics/csat/`;
+};
 
-export const analyticsCsatList = async (params?: AnalyticsCsatListParams, options?: RequestInit): Promise<analyticsCsatListResponse> => {
-  
-  return customFetch<analyticsCsatListResponse>(getAnalyticsCsatListUrl(params),
-  {      
+export const analyticsCsatList = async (
+  params?: AnalyticsCsatListParams,
+  options?: RequestInit
+): Promise<analyticsCsatListResponse> => {
+  return customFetch<analyticsCsatListResponse>(getAnalyticsCsatListUrl(params), {
     ...options,
     method: 'GET'
-    
-    
+  });
+};
+
+export const getAnalyticsCsatListInfiniteQueryKey = (params?: AnalyticsCsatListParams) => {
+  return ['infinite', `/api/analytics/csat/`, ...(params ? [params] : [])] as const;
+};
+
+export const getAnalyticsCsatListQueryKey = (params?: AnalyticsCsatListParams) => {
+  return [`/api/analytics/csat/`, ...(params ? [params] : [])] as const;
+};
+
+export const getAnalyticsCsatListInfiniteQueryOptions = <
+  TData = InfiniteData<Awaited<ReturnType<typeof analyticsCsatList>>>,
+  TError = unknown
+>(
+  params?: AnalyticsCsatListParams,
+  options?: {
+    query?: Partial<
+      UseInfiniteQueryOptions<Awaited<ReturnType<typeof analyticsCsatList>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof customFetch>;
   }
-);}
-
-
-
-
-
-export const getAnalyticsCsatListInfiniteQueryKey = (params?: AnalyticsCsatListParams,) => {
-    return [
-    'infinite', `/api/analytics/csat/`, ...(params ? [params]: [])
-    ] as const;
-    }
-
-export const getAnalyticsCsatListQueryKey = (params?: AnalyticsCsatListParams,) => {
-    return [
-    `/api/analytics/csat/`, ...(params ? [params]: [])
-    ] as const;
-    }
-
-    
-export const getAnalyticsCsatListInfiniteQueryOptions = <TData = InfiniteData<Awaited<ReturnType<typeof analyticsCsatList>>>, TError = unknown>(params?: AnalyticsCsatListParams, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof analyticsCsatList>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
 ) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
 
-const {query: queryOptions, request: requestOptions} = options ?? {};
+  const queryKey = queryOptions?.queryKey ?? getAnalyticsCsatListInfiniteQueryKey(params);
 
-  const queryKey =  queryOptions?.queryKey ?? getAnalyticsCsatListInfiniteQueryKey(params);
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof analyticsCsatList>>> = ({ signal }) =>
+    analyticsCsatList(params, { signal, ...requestOptions });
 
-  
+  return { queryKey, queryFn, ...queryOptions } as UseInfiniteQueryOptions<
+    Awaited<ReturnType<typeof analyticsCsatList>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof analyticsCsatList>>> = ({ signal }) => analyticsCsatList(params, { signal, ...requestOptions });
+export type AnalyticsCsatListInfiniteQueryResult = NonNullable<
+  Awaited<ReturnType<typeof analyticsCsatList>>
+>;
+export type AnalyticsCsatListInfiniteQueryError = unknown;
 
-      
-
-      
-
-   return  { queryKey, queryFn, ...queryOptions} as UseInfiniteQueryOptions<Awaited<ReturnType<typeof analyticsCsatList>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type AnalyticsCsatListInfiniteQueryResult = NonNullable<Awaited<ReturnType<typeof analyticsCsatList>>>
-export type AnalyticsCsatListInfiniteQueryError = unknown
-
-
-export function useAnalyticsCsatListInfinite<TData = InfiniteData<Awaited<ReturnType<typeof analyticsCsatList>>>, TError = unknown>(
- params: undefined |  AnalyticsCsatListParams, options: { query:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof analyticsCsatList>>, TError, TData>> & Pick<
+export function useAnalyticsCsatListInfinite<
+  TData = InfiniteData<Awaited<ReturnType<typeof analyticsCsatList>>>,
+  TError = unknown
+>(
+  params: undefined | AnalyticsCsatListParams,
+  options: {
+    query: Partial<
+      UseInfiniteQueryOptions<Awaited<ReturnType<typeof analyticsCsatList>>, TError, TData>
+    > &
+      Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof analyticsCsatList>>,
           TError,
           Awaited<ReturnType<typeof analyticsCsatList>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  DefinedUseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useAnalyticsCsatListInfinite<TData = InfiniteData<Awaited<ReturnType<typeof analyticsCsatList>>>, TError = unknown>(
- params?: AnalyticsCsatListParams, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof analyticsCsatList>>, TError, TData>> & Pick<
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): DefinedUseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useAnalyticsCsatListInfinite<
+  TData = InfiniteData<Awaited<ReturnType<typeof analyticsCsatList>>>,
+  TError = unknown
+>(
+  params?: AnalyticsCsatListParams,
+  options?: {
+    query?: Partial<
+      UseInfiniteQueryOptions<Awaited<ReturnType<typeof analyticsCsatList>>, TError, TData>
+    > &
+      Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof analyticsCsatList>>,
           TError,
           Awaited<ReturnType<typeof analyticsCsatList>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useAnalyticsCsatListInfinite<TData = InfiniteData<Awaited<ReturnType<typeof analyticsCsatList>>>, TError = unknown>(
- params?: AnalyticsCsatListParams, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof analyticsCsatList>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useAnalyticsCsatListInfinite<
+  TData = InfiniteData<Awaited<ReturnType<typeof analyticsCsatList>>>,
+  TError = unknown
+>(
+  params?: AnalyticsCsatListParams,
+  options?: {
+    query?: Partial<
+      UseInfiniteQueryOptions<Awaited<ReturnType<typeof analyticsCsatList>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 /**
  * @summary List CSAT metrics
  */
 
-export function useAnalyticsCsatListInfinite<TData = InfiniteData<Awaited<ReturnType<typeof analyticsCsatList>>>, TError = unknown>(
- params?: AnalyticsCsatListParams, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof analyticsCsatList>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient 
- ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+export function useAnalyticsCsatListInfinite<
+  TData = InfiniteData<Awaited<ReturnType<typeof analyticsCsatList>>>,
+  TError = unknown
+>(
+  params?: AnalyticsCsatListParams,
+  options?: {
+    query?: Partial<
+      UseInfiniteQueryOptions<Awaited<ReturnType<typeof analyticsCsatList>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+  const queryOptions = getAnalyticsCsatListInfiniteQueryOptions(params, options);
 
-  const queryOptions = getAnalyticsCsatListInfiniteQueryOptions(params,options)
+  const query = useInfiniteQuery(queryOptions, queryClient) as UseInfiniteQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
 
-  const query = useInfiniteQuery(queryOptions, queryClient) as  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-
-  query.queryKey = queryOptions.queryKey ;
+  query.queryKey = queryOptions.queryKey;
 
   return query;
 }
 
-
-
-
-export const getAnalyticsCsatListQueryOptions = <TData = Awaited<ReturnType<typeof analyticsCsatList>>, TError = unknown>(params?: AnalyticsCsatListParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof analyticsCsatList>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+export const getAnalyticsCsatListQueryOptions = <
+  TData = Awaited<ReturnType<typeof analyticsCsatList>>,
+  TError = unknown
+>(
+  params?: AnalyticsCsatListParams,
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof analyticsCsatList>>, TError, TData>>;
+    request?: SecondParameter<typeof customFetch>;
+  }
 ) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
 
-const {query: queryOptions, request: requestOptions} = options ?? {};
+  const queryKey = queryOptions?.queryKey ?? getAnalyticsCsatListQueryKey(params);
 
-  const queryKey =  queryOptions?.queryKey ?? getAnalyticsCsatListQueryKey(params);
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof analyticsCsatList>>> = ({ signal }) =>
+    analyticsCsatList(params, { signal, ...requestOptions });
 
-  
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof analyticsCsatList>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof analyticsCsatList>>> = ({ signal }) => analyticsCsatList(params, { signal, ...requestOptions });
+export type AnalyticsCsatListQueryResult = NonNullable<
+  Awaited<ReturnType<typeof analyticsCsatList>>
+>;
+export type AnalyticsCsatListQueryError = unknown;
 
-      
-
-      
-
-   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof analyticsCsatList>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type AnalyticsCsatListQueryResult = NonNullable<Awaited<ReturnType<typeof analyticsCsatList>>>
-export type AnalyticsCsatListQueryError = unknown
-
-
-export function useAnalyticsCsatList<TData = Awaited<ReturnType<typeof analyticsCsatList>>, TError = unknown>(
- params: undefined |  AnalyticsCsatListParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof analyticsCsatList>>, TError, TData>> & Pick<
+export function useAnalyticsCsatList<
+  TData = Awaited<ReturnType<typeof analyticsCsatList>>,
+  TError = unknown
+>(
+  params: undefined | AnalyticsCsatListParams,
+  options: {
+    query: Partial<UseQueryOptions<Awaited<ReturnType<typeof analyticsCsatList>>, TError, TData>> &
+      Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof analyticsCsatList>>,
           TError,
           Awaited<ReturnType<typeof analyticsCsatList>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useAnalyticsCsatList<TData = Awaited<ReturnType<typeof analyticsCsatList>>, TError = unknown>(
- params?: AnalyticsCsatListParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof analyticsCsatList>>, TError, TData>> & Pick<
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useAnalyticsCsatList<
+  TData = Awaited<ReturnType<typeof analyticsCsatList>>,
+  TError = unknown
+>(
+  params?: AnalyticsCsatListParams,
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof analyticsCsatList>>, TError, TData>> &
+      Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof analyticsCsatList>>,
           TError,
           Awaited<ReturnType<typeof analyticsCsatList>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useAnalyticsCsatList<TData = Awaited<ReturnType<typeof analyticsCsatList>>, TError = unknown>(
- params?: AnalyticsCsatListParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof analyticsCsatList>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useAnalyticsCsatList<
+  TData = Awaited<ReturnType<typeof analyticsCsatList>>,
+  TError = unknown
+>(
+  params?: AnalyticsCsatListParams,
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof analyticsCsatList>>, TError, TData>>;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 /**
  * @summary List CSAT metrics
  */
 
-export function useAnalyticsCsatList<TData = Awaited<ReturnType<typeof analyticsCsatList>>, TError = unknown>(
- params?: AnalyticsCsatListParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof analyticsCsatList>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient 
- ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+export function useAnalyticsCsatList<
+  TData = Awaited<ReturnType<typeof analyticsCsatList>>,
+  TError = unknown
+>(
+  params?: AnalyticsCsatListParams,
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof analyticsCsatList>>, TError, TData>>;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+  const queryOptions = getAnalyticsCsatListQueryOptions(params, options);
 
-  const queryOptions = getAnalyticsCsatListQueryOptions(params,options)
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+  };
 
-  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-
-  query.queryKey = queryOptions.queryKey ;
+  query.queryKey = queryOptions.queryKey;
 
   return query;
 }
-
-
-
-
 
 /**
  * @summary List CSI metrics
  */
 export type analyticsCsiListResponse200 = {
-  data: MetricResult[]
-  status: 200
-}
-    
-export type analyticsCsiListResponseSuccess = (analyticsCsiListResponse200) & {
+  data: MetricResult[];
+  status: 200;
+};
+
+export type analyticsCsiListResponseSuccess = analyticsCsiListResponse200 & {
   headers: Headers;
 };
-;
 
-export type analyticsCsiListResponse = (analyticsCsiListResponseSuccess)
+export type analyticsCsiListResponse = analyticsCsiListResponseSuccess;
 
-export const getAnalyticsCsiListUrl = (params?: AnalyticsCsiListParams,) => {
+export const getAnalyticsCsiListUrl = (params?: AnalyticsCsiListParams) => {
   const normalizedParams = new URLSearchParams();
 
   Object.entries(params || {}).forEach(([key, value]) => {
-    
     if (value !== undefined) {
-      normalizedParams.append(key, value === null ? 'null' : value.toString())
+      normalizedParams.append(key, value === null ? 'null' : value.toString());
     }
   });
 
   const stringifiedParams = normalizedParams.toString();
 
-  return stringifiedParams.length > 0 ? `/api/analytics/csi/?${stringifiedParams}` : `/api/analytics/csi/`
-}
+  return stringifiedParams.length > 0
+    ? `/api/analytics/csi/?${stringifiedParams}`
+    : `/api/analytics/csi/`;
+};
 
-export const analyticsCsiList = async (params?: AnalyticsCsiListParams, options?: RequestInit): Promise<analyticsCsiListResponse> => {
-  
-  return customFetch<analyticsCsiListResponse>(getAnalyticsCsiListUrl(params),
-  {      
+export const analyticsCsiList = async (
+  params?: AnalyticsCsiListParams,
+  options?: RequestInit
+): Promise<analyticsCsiListResponse> => {
+  return customFetch<analyticsCsiListResponse>(getAnalyticsCsiListUrl(params), {
     ...options,
     method: 'GET'
-    
-    
+  });
+};
+
+export const getAnalyticsCsiListInfiniteQueryKey = (params?: AnalyticsCsiListParams) => {
+  return ['infinite', `/api/analytics/csi/`, ...(params ? [params] : [])] as const;
+};
+
+export const getAnalyticsCsiListQueryKey = (params?: AnalyticsCsiListParams) => {
+  return [`/api/analytics/csi/`, ...(params ? [params] : [])] as const;
+};
+
+export const getAnalyticsCsiListInfiniteQueryOptions = <
+  TData = InfiniteData<Awaited<ReturnType<typeof analyticsCsiList>>>,
+  TError = unknown
+>(
+  params?: AnalyticsCsiListParams,
+  options?: {
+    query?: Partial<
+      UseInfiniteQueryOptions<Awaited<ReturnType<typeof analyticsCsiList>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof customFetch>;
   }
-);}
-
-
-
-
-
-export const getAnalyticsCsiListInfiniteQueryKey = (params?: AnalyticsCsiListParams,) => {
-    return [
-    'infinite', `/api/analytics/csi/`, ...(params ? [params]: [])
-    ] as const;
-    }
-
-export const getAnalyticsCsiListQueryKey = (params?: AnalyticsCsiListParams,) => {
-    return [
-    `/api/analytics/csi/`, ...(params ? [params]: [])
-    ] as const;
-    }
-
-    
-export const getAnalyticsCsiListInfiniteQueryOptions = <TData = InfiniteData<Awaited<ReturnType<typeof analyticsCsiList>>>, TError = unknown>(params?: AnalyticsCsiListParams, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof analyticsCsiList>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
 ) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
 
-const {query: queryOptions, request: requestOptions} = options ?? {};
+  const queryKey = queryOptions?.queryKey ?? getAnalyticsCsiListInfiniteQueryKey(params);
 
-  const queryKey =  queryOptions?.queryKey ?? getAnalyticsCsiListInfiniteQueryKey(params);
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof analyticsCsiList>>> = ({ signal }) =>
+    analyticsCsiList(params, { signal, ...requestOptions });
 
-  
+  return { queryKey, queryFn, ...queryOptions } as UseInfiniteQueryOptions<
+    Awaited<ReturnType<typeof analyticsCsiList>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof analyticsCsiList>>> = ({ signal }) => analyticsCsiList(params, { signal, ...requestOptions });
+export type AnalyticsCsiListInfiniteQueryResult = NonNullable<
+  Awaited<ReturnType<typeof analyticsCsiList>>
+>;
+export type AnalyticsCsiListInfiniteQueryError = unknown;
 
-      
-
-      
-
-   return  { queryKey, queryFn, ...queryOptions} as UseInfiniteQueryOptions<Awaited<ReturnType<typeof analyticsCsiList>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type AnalyticsCsiListInfiniteQueryResult = NonNullable<Awaited<ReturnType<typeof analyticsCsiList>>>
-export type AnalyticsCsiListInfiniteQueryError = unknown
-
-
-export function useAnalyticsCsiListInfinite<TData = InfiniteData<Awaited<ReturnType<typeof analyticsCsiList>>>, TError = unknown>(
- params: undefined |  AnalyticsCsiListParams, options: { query:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof analyticsCsiList>>, TError, TData>> & Pick<
+export function useAnalyticsCsiListInfinite<
+  TData = InfiniteData<Awaited<ReturnType<typeof analyticsCsiList>>>,
+  TError = unknown
+>(
+  params: undefined | AnalyticsCsiListParams,
+  options: {
+    query: Partial<
+      UseInfiniteQueryOptions<Awaited<ReturnType<typeof analyticsCsiList>>, TError, TData>
+    > &
+      Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof analyticsCsiList>>,
           TError,
           Awaited<ReturnType<typeof analyticsCsiList>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  DefinedUseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useAnalyticsCsiListInfinite<TData = InfiniteData<Awaited<ReturnType<typeof analyticsCsiList>>>, TError = unknown>(
- params?: AnalyticsCsiListParams, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof analyticsCsiList>>, TError, TData>> & Pick<
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): DefinedUseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useAnalyticsCsiListInfinite<
+  TData = InfiniteData<Awaited<ReturnType<typeof analyticsCsiList>>>,
+  TError = unknown
+>(
+  params?: AnalyticsCsiListParams,
+  options?: {
+    query?: Partial<
+      UseInfiniteQueryOptions<Awaited<ReturnType<typeof analyticsCsiList>>, TError, TData>
+    > &
+      Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof analyticsCsiList>>,
           TError,
           Awaited<ReturnType<typeof analyticsCsiList>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useAnalyticsCsiListInfinite<TData = InfiniteData<Awaited<ReturnType<typeof analyticsCsiList>>>, TError = unknown>(
- params?: AnalyticsCsiListParams, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof analyticsCsiList>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useAnalyticsCsiListInfinite<
+  TData = InfiniteData<Awaited<ReturnType<typeof analyticsCsiList>>>,
+  TError = unknown
+>(
+  params?: AnalyticsCsiListParams,
+  options?: {
+    query?: Partial<
+      UseInfiniteQueryOptions<Awaited<ReturnType<typeof analyticsCsiList>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 /**
  * @summary List CSI metrics
  */
 
-export function useAnalyticsCsiListInfinite<TData = InfiniteData<Awaited<ReturnType<typeof analyticsCsiList>>>, TError = unknown>(
- params?: AnalyticsCsiListParams, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof analyticsCsiList>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient 
- ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+export function useAnalyticsCsiListInfinite<
+  TData = InfiniteData<Awaited<ReturnType<typeof analyticsCsiList>>>,
+  TError = unknown
+>(
+  params?: AnalyticsCsiListParams,
+  options?: {
+    query?: Partial<
+      UseInfiniteQueryOptions<Awaited<ReturnType<typeof analyticsCsiList>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+  const queryOptions = getAnalyticsCsiListInfiniteQueryOptions(params, options);
 
-  const queryOptions = getAnalyticsCsiListInfiniteQueryOptions(params,options)
+  const query = useInfiniteQuery(queryOptions, queryClient) as UseInfiniteQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
 
-  const query = useInfiniteQuery(queryOptions, queryClient) as  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-
-  query.queryKey = queryOptions.queryKey ;
+  query.queryKey = queryOptions.queryKey;
 
   return query;
 }
 
-
-
-
-export const getAnalyticsCsiListQueryOptions = <TData = Awaited<ReturnType<typeof analyticsCsiList>>, TError = unknown>(params?: AnalyticsCsiListParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof analyticsCsiList>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+export const getAnalyticsCsiListQueryOptions = <
+  TData = Awaited<ReturnType<typeof analyticsCsiList>>,
+  TError = unknown
+>(
+  params?: AnalyticsCsiListParams,
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof analyticsCsiList>>, TError, TData>>;
+    request?: SecondParameter<typeof customFetch>;
+  }
 ) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
 
-const {query: queryOptions, request: requestOptions} = options ?? {};
+  const queryKey = queryOptions?.queryKey ?? getAnalyticsCsiListQueryKey(params);
 
-  const queryKey =  queryOptions?.queryKey ?? getAnalyticsCsiListQueryKey(params);
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof analyticsCsiList>>> = ({ signal }) =>
+    analyticsCsiList(params, { signal, ...requestOptions });
 
-  
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof analyticsCsiList>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof analyticsCsiList>>> = ({ signal }) => analyticsCsiList(params, { signal, ...requestOptions });
+export type AnalyticsCsiListQueryResult = NonNullable<Awaited<ReturnType<typeof analyticsCsiList>>>;
+export type AnalyticsCsiListQueryError = unknown;
 
-      
-
-      
-
-   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof analyticsCsiList>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type AnalyticsCsiListQueryResult = NonNullable<Awaited<ReturnType<typeof analyticsCsiList>>>
-export type AnalyticsCsiListQueryError = unknown
-
-
-export function useAnalyticsCsiList<TData = Awaited<ReturnType<typeof analyticsCsiList>>, TError = unknown>(
- params: undefined |  AnalyticsCsiListParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof analyticsCsiList>>, TError, TData>> & Pick<
+export function useAnalyticsCsiList<
+  TData = Awaited<ReturnType<typeof analyticsCsiList>>,
+  TError = unknown
+>(
+  params: undefined | AnalyticsCsiListParams,
+  options: {
+    query: Partial<UseQueryOptions<Awaited<ReturnType<typeof analyticsCsiList>>, TError, TData>> &
+      Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof analyticsCsiList>>,
           TError,
           Awaited<ReturnType<typeof analyticsCsiList>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useAnalyticsCsiList<TData = Awaited<ReturnType<typeof analyticsCsiList>>, TError = unknown>(
- params?: AnalyticsCsiListParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof analyticsCsiList>>, TError, TData>> & Pick<
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useAnalyticsCsiList<
+  TData = Awaited<ReturnType<typeof analyticsCsiList>>,
+  TError = unknown
+>(
+  params?: AnalyticsCsiListParams,
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof analyticsCsiList>>, TError, TData>> &
+      Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof analyticsCsiList>>,
           TError,
           Awaited<ReturnType<typeof analyticsCsiList>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useAnalyticsCsiList<TData = Awaited<ReturnType<typeof analyticsCsiList>>, TError = unknown>(
- params?: AnalyticsCsiListParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof analyticsCsiList>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useAnalyticsCsiList<
+  TData = Awaited<ReturnType<typeof analyticsCsiList>>,
+  TError = unknown
+>(
+  params?: AnalyticsCsiListParams,
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof analyticsCsiList>>, TError, TData>>;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 /**
  * @summary List CSI metrics
  */
 
-export function useAnalyticsCsiList<TData = Awaited<ReturnType<typeof analyticsCsiList>>, TError = unknown>(
- params?: AnalyticsCsiListParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof analyticsCsiList>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient 
- ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+export function useAnalyticsCsiList<
+  TData = Awaited<ReturnType<typeof analyticsCsiList>>,
+  TError = unknown
+>(
+  params?: AnalyticsCsiListParams,
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof analyticsCsiList>>, TError, TData>>;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+  const queryOptions = getAnalyticsCsiListQueryOptions(params, options);
 
-  const queryOptions = getAnalyticsCsiListQueryOptions(params,options)
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+  };
 
-  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-
-  query.queryKey = queryOptions.queryKey ;
+  query.queryKey = queryOptions.queryKey;
 
   return query;
 }
-
-
-
-
 
 /**
  * @summary Get analytics for a specific form
  */
 export type analyticsFormsRetrieveResponse200 = {
-  data: void
-  status: 200
-}
-    
-export type analyticsFormsRetrieveResponseSuccess = (analyticsFormsRetrieveResponse200) & {
+  data: void;
+  status: 200;
+};
+
+export type analyticsFormsRetrieveResponseSuccess = analyticsFormsRetrieveResponse200 & {
   headers: Headers;
 };
-;
 
-export type analyticsFormsRetrieveResponse = (analyticsFormsRetrieveResponseSuccess)
+export type analyticsFormsRetrieveResponse = analyticsFormsRetrieveResponseSuccess;
 
-export const getAnalyticsFormsRetrieveUrl = (formId: string,) => {
+export const getAnalyticsFormsRetrieveUrl = (formId: string) => {
+  return `/api/analytics/forms/${formId}/`;
+};
 
-
-  
-
-  return `/api/analytics/forms/${formId}/`
-}
-
-export const analyticsFormsRetrieve = async (formId: string, options?: RequestInit): Promise<analyticsFormsRetrieveResponse> => {
-  
-  return customFetch<analyticsFormsRetrieveResponse>(getAnalyticsFormsRetrieveUrl(formId),
-  {      
+export const analyticsFormsRetrieve = async (
+  formId: string,
+  options?: RequestInit
+): Promise<analyticsFormsRetrieveResponse> => {
+  return customFetch<analyticsFormsRetrieveResponse>(getAnalyticsFormsRetrieveUrl(formId), {
     ...options,
     method: 'GET'
-    
-    
+  });
+};
+
+export const getAnalyticsFormsRetrieveInfiniteQueryKey = (formId?: string) => {
+  return ['infinite', `/api/analytics/forms/${formId}/`] as const;
+};
+
+export const getAnalyticsFormsRetrieveQueryKey = (formId?: string) => {
+  return [`/api/analytics/forms/${formId}/`] as const;
+};
+
+export const getAnalyticsFormsRetrieveInfiniteQueryOptions = <
+  TData = InfiniteData<Awaited<ReturnType<typeof analyticsFormsRetrieve>>>,
+  TError = unknown
+>(
+  formId: string,
+  options?: {
+    query?: Partial<
+      UseInfiniteQueryOptions<Awaited<ReturnType<typeof analyticsFormsRetrieve>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof customFetch>;
   }
-);}
-
-
-
-
-
-export const getAnalyticsFormsRetrieveInfiniteQueryKey = (formId?: string,) => {
-    return [
-    'infinite', `/api/analytics/forms/${formId}/`
-    ] as const;
-    }
-
-export const getAnalyticsFormsRetrieveQueryKey = (formId?: string,) => {
-    return [
-    `/api/analytics/forms/${formId}/`
-    ] as const;
-    }
-
-    
-export const getAnalyticsFormsRetrieveInfiniteQueryOptions = <TData = InfiniteData<Awaited<ReturnType<typeof analyticsFormsRetrieve>>>, TError = unknown>(formId: string, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof analyticsFormsRetrieve>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
 ) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
 
-const {query: queryOptions, request: requestOptions} = options ?? {};
+  const queryKey = queryOptions?.queryKey ?? getAnalyticsFormsRetrieveInfiniteQueryKey(formId);
 
-  const queryKey =  queryOptions?.queryKey ?? getAnalyticsFormsRetrieveInfiniteQueryKey(formId);
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof analyticsFormsRetrieve>>> = ({ signal }) =>
+    analyticsFormsRetrieve(formId, { signal, ...requestOptions });
 
-  
+  return { queryKey, queryFn, enabled: !!formId, ...queryOptions } as UseInfiniteQueryOptions<
+    Awaited<ReturnType<typeof analyticsFormsRetrieve>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof analyticsFormsRetrieve>>> = ({ signal }) => analyticsFormsRetrieve(formId, { signal, ...requestOptions });
+export type AnalyticsFormsRetrieveInfiniteQueryResult = NonNullable<
+  Awaited<ReturnType<typeof analyticsFormsRetrieve>>
+>;
+export type AnalyticsFormsRetrieveInfiniteQueryError = unknown;
 
-      
-
-      
-
-   return  { queryKey, queryFn, enabled: !!(formId), ...queryOptions} as UseInfiniteQueryOptions<Awaited<ReturnType<typeof analyticsFormsRetrieve>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type AnalyticsFormsRetrieveInfiniteQueryResult = NonNullable<Awaited<ReturnType<typeof analyticsFormsRetrieve>>>
-export type AnalyticsFormsRetrieveInfiniteQueryError = unknown
-
-
-export function useAnalyticsFormsRetrieveInfinite<TData = InfiniteData<Awaited<ReturnType<typeof analyticsFormsRetrieve>>>, TError = unknown>(
- formId: string, options: { query:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof analyticsFormsRetrieve>>, TError, TData>> & Pick<
+export function useAnalyticsFormsRetrieveInfinite<
+  TData = InfiniteData<Awaited<ReturnType<typeof analyticsFormsRetrieve>>>,
+  TError = unknown
+>(
+  formId: string,
+  options: {
+    query: Partial<
+      UseInfiniteQueryOptions<Awaited<ReturnType<typeof analyticsFormsRetrieve>>, TError, TData>
+    > &
+      Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof analyticsFormsRetrieve>>,
           TError,
           Awaited<ReturnType<typeof analyticsFormsRetrieve>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  DefinedUseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useAnalyticsFormsRetrieveInfinite<TData = InfiniteData<Awaited<ReturnType<typeof analyticsFormsRetrieve>>>, TError = unknown>(
- formId: string, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof analyticsFormsRetrieve>>, TError, TData>> & Pick<
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): DefinedUseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useAnalyticsFormsRetrieveInfinite<
+  TData = InfiniteData<Awaited<ReturnType<typeof analyticsFormsRetrieve>>>,
+  TError = unknown
+>(
+  formId: string,
+  options?: {
+    query?: Partial<
+      UseInfiniteQueryOptions<Awaited<ReturnType<typeof analyticsFormsRetrieve>>, TError, TData>
+    > &
+      Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof analyticsFormsRetrieve>>,
           TError,
           Awaited<ReturnType<typeof analyticsFormsRetrieve>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useAnalyticsFormsRetrieveInfinite<TData = InfiniteData<Awaited<ReturnType<typeof analyticsFormsRetrieve>>>, TError = unknown>(
- formId: string, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof analyticsFormsRetrieve>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useAnalyticsFormsRetrieveInfinite<
+  TData = InfiniteData<Awaited<ReturnType<typeof analyticsFormsRetrieve>>>,
+  TError = unknown
+>(
+  formId: string,
+  options?: {
+    query?: Partial<
+      UseInfiniteQueryOptions<Awaited<ReturnType<typeof analyticsFormsRetrieve>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 /**
  * @summary Get analytics for a specific form
  */
 
-export function useAnalyticsFormsRetrieveInfinite<TData = InfiniteData<Awaited<ReturnType<typeof analyticsFormsRetrieve>>>, TError = unknown>(
- formId: string, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof analyticsFormsRetrieve>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient 
- ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+export function useAnalyticsFormsRetrieveInfinite<
+  TData = InfiniteData<Awaited<ReturnType<typeof analyticsFormsRetrieve>>>,
+  TError = unknown
+>(
+  formId: string,
+  options?: {
+    query?: Partial<
+      UseInfiniteQueryOptions<Awaited<ReturnType<typeof analyticsFormsRetrieve>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+  const queryOptions = getAnalyticsFormsRetrieveInfiniteQueryOptions(formId, options);
 
-  const queryOptions = getAnalyticsFormsRetrieveInfiniteQueryOptions(formId,options)
+  const query = useInfiniteQuery(queryOptions, queryClient) as UseInfiniteQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
 
-  const query = useInfiniteQuery(queryOptions, queryClient) as  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-
-  query.queryKey = queryOptions.queryKey ;
+  query.queryKey = queryOptions.queryKey;
 
   return query;
 }
 
-
-
-
-export const getAnalyticsFormsRetrieveQueryOptions = <TData = Awaited<ReturnType<typeof analyticsFormsRetrieve>>, TError = unknown>(formId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof analyticsFormsRetrieve>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+export const getAnalyticsFormsRetrieveQueryOptions = <
+  TData = Awaited<ReturnType<typeof analyticsFormsRetrieve>>,
+  TError = unknown
+>(
+  formId: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof analyticsFormsRetrieve>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  }
 ) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
 
-const {query: queryOptions, request: requestOptions} = options ?? {};
+  const queryKey = queryOptions?.queryKey ?? getAnalyticsFormsRetrieveQueryKey(formId);
 
-  const queryKey =  queryOptions?.queryKey ?? getAnalyticsFormsRetrieveQueryKey(formId);
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof analyticsFormsRetrieve>>> = ({ signal }) =>
+    analyticsFormsRetrieve(formId, { signal, ...requestOptions });
 
-  
+  return { queryKey, queryFn, enabled: !!formId, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof analyticsFormsRetrieve>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof analyticsFormsRetrieve>>> = ({ signal }) => analyticsFormsRetrieve(formId, { signal, ...requestOptions });
+export type AnalyticsFormsRetrieveQueryResult = NonNullable<
+  Awaited<ReturnType<typeof analyticsFormsRetrieve>>
+>;
+export type AnalyticsFormsRetrieveQueryError = unknown;
 
-      
-
-      
-
-   return  { queryKey, queryFn, enabled: !!(formId), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof analyticsFormsRetrieve>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type AnalyticsFormsRetrieveQueryResult = NonNullable<Awaited<ReturnType<typeof analyticsFormsRetrieve>>>
-export type AnalyticsFormsRetrieveQueryError = unknown
-
-
-export function useAnalyticsFormsRetrieve<TData = Awaited<ReturnType<typeof analyticsFormsRetrieve>>, TError = unknown>(
- formId: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof analyticsFormsRetrieve>>, TError, TData>> & Pick<
+export function useAnalyticsFormsRetrieve<
+  TData = Awaited<ReturnType<typeof analyticsFormsRetrieve>>,
+  TError = unknown
+>(
+  formId: string,
+  options: {
+    query: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof analyticsFormsRetrieve>>, TError, TData>
+    > &
+      Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof analyticsFormsRetrieve>>,
           TError,
           Awaited<ReturnType<typeof analyticsFormsRetrieve>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useAnalyticsFormsRetrieve<TData = Awaited<ReturnType<typeof analyticsFormsRetrieve>>, TError = unknown>(
- formId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof analyticsFormsRetrieve>>, TError, TData>> & Pick<
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useAnalyticsFormsRetrieve<
+  TData = Awaited<ReturnType<typeof analyticsFormsRetrieve>>,
+  TError = unknown
+>(
+  formId: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof analyticsFormsRetrieve>>, TError, TData>
+    > &
+      Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof analyticsFormsRetrieve>>,
           TError,
           Awaited<ReturnType<typeof analyticsFormsRetrieve>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useAnalyticsFormsRetrieve<TData = Awaited<ReturnType<typeof analyticsFormsRetrieve>>, TError = unknown>(
- formId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof analyticsFormsRetrieve>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useAnalyticsFormsRetrieve<
+  TData = Awaited<ReturnType<typeof analyticsFormsRetrieve>>,
+  TError = unknown
+>(
+  formId: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof analyticsFormsRetrieve>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 /**
  * @summary Get analytics for a specific form
  */
 
-export function useAnalyticsFormsRetrieve<TData = Awaited<ReturnType<typeof analyticsFormsRetrieve>>, TError = unknown>(
- formId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof analyticsFormsRetrieve>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient 
- ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+export function useAnalyticsFormsRetrieve<
+  TData = Awaited<ReturnType<typeof analyticsFormsRetrieve>>,
+  TError = unknown
+>(
+  formId: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof analyticsFormsRetrieve>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+  const queryOptions = getAnalyticsFormsRetrieveQueryOptions(formId, options);
 
-  const queryOptions = getAnalyticsFormsRetrieveQueryOptions(formId,options)
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+  };
 
-  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-
-  query.queryKey = queryOptions.queryKey ;
+  query.queryKey = queryOptions.queryKey;
 
   return query;
 }
-
-
-
-
 
 /**
  * @summary List NPS metrics
  */
 export type analyticsNpsListResponse200 = {
-  data: MetricResult[]
-  status: 200
-}
-    
-export type analyticsNpsListResponseSuccess = (analyticsNpsListResponse200) & {
+  data: MetricResult[];
+  status: 200;
+};
+
+export type analyticsNpsListResponseSuccess = analyticsNpsListResponse200 & {
   headers: Headers;
 };
-;
 
-export type analyticsNpsListResponse = (analyticsNpsListResponseSuccess)
+export type analyticsNpsListResponse = analyticsNpsListResponseSuccess;
 
-export const getAnalyticsNpsListUrl = (params?: AnalyticsNpsListParams,) => {
+export const getAnalyticsNpsListUrl = (params?: AnalyticsNpsListParams) => {
   const normalizedParams = new URLSearchParams();
 
   Object.entries(params || {}).forEach(([key, value]) => {
-    
     if (value !== undefined) {
-      normalizedParams.append(key, value === null ? 'null' : value.toString())
+      normalizedParams.append(key, value === null ? 'null' : value.toString());
     }
   });
 
   const stringifiedParams = normalizedParams.toString();
 
-  return stringifiedParams.length > 0 ? `/api/analytics/nps/?${stringifiedParams}` : `/api/analytics/nps/`
-}
+  return stringifiedParams.length > 0
+    ? `/api/analytics/nps/?${stringifiedParams}`
+    : `/api/analytics/nps/`;
+};
 
-export const analyticsNpsList = async (params?: AnalyticsNpsListParams, options?: RequestInit): Promise<analyticsNpsListResponse> => {
-  
-  return customFetch<analyticsNpsListResponse>(getAnalyticsNpsListUrl(params),
-  {      
+export const analyticsNpsList = async (
+  params?: AnalyticsNpsListParams,
+  options?: RequestInit
+): Promise<analyticsNpsListResponse> => {
+  return customFetch<analyticsNpsListResponse>(getAnalyticsNpsListUrl(params), {
     ...options,
     method: 'GET'
-    
-    
+  });
+};
+
+export const getAnalyticsNpsListInfiniteQueryKey = (params?: AnalyticsNpsListParams) => {
+  return ['infinite', `/api/analytics/nps/`, ...(params ? [params] : [])] as const;
+};
+
+export const getAnalyticsNpsListQueryKey = (params?: AnalyticsNpsListParams) => {
+  return [`/api/analytics/nps/`, ...(params ? [params] : [])] as const;
+};
+
+export const getAnalyticsNpsListInfiniteQueryOptions = <
+  TData = InfiniteData<Awaited<ReturnType<typeof analyticsNpsList>>>,
+  TError = unknown
+>(
+  params?: AnalyticsNpsListParams,
+  options?: {
+    query?: Partial<
+      UseInfiniteQueryOptions<Awaited<ReturnType<typeof analyticsNpsList>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof customFetch>;
   }
-);}
-
-
-
-
-
-export const getAnalyticsNpsListInfiniteQueryKey = (params?: AnalyticsNpsListParams,) => {
-    return [
-    'infinite', `/api/analytics/nps/`, ...(params ? [params]: [])
-    ] as const;
-    }
-
-export const getAnalyticsNpsListQueryKey = (params?: AnalyticsNpsListParams,) => {
-    return [
-    `/api/analytics/nps/`, ...(params ? [params]: [])
-    ] as const;
-    }
-
-    
-export const getAnalyticsNpsListInfiniteQueryOptions = <TData = InfiniteData<Awaited<ReturnType<typeof analyticsNpsList>>>, TError = unknown>(params?: AnalyticsNpsListParams, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof analyticsNpsList>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
 ) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
 
-const {query: queryOptions, request: requestOptions} = options ?? {};
+  const queryKey = queryOptions?.queryKey ?? getAnalyticsNpsListInfiniteQueryKey(params);
 
-  const queryKey =  queryOptions?.queryKey ?? getAnalyticsNpsListInfiniteQueryKey(params);
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof analyticsNpsList>>> = ({ signal }) =>
+    analyticsNpsList(params, { signal, ...requestOptions });
 
-  
+  return { queryKey, queryFn, ...queryOptions } as UseInfiniteQueryOptions<
+    Awaited<ReturnType<typeof analyticsNpsList>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof analyticsNpsList>>> = ({ signal }) => analyticsNpsList(params, { signal, ...requestOptions });
+export type AnalyticsNpsListInfiniteQueryResult = NonNullable<
+  Awaited<ReturnType<typeof analyticsNpsList>>
+>;
+export type AnalyticsNpsListInfiniteQueryError = unknown;
 
-      
-
-      
-
-   return  { queryKey, queryFn, ...queryOptions} as UseInfiniteQueryOptions<Awaited<ReturnType<typeof analyticsNpsList>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type AnalyticsNpsListInfiniteQueryResult = NonNullable<Awaited<ReturnType<typeof analyticsNpsList>>>
-export type AnalyticsNpsListInfiniteQueryError = unknown
-
-
-export function useAnalyticsNpsListInfinite<TData = InfiniteData<Awaited<ReturnType<typeof analyticsNpsList>>>, TError = unknown>(
- params: undefined |  AnalyticsNpsListParams, options: { query:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof analyticsNpsList>>, TError, TData>> & Pick<
+export function useAnalyticsNpsListInfinite<
+  TData = InfiniteData<Awaited<ReturnType<typeof analyticsNpsList>>>,
+  TError = unknown
+>(
+  params: undefined | AnalyticsNpsListParams,
+  options: {
+    query: Partial<
+      UseInfiniteQueryOptions<Awaited<ReturnType<typeof analyticsNpsList>>, TError, TData>
+    > &
+      Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof analyticsNpsList>>,
           TError,
           Awaited<ReturnType<typeof analyticsNpsList>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  DefinedUseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useAnalyticsNpsListInfinite<TData = InfiniteData<Awaited<ReturnType<typeof analyticsNpsList>>>, TError = unknown>(
- params?: AnalyticsNpsListParams, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof analyticsNpsList>>, TError, TData>> & Pick<
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): DefinedUseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useAnalyticsNpsListInfinite<
+  TData = InfiniteData<Awaited<ReturnType<typeof analyticsNpsList>>>,
+  TError = unknown
+>(
+  params?: AnalyticsNpsListParams,
+  options?: {
+    query?: Partial<
+      UseInfiniteQueryOptions<Awaited<ReturnType<typeof analyticsNpsList>>, TError, TData>
+    > &
+      Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof analyticsNpsList>>,
           TError,
           Awaited<ReturnType<typeof analyticsNpsList>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useAnalyticsNpsListInfinite<TData = InfiniteData<Awaited<ReturnType<typeof analyticsNpsList>>>, TError = unknown>(
- params?: AnalyticsNpsListParams, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof analyticsNpsList>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useAnalyticsNpsListInfinite<
+  TData = InfiniteData<Awaited<ReturnType<typeof analyticsNpsList>>>,
+  TError = unknown
+>(
+  params?: AnalyticsNpsListParams,
+  options?: {
+    query?: Partial<
+      UseInfiniteQueryOptions<Awaited<ReturnType<typeof analyticsNpsList>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 /**
  * @summary List NPS metrics
  */
 
-export function useAnalyticsNpsListInfinite<TData = InfiniteData<Awaited<ReturnType<typeof analyticsNpsList>>>, TError = unknown>(
- params?: AnalyticsNpsListParams, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof analyticsNpsList>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient 
- ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+export function useAnalyticsNpsListInfinite<
+  TData = InfiniteData<Awaited<ReturnType<typeof analyticsNpsList>>>,
+  TError = unknown
+>(
+  params?: AnalyticsNpsListParams,
+  options?: {
+    query?: Partial<
+      UseInfiniteQueryOptions<Awaited<ReturnType<typeof analyticsNpsList>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+  const queryOptions = getAnalyticsNpsListInfiniteQueryOptions(params, options);
 
-  const queryOptions = getAnalyticsNpsListInfiniteQueryOptions(params,options)
+  const query = useInfiniteQuery(queryOptions, queryClient) as UseInfiniteQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
 
-  const query = useInfiniteQuery(queryOptions, queryClient) as  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-
-  query.queryKey = queryOptions.queryKey ;
+  query.queryKey = queryOptions.queryKey;
 
   return query;
 }
 
-
-
-
-export const getAnalyticsNpsListQueryOptions = <TData = Awaited<ReturnType<typeof analyticsNpsList>>, TError = unknown>(params?: AnalyticsNpsListParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof analyticsNpsList>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+export const getAnalyticsNpsListQueryOptions = <
+  TData = Awaited<ReturnType<typeof analyticsNpsList>>,
+  TError = unknown
+>(
+  params?: AnalyticsNpsListParams,
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof analyticsNpsList>>, TError, TData>>;
+    request?: SecondParameter<typeof customFetch>;
+  }
 ) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
 
-const {query: queryOptions, request: requestOptions} = options ?? {};
+  const queryKey = queryOptions?.queryKey ?? getAnalyticsNpsListQueryKey(params);
 
-  const queryKey =  queryOptions?.queryKey ?? getAnalyticsNpsListQueryKey(params);
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof analyticsNpsList>>> = ({ signal }) =>
+    analyticsNpsList(params, { signal, ...requestOptions });
 
-  
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof analyticsNpsList>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof analyticsNpsList>>> = ({ signal }) => analyticsNpsList(params, { signal, ...requestOptions });
+export type AnalyticsNpsListQueryResult = NonNullable<Awaited<ReturnType<typeof analyticsNpsList>>>;
+export type AnalyticsNpsListQueryError = unknown;
 
-      
-
-      
-
-   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof analyticsNpsList>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type AnalyticsNpsListQueryResult = NonNullable<Awaited<ReturnType<typeof analyticsNpsList>>>
-export type AnalyticsNpsListQueryError = unknown
-
-
-export function useAnalyticsNpsList<TData = Awaited<ReturnType<typeof analyticsNpsList>>, TError = unknown>(
- params: undefined |  AnalyticsNpsListParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof analyticsNpsList>>, TError, TData>> & Pick<
+export function useAnalyticsNpsList<
+  TData = Awaited<ReturnType<typeof analyticsNpsList>>,
+  TError = unknown
+>(
+  params: undefined | AnalyticsNpsListParams,
+  options: {
+    query: Partial<UseQueryOptions<Awaited<ReturnType<typeof analyticsNpsList>>, TError, TData>> &
+      Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof analyticsNpsList>>,
           TError,
           Awaited<ReturnType<typeof analyticsNpsList>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useAnalyticsNpsList<TData = Awaited<ReturnType<typeof analyticsNpsList>>, TError = unknown>(
- params?: AnalyticsNpsListParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof analyticsNpsList>>, TError, TData>> & Pick<
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useAnalyticsNpsList<
+  TData = Awaited<ReturnType<typeof analyticsNpsList>>,
+  TError = unknown
+>(
+  params?: AnalyticsNpsListParams,
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof analyticsNpsList>>, TError, TData>> &
+      Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof analyticsNpsList>>,
           TError,
           Awaited<ReturnType<typeof analyticsNpsList>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useAnalyticsNpsList<TData = Awaited<ReturnType<typeof analyticsNpsList>>, TError = unknown>(
- params?: AnalyticsNpsListParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof analyticsNpsList>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useAnalyticsNpsList<
+  TData = Awaited<ReturnType<typeof analyticsNpsList>>,
+  TError = unknown
+>(
+  params?: AnalyticsNpsListParams,
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof analyticsNpsList>>, TError, TData>>;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 /**
  * @summary List NPS metrics
  */
 
-export function useAnalyticsNpsList<TData = Awaited<ReturnType<typeof analyticsNpsList>>, TError = unknown>(
- params?: AnalyticsNpsListParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof analyticsNpsList>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient 
- ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+export function useAnalyticsNpsList<
+  TData = Awaited<ReturnType<typeof analyticsNpsList>>,
+  TError = unknown
+>(
+  params?: AnalyticsNpsListParams,
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof analyticsNpsList>>, TError, TData>>;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+  const queryOptions = getAnalyticsNpsListQueryOptions(params, options);
 
-  const queryOptions = getAnalyticsNpsListQueryOptions(params,options)
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+  };
 
-  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-
-  query.queryKey = queryOptions.queryKey ;
+  query.queryKey = queryOptions.queryKey;
 
   return query;
 }
-
-
-
-
 
 /**
  * @summary Get analytics overview
  */
 export type analyticsOverviewRetrieveResponse200 = {
-  data: void
-  status: 200
-}
-    
-export type analyticsOverviewRetrieveResponseSuccess = (analyticsOverviewRetrieveResponse200) & {
+  data: void;
+  status: 200;
+};
+
+export type analyticsOverviewRetrieveResponseSuccess = analyticsOverviewRetrieveResponse200 & {
   headers: Headers;
 };
-;
 
-export type analyticsOverviewRetrieveResponse = (analyticsOverviewRetrieveResponseSuccess)
+export type analyticsOverviewRetrieveResponse = analyticsOverviewRetrieveResponseSuccess;
 
-export const getAnalyticsOverviewRetrieveUrl = (params?: AnalyticsOverviewRetrieveParams,) => {
+export const getAnalyticsOverviewRetrieveUrl = (params?: AnalyticsOverviewRetrieveParams) => {
   const normalizedParams = new URLSearchParams();
 
   Object.entries(params || {}).forEach(([key, value]) => {
-    
     if (value !== undefined) {
-      normalizedParams.append(key, value === null ? 'null' : value.toString())
+      normalizedParams.append(key, value === null ? 'null' : value.toString());
     }
   });
 
   const stringifiedParams = normalizedParams.toString();
 
-  return stringifiedParams.length > 0 ? `/api/analytics/overview/?${stringifiedParams}` : `/api/analytics/overview/`
-}
+  return stringifiedParams.length > 0
+    ? `/api/analytics/overview/?${stringifiedParams}`
+    : `/api/analytics/overview/`;
+};
 
-export const analyticsOverviewRetrieve = async (params?: AnalyticsOverviewRetrieveParams, options?: RequestInit): Promise<analyticsOverviewRetrieveResponse> => {
-  
-  return customFetch<analyticsOverviewRetrieveResponse>(getAnalyticsOverviewRetrieveUrl(params),
-  {      
+export const analyticsOverviewRetrieve = async (
+  params?: AnalyticsOverviewRetrieveParams,
+  options?: RequestInit
+): Promise<analyticsOverviewRetrieveResponse> => {
+  return customFetch<analyticsOverviewRetrieveResponse>(getAnalyticsOverviewRetrieveUrl(params), {
     ...options,
     method: 'GET'
-    
-    
+  });
+};
+
+export const getAnalyticsOverviewRetrieveInfiniteQueryKey = (
+  params?: AnalyticsOverviewRetrieveParams
+) => {
+  return ['infinite', `/api/analytics/overview/`, ...(params ? [params] : [])] as const;
+};
+
+export const getAnalyticsOverviewRetrieveQueryKey = (params?: AnalyticsOverviewRetrieveParams) => {
+  return [`/api/analytics/overview/`, ...(params ? [params] : [])] as const;
+};
+
+export const getAnalyticsOverviewRetrieveInfiniteQueryOptions = <
+  TData = InfiniteData<Awaited<ReturnType<typeof analyticsOverviewRetrieve>>>,
+  TError = unknown
+>(
+  params?: AnalyticsOverviewRetrieveParams,
+  options?: {
+    query?: Partial<
+      UseInfiniteQueryOptions<Awaited<ReturnType<typeof analyticsOverviewRetrieve>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof customFetch>;
   }
-);}
-
-
-
-
-
-export const getAnalyticsOverviewRetrieveInfiniteQueryKey = (params?: AnalyticsOverviewRetrieveParams,) => {
-    return [
-    'infinite', `/api/analytics/overview/`, ...(params ? [params]: [])
-    ] as const;
-    }
-
-export const getAnalyticsOverviewRetrieveQueryKey = (params?: AnalyticsOverviewRetrieveParams,) => {
-    return [
-    `/api/analytics/overview/`, ...(params ? [params]: [])
-    ] as const;
-    }
-
-    
-export const getAnalyticsOverviewRetrieveInfiniteQueryOptions = <TData = InfiniteData<Awaited<ReturnType<typeof analyticsOverviewRetrieve>>>, TError = unknown>(params?: AnalyticsOverviewRetrieveParams, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof analyticsOverviewRetrieve>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
 ) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
 
-const {query: queryOptions, request: requestOptions} = options ?? {};
+  const queryKey = queryOptions?.queryKey ?? getAnalyticsOverviewRetrieveInfiniteQueryKey(params);
 
-  const queryKey =  queryOptions?.queryKey ?? getAnalyticsOverviewRetrieveInfiniteQueryKey(params);
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof analyticsOverviewRetrieve>>> = ({
+    signal
+  }) => analyticsOverviewRetrieve(params, { signal, ...requestOptions });
 
-  
+  return { queryKey, queryFn, ...queryOptions } as UseInfiniteQueryOptions<
+    Awaited<ReturnType<typeof analyticsOverviewRetrieve>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof analyticsOverviewRetrieve>>> = ({ signal }) => analyticsOverviewRetrieve(params, { signal, ...requestOptions });
+export type AnalyticsOverviewRetrieveInfiniteQueryResult = NonNullable<
+  Awaited<ReturnType<typeof analyticsOverviewRetrieve>>
+>;
+export type AnalyticsOverviewRetrieveInfiniteQueryError = unknown;
 
-      
-
-      
-
-   return  { queryKey, queryFn, ...queryOptions} as UseInfiniteQueryOptions<Awaited<ReturnType<typeof analyticsOverviewRetrieve>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type AnalyticsOverviewRetrieveInfiniteQueryResult = NonNullable<Awaited<ReturnType<typeof analyticsOverviewRetrieve>>>
-export type AnalyticsOverviewRetrieveInfiniteQueryError = unknown
-
-
-export function useAnalyticsOverviewRetrieveInfinite<TData = InfiniteData<Awaited<ReturnType<typeof analyticsOverviewRetrieve>>>, TError = unknown>(
- params: undefined |  AnalyticsOverviewRetrieveParams, options: { query:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof analyticsOverviewRetrieve>>, TError, TData>> & Pick<
+export function useAnalyticsOverviewRetrieveInfinite<
+  TData = InfiniteData<Awaited<ReturnType<typeof analyticsOverviewRetrieve>>>,
+  TError = unknown
+>(
+  params: undefined | AnalyticsOverviewRetrieveParams,
+  options: {
+    query: Partial<
+      UseInfiniteQueryOptions<Awaited<ReturnType<typeof analyticsOverviewRetrieve>>, TError, TData>
+    > &
+      Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof analyticsOverviewRetrieve>>,
           TError,
           Awaited<ReturnType<typeof analyticsOverviewRetrieve>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  DefinedUseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useAnalyticsOverviewRetrieveInfinite<TData = InfiniteData<Awaited<ReturnType<typeof analyticsOverviewRetrieve>>>, TError = unknown>(
- params?: AnalyticsOverviewRetrieveParams, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof analyticsOverviewRetrieve>>, TError, TData>> & Pick<
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): DefinedUseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useAnalyticsOverviewRetrieveInfinite<
+  TData = InfiniteData<Awaited<ReturnType<typeof analyticsOverviewRetrieve>>>,
+  TError = unknown
+>(
+  params?: AnalyticsOverviewRetrieveParams,
+  options?: {
+    query?: Partial<
+      UseInfiniteQueryOptions<Awaited<ReturnType<typeof analyticsOverviewRetrieve>>, TError, TData>
+    > &
+      Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof analyticsOverviewRetrieve>>,
           TError,
           Awaited<ReturnType<typeof analyticsOverviewRetrieve>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useAnalyticsOverviewRetrieveInfinite<TData = InfiniteData<Awaited<ReturnType<typeof analyticsOverviewRetrieve>>>, TError = unknown>(
- params?: AnalyticsOverviewRetrieveParams, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof analyticsOverviewRetrieve>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useAnalyticsOverviewRetrieveInfinite<
+  TData = InfiniteData<Awaited<ReturnType<typeof analyticsOverviewRetrieve>>>,
+  TError = unknown
+>(
+  params?: AnalyticsOverviewRetrieveParams,
+  options?: {
+    query?: Partial<
+      UseInfiniteQueryOptions<Awaited<ReturnType<typeof analyticsOverviewRetrieve>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 /**
  * @summary Get analytics overview
  */
 
-export function useAnalyticsOverviewRetrieveInfinite<TData = InfiniteData<Awaited<ReturnType<typeof analyticsOverviewRetrieve>>>, TError = unknown>(
- params?: AnalyticsOverviewRetrieveParams, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof analyticsOverviewRetrieve>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient 
- ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+export function useAnalyticsOverviewRetrieveInfinite<
+  TData = InfiniteData<Awaited<ReturnType<typeof analyticsOverviewRetrieve>>>,
+  TError = unknown
+>(
+  params?: AnalyticsOverviewRetrieveParams,
+  options?: {
+    query?: Partial<
+      UseInfiniteQueryOptions<Awaited<ReturnType<typeof analyticsOverviewRetrieve>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+  const queryOptions = getAnalyticsOverviewRetrieveInfiniteQueryOptions(params, options);
 
-  const queryOptions = getAnalyticsOverviewRetrieveInfiniteQueryOptions(params,options)
+  const query = useInfiniteQuery(queryOptions, queryClient) as UseInfiniteQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
 
-  const query = useInfiniteQuery(queryOptions, queryClient) as  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-
-  query.queryKey = queryOptions.queryKey ;
+  query.queryKey = queryOptions.queryKey;
 
   return query;
 }
 
-
-
-
-export const getAnalyticsOverviewRetrieveQueryOptions = <TData = Awaited<ReturnType<typeof analyticsOverviewRetrieve>>, TError = unknown>(params?: AnalyticsOverviewRetrieveParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof analyticsOverviewRetrieve>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+export const getAnalyticsOverviewRetrieveQueryOptions = <
+  TData = Awaited<ReturnType<typeof analyticsOverviewRetrieve>>,
+  TError = unknown
+>(
+  params?: AnalyticsOverviewRetrieveParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof analyticsOverviewRetrieve>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  }
 ) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
 
-const {query: queryOptions, request: requestOptions} = options ?? {};
+  const queryKey = queryOptions?.queryKey ?? getAnalyticsOverviewRetrieveQueryKey(params);
 
-  const queryKey =  queryOptions?.queryKey ?? getAnalyticsOverviewRetrieveQueryKey(params);
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof analyticsOverviewRetrieve>>> = ({
+    signal
+  }) => analyticsOverviewRetrieve(params, { signal, ...requestOptions });
 
-  
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof analyticsOverviewRetrieve>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof analyticsOverviewRetrieve>>> = ({ signal }) => analyticsOverviewRetrieve(params, { signal, ...requestOptions });
+export type AnalyticsOverviewRetrieveQueryResult = NonNullable<
+  Awaited<ReturnType<typeof analyticsOverviewRetrieve>>
+>;
+export type AnalyticsOverviewRetrieveQueryError = unknown;
 
-      
-
-      
-
-   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof analyticsOverviewRetrieve>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type AnalyticsOverviewRetrieveQueryResult = NonNullable<Awaited<ReturnType<typeof analyticsOverviewRetrieve>>>
-export type AnalyticsOverviewRetrieveQueryError = unknown
-
-
-export function useAnalyticsOverviewRetrieve<TData = Awaited<ReturnType<typeof analyticsOverviewRetrieve>>, TError = unknown>(
- params: undefined |  AnalyticsOverviewRetrieveParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof analyticsOverviewRetrieve>>, TError, TData>> & Pick<
+export function useAnalyticsOverviewRetrieve<
+  TData = Awaited<ReturnType<typeof analyticsOverviewRetrieve>>,
+  TError = unknown
+>(
+  params: undefined | AnalyticsOverviewRetrieveParams,
+  options: {
+    query: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof analyticsOverviewRetrieve>>, TError, TData>
+    > &
+      Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof analyticsOverviewRetrieve>>,
           TError,
           Awaited<ReturnType<typeof analyticsOverviewRetrieve>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useAnalyticsOverviewRetrieve<TData = Awaited<ReturnType<typeof analyticsOverviewRetrieve>>, TError = unknown>(
- params?: AnalyticsOverviewRetrieveParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof analyticsOverviewRetrieve>>, TError, TData>> & Pick<
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useAnalyticsOverviewRetrieve<
+  TData = Awaited<ReturnType<typeof analyticsOverviewRetrieve>>,
+  TError = unknown
+>(
+  params?: AnalyticsOverviewRetrieveParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof analyticsOverviewRetrieve>>, TError, TData>
+    > &
+      Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof analyticsOverviewRetrieve>>,
           TError,
           Awaited<ReturnType<typeof analyticsOverviewRetrieve>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useAnalyticsOverviewRetrieve<TData = Awaited<ReturnType<typeof analyticsOverviewRetrieve>>, TError = unknown>(
- params?: AnalyticsOverviewRetrieveParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof analyticsOverviewRetrieve>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useAnalyticsOverviewRetrieve<
+  TData = Awaited<ReturnType<typeof analyticsOverviewRetrieve>>,
+  TError = unknown
+>(
+  params?: AnalyticsOverviewRetrieveParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof analyticsOverviewRetrieve>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 /**
  * @summary Get analytics overview
  */
 
-export function useAnalyticsOverviewRetrieve<TData = Awaited<ReturnType<typeof analyticsOverviewRetrieve>>, TError = unknown>(
- params?: AnalyticsOverviewRetrieveParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof analyticsOverviewRetrieve>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient 
- ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+export function useAnalyticsOverviewRetrieve<
+  TData = Awaited<ReturnType<typeof analyticsOverviewRetrieve>>,
+  TError = unknown
+>(
+  params?: AnalyticsOverviewRetrieveParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof analyticsOverviewRetrieve>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+  const queryOptions = getAnalyticsOverviewRetrieveQueryOptions(params, options);
 
-  const queryOptions = getAnalyticsOverviewRetrieveQueryOptions(params,options)
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+  };
 
-  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-
-  query.queryKey = queryOptions.queryKey ;
+  query.queryKey = queryOptions.queryKey;
 
   return query;
 }
-
-
-
-
 
 /**
  * Issues a new token pair using the user current tenant memberships, without requiring a second login.
  * @summary Refresh JWT claims
  */
 export type authRefreshClaimsCreateResponse200 = {
-  data: TokenPairResponse
-  status: 200
-}
+  data: TokenPairResponse;
+  status: 200;
+};
 
 export type authRefreshClaimsCreateResponse401 = {
-  data: ErrorResponse
-  status: 401
-}
-    
-export type authRefreshClaimsCreateResponseSuccess = (authRefreshClaimsCreateResponse200) & {
+  data: ErrorResponse;
+  status: 401;
+};
+
+export type authRefreshClaimsCreateResponseSuccess = authRefreshClaimsCreateResponse200 & {
   headers: Headers;
 };
-export type authRefreshClaimsCreateResponseError = (authRefreshClaimsCreateResponse401) & {
+export type authRefreshClaimsCreateResponseError = authRefreshClaimsCreateResponse401 & {
   headers: Headers;
 };
 
-export type authRefreshClaimsCreateResponse = (authRefreshClaimsCreateResponseSuccess | authRefreshClaimsCreateResponseError)
+export type authRefreshClaimsCreateResponse =
+  | authRefreshClaimsCreateResponseSuccess
+  | authRefreshClaimsCreateResponseError;
 
 export const getAuthRefreshClaimsCreateUrl = () => {
+  return `/api/auth/refresh-claims/`;
+};
 
-
-  
-
-  return `/api/auth/refresh-claims/`
-}
-
-export const authRefreshClaimsCreate = async ( options?: RequestInit): Promise<authRefreshClaimsCreateResponse> => {
-  
-  return customFetch<authRefreshClaimsCreateResponse>(getAuthRefreshClaimsCreateUrl(),
-  {      
+export const authRefreshClaimsCreate = async (
+  options?: RequestInit
+): Promise<authRefreshClaimsCreateResponse> => {
+  return customFetch<authRefreshClaimsCreateResponse>(getAuthRefreshClaimsCreateUrl(), {
     ...options,
     method: 'POST'
-    
-    
-  }
-);}
+  });
+};
 
+export const getAuthRefreshClaimsCreateMutationOptions = <
+  TError = ErrorResponse,
+  TContext = unknown
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof authRefreshClaimsCreate>>,
+    TError,
+    void,
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof authRefreshClaimsCreate>>,
+  TError,
+  void,
+  TContext
+> => {
+  const mutationKey = ['authRefreshClaimsCreate'];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
 
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof authRefreshClaimsCreate>>,
+    void
+  > = () => {
+    return authRefreshClaimsCreate(requestOptions);
+  };
 
+  return { mutationFn, ...mutationOptions };
+};
 
-export const getAuthRefreshClaimsCreateMutationOptions = <TError = ErrorResponse,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof authRefreshClaimsCreate>>, TError,void, TContext>, request?: SecondParameter<typeof customFetch>}
-): UseMutationOptions<Awaited<ReturnType<typeof authRefreshClaimsCreate>>, TError,void, TContext> => {
+export type AuthRefreshClaimsCreateMutationResult = NonNullable<
+  Awaited<ReturnType<typeof authRefreshClaimsCreate>>
+>;
 
-const mutationKey = ['authRefreshClaimsCreate'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
+export type AuthRefreshClaimsCreateMutationError = ErrorResponse;
 
-      
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof authRefreshClaimsCreate>>, void> = () => {
-          
-
-          return  authRefreshClaimsCreate(requestOptions)
-        }
-
-        
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type AuthRefreshClaimsCreateMutationResult = NonNullable<Awaited<ReturnType<typeof authRefreshClaimsCreate>>>
-    
-    export type AuthRefreshClaimsCreateMutationError = ErrorResponse
-
-    /**
+/**
  * @summary Refresh JWT claims
  */
-export const useAuthRefreshClaimsCreate = <TError = ErrorResponse,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof authRefreshClaimsCreate>>, TError,void, TContext>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof authRefreshClaimsCreate>>,
-        TError,
-        void,
-        TContext
-      > => {
+export const useAuthRefreshClaimsCreate = <TError = ErrorResponse, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof authRefreshClaimsCreate>>,
+      TError,
+      void,
+      TContext
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseMutationResult<
+  Awaited<ReturnType<typeof authRefreshClaimsCreate>>,
+  TError,
+  void,
+  TContext
+> => {
+  const mutationOptions = getAuthRefreshClaimsCreateMutationOptions(options);
 
-      const mutationOptions = getAuthRefreshClaimsCreateMutationOptions(options);
+  return useMutation(mutationOptions, queryClient);
+};
 
-      return useMutation(mutationOptions, queryClient);
-    }
-    
 /**
  * @summary List campaigns
  */
 export type campaignsListResponse200 = {
-  data: Campaign[]
-  status: 200
-}
-    
-export type campaignsListResponseSuccess = (campaignsListResponse200) & {
+  data: Campaign[];
+  status: 200;
+};
+
+export type campaignsListResponseSuccess = campaignsListResponse200 & {
   headers: Headers;
 };
-;
 
-export type campaignsListResponse = (campaignsListResponseSuccess)
+export type campaignsListResponse = campaignsListResponseSuccess;
 
-export const getCampaignsListUrl = (params?: CampaignsListParams,) => {
+export const getCampaignsListUrl = (params?: CampaignsListParams) => {
   const normalizedParams = new URLSearchParams();
 
   Object.entries(params || {}).forEach(([key, value]) => {
-    
     if (value !== undefined) {
-      normalizedParams.append(key, value === null ? 'null' : value.toString())
+      normalizedParams.append(key, value === null ? 'null' : value.toString());
     }
   });
 
   const stringifiedParams = normalizedParams.toString();
 
-  return stringifiedParams.length > 0 ? `/api/campaigns/?${stringifiedParams}` : `/api/campaigns/`
-}
+  return stringifiedParams.length > 0 ? `/api/campaigns/?${stringifiedParams}` : `/api/campaigns/`;
+};
 
-export const campaignsList = async (params?: CampaignsListParams, options?: RequestInit): Promise<campaignsListResponse> => {
-  
-  return customFetch<campaignsListResponse>(getCampaignsListUrl(params),
-  {      
+export const campaignsList = async (
+  params?: CampaignsListParams,
+  options?: RequestInit
+): Promise<campaignsListResponse> => {
+  return customFetch<campaignsListResponse>(getCampaignsListUrl(params), {
     ...options,
     method: 'GET'
-    
-    
+  });
+};
+
+export const getCampaignsListInfiniteQueryKey = (params?: CampaignsListParams) => {
+  return ['infinite', `/api/campaigns/`, ...(params ? [params] : [])] as const;
+};
+
+export const getCampaignsListQueryKey = (params?: CampaignsListParams) => {
+  return [`/api/campaigns/`, ...(params ? [params] : [])] as const;
+};
+
+export const getCampaignsListInfiniteQueryOptions = <
+  TData = InfiniteData<Awaited<ReturnType<typeof campaignsList>>>,
+  TError = unknown
+>(
+  params?: CampaignsListParams,
+  options?: {
+    query?: Partial<
+      UseInfiniteQueryOptions<Awaited<ReturnType<typeof campaignsList>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof customFetch>;
   }
-);}
-
-
-
-
-
-export const getCampaignsListInfiniteQueryKey = (params?: CampaignsListParams,) => {
-    return [
-    'infinite', `/api/campaigns/`, ...(params ? [params]: [])
-    ] as const;
-    }
-
-export const getCampaignsListQueryKey = (params?: CampaignsListParams,) => {
-    return [
-    `/api/campaigns/`, ...(params ? [params]: [])
-    ] as const;
-    }
-
-    
-export const getCampaignsListInfiniteQueryOptions = <TData = InfiniteData<Awaited<ReturnType<typeof campaignsList>>>, TError = unknown>(params?: CampaignsListParams, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof campaignsList>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
 ) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
 
-const {query: queryOptions, request: requestOptions} = options ?? {};
+  const queryKey = queryOptions?.queryKey ?? getCampaignsListInfiniteQueryKey(params);
 
-  const queryKey =  queryOptions?.queryKey ?? getCampaignsListInfiniteQueryKey(params);
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof campaignsList>>> = ({ signal }) =>
+    campaignsList(params, { signal, ...requestOptions });
 
-  
+  return { queryKey, queryFn, ...queryOptions } as UseInfiniteQueryOptions<
+    Awaited<ReturnType<typeof campaignsList>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof campaignsList>>> = ({ signal }) => campaignsList(params, { signal, ...requestOptions });
+export type CampaignsListInfiniteQueryResult = NonNullable<
+  Awaited<ReturnType<typeof campaignsList>>
+>;
+export type CampaignsListInfiniteQueryError = unknown;
 
-      
-
-      
-
-   return  { queryKey, queryFn, ...queryOptions} as UseInfiniteQueryOptions<Awaited<ReturnType<typeof campaignsList>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type CampaignsListInfiniteQueryResult = NonNullable<Awaited<ReturnType<typeof campaignsList>>>
-export type CampaignsListInfiniteQueryError = unknown
-
-
-export function useCampaignsListInfinite<TData = InfiniteData<Awaited<ReturnType<typeof campaignsList>>>, TError = unknown>(
- params: undefined |  CampaignsListParams, options: { query:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof campaignsList>>, TError, TData>> & Pick<
+export function useCampaignsListInfinite<
+  TData = InfiniteData<Awaited<ReturnType<typeof campaignsList>>>,
+  TError = unknown
+>(
+  params: undefined | CampaignsListParams,
+  options: {
+    query: Partial<
+      UseInfiniteQueryOptions<Awaited<ReturnType<typeof campaignsList>>, TError, TData>
+    > &
+      Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof campaignsList>>,
           TError,
           Awaited<ReturnType<typeof campaignsList>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  DefinedUseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useCampaignsListInfinite<TData = InfiniteData<Awaited<ReturnType<typeof campaignsList>>>, TError = unknown>(
- params?: CampaignsListParams, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof campaignsList>>, TError, TData>> & Pick<
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): DefinedUseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useCampaignsListInfinite<
+  TData = InfiniteData<Awaited<ReturnType<typeof campaignsList>>>,
+  TError = unknown
+>(
+  params?: CampaignsListParams,
+  options?: {
+    query?: Partial<
+      UseInfiniteQueryOptions<Awaited<ReturnType<typeof campaignsList>>, TError, TData>
+    > &
+      Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof campaignsList>>,
           TError,
           Awaited<ReturnType<typeof campaignsList>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useCampaignsListInfinite<TData = InfiniteData<Awaited<ReturnType<typeof campaignsList>>>, TError = unknown>(
- params?: CampaignsListParams, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof campaignsList>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useCampaignsListInfinite<
+  TData = InfiniteData<Awaited<ReturnType<typeof campaignsList>>>,
+  TError = unknown
+>(
+  params?: CampaignsListParams,
+  options?: {
+    query?: Partial<
+      UseInfiniteQueryOptions<Awaited<ReturnType<typeof campaignsList>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 /**
  * @summary List campaigns
  */
 
-export function useCampaignsListInfinite<TData = InfiniteData<Awaited<ReturnType<typeof campaignsList>>>, TError = unknown>(
- params?: CampaignsListParams, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof campaignsList>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient 
- ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+export function useCampaignsListInfinite<
+  TData = InfiniteData<Awaited<ReturnType<typeof campaignsList>>>,
+  TError = unknown
+>(
+  params?: CampaignsListParams,
+  options?: {
+    query?: Partial<
+      UseInfiniteQueryOptions<Awaited<ReturnType<typeof campaignsList>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+  const queryOptions = getCampaignsListInfiniteQueryOptions(params, options);
 
-  const queryOptions = getCampaignsListInfiniteQueryOptions(params,options)
+  const query = useInfiniteQuery(queryOptions, queryClient) as UseInfiniteQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
 
-  const query = useInfiniteQuery(queryOptions, queryClient) as  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-
-  query.queryKey = queryOptions.queryKey ;
+  query.queryKey = queryOptions.queryKey;
 
   return query;
 }
 
-
-
-
-export const getCampaignsListQueryOptions = <TData = Awaited<ReturnType<typeof campaignsList>>, TError = unknown>(params?: CampaignsListParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof campaignsList>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+export const getCampaignsListQueryOptions = <
+  TData = Awaited<ReturnType<typeof campaignsList>>,
+  TError = unknown
+>(
+  params?: CampaignsListParams,
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof campaignsList>>, TError, TData>>;
+    request?: SecondParameter<typeof customFetch>;
+  }
 ) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
 
-const {query: queryOptions, request: requestOptions} = options ?? {};
+  const queryKey = queryOptions?.queryKey ?? getCampaignsListQueryKey(params);
 
-  const queryKey =  queryOptions?.queryKey ?? getCampaignsListQueryKey(params);
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof campaignsList>>> = ({ signal }) =>
+    campaignsList(params, { signal, ...requestOptions });
 
-  
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof campaignsList>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof campaignsList>>> = ({ signal }) => campaignsList(params, { signal, ...requestOptions });
+export type CampaignsListQueryResult = NonNullable<Awaited<ReturnType<typeof campaignsList>>>;
+export type CampaignsListQueryError = unknown;
 
-      
-
-      
-
-   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof campaignsList>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type CampaignsListQueryResult = NonNullable<Awaited<ReturnType<typeof campaignsList>>>
-export type CampaignsListQueryError = unknown
-
-
-export function useCampaignsList<TData = Awaited<ReturnType<typeof campaignsList>>, TError = unknown>(
- params: undefined |  CampaignsListParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof campaignsList>>, TError, TData>> & Pick<
+export function useCampaignsList<
+  TData = Awaited<ReturnType<typeof campaignsList>>,
+  TError = unknown
+>(
+  params: undefined | CampaignsListParams,
+  options: {
+    query: Partial<UseQueryOptions<Awaited<ReturnType<typeof campaignsList>>, TError, TData>> &
+      Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof campaignsList>>,
           TError,
           Awaited<ReturnType<typeof campaignsList>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useCampaignsList<TData = Awaited<ReturnType<typeof campaignsList>>, TError = unknown>(
- params?: CampaignsListParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof campaignsList>>, TError, TData>> & Pick<
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useCampaignsList<
+  TData = Awaited<ReturnType<typeof campaignsList>>,
+  TError = unknown
+>(
+  params?: CampaignsListParams,
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof campaignsList>>, TError, TData>> &
+      Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof campaignsList>>,
           TError,
           Awaited<ReturnType<typeof campaignsList>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useCampaignsList<TData = Awaited<ReturnType<typeof campaignsList>>, TError = unknown>(
- params?: CampaignsListParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof campaignsList>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useCampaignsList<
+  TData = Awaited<ReturnType<typeof campaignsList>>,
+  TError = unknown
+>(
+  params?: CampaignsListParams,
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof campaignsList>>, TError, TData>>;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 /**
  * @summary List campaigns
  */
 
-export function useCampaignsList<TData = Awaited<ReturnType<typeof campaignsList>>, TError = unknown>(
- params?: CampaignsListParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof campaignsList>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient 
- ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+export function useCampaignsList<
+  TData = Awaited<ReturnType<typeof campaignsList>>,
+  TError = unknown
+>(
+  params?: CampaignsListParams,
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof campaignsList>>, TError, TData>>;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+  const queryOptions = getCampaignsListQueryOptions(params, options);
 
-  const queryOptions = getCampaignsListQueryOptions(params,options)
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+  };
 
-  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-
-  query.queryKey = queryOptions.queryKey ;
+  query.queryKey = queryOptions.queryKey;
 
   return query;
 }
-
-
-
-
 
 /**
  * @summary Create campaign
  */
 export type campaignsCreateResponse201 = {
-  data: Campaign
-  status: 201
-}
-    
-export type campaignsCreateResponseSuccess = (campaignsCreateResponse201) & {
+  data: Campaign;
+  status: 201;
+};
+
+export type campaignsCreateResponseSuccess = campaignsCreateResponse201 & {
   headers: Headers;
 };
-;
 
-export type campaignsCreateResponse = (campaignsCreateResponseSuccess)
+export type campaignsCreateResponse = campaignsCreateResponseSuccess;
 
 export const getCampaignsCreateUrl = () => {
+  return `/api/campaigns/`;
+};
 
-
-  
-
-  return `/api/campaigns/`
-}
-
-export const campaignsCreate = async (campaign: NonReadonly<Campaign>, options?: RequestInit): Promise<campaignsCreateResponse> => {
-  
-  return customFetch<campaignsCreateResponse>(getCampaignsCreateUrl(),
-  {      
+export const campaignsCreate = async (
+  campaign: NonReadonly<Campaign>,
+  options?: RequestInit
+): Promise<campaignsCreateResponse> => {
+  return customFetch<campaignsCreateResponse>(getCampaignsCreateUrl(), {
     ...options,
     method: 'POST',
     headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(
-      campaign,)
-  }
-);}
+    body: JSON.stringify(campaign)
+  });
+};
 
+export const getCampaignsCreateMutationOptions = <TError = unknown, TContext = unknown>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof campaignsCreate>>,
+    TError,
+    { data: NonReadonly<Campaign> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof campaignsCreate>>,
+  TError,
+  { data: NonReadonly<Campaign> },
+  TContext
+> => {
+  const mutationKey = ['campaignsCreate'];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
 
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof campaignsCreate>>,
+    { data: NonReadonly<Campaign> }
+  > = (props) => {
+    const { data } = props ?? {};
 
+    return campaignsCreate(data, requestOptions);
+  };
 
-export const getCampaignsCreateMutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof campaignsCreate>>, TError,{data: NonReadonly<Campaign>}, TContext>, request?: SecondParameter<typeof customFetch>}
-): UseMutationOptions<Awaited<ReturnType<typeof campaignsCreate>>, TError,{data: NonReadonly<Campaign>}, TContext> => {
+  return { mutationFn, ...mutationOptions };
+};
 
-const mutationKey = ['campaignsCreate'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
+export type CampaignsCreateMutationResult = NonNullable<
+  Awaited<ReturnType<typeof campaignsCreate>>
+>;
+export type CampaignsCreateMutationBody = NonReadonly<Campaign>;
+export type CampaignsCreateMutationError = unknown;
 
-      
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof campaignsCreate>>, {data: NonReadonly<Campaign>}> = (props) => {
-          const {data} = props ?? {};
-
-          return  campaignsCreate(data,requestOptions)
-        }
-
-        
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type CampaignsCreateMutationResult = NonNullable<Awaited<ReturnType<typeof campaignsCreate>>>
-    export type CampaignsCreateMutationBody = NonReadonly<Campaign>
-    export type CampaignsCreateMutationError = unknown
-
-    /**
+/**
  * @summary Create campaign
  */
-export const useCampaignsCreate = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof campaignsCreate>>, TError,{data: NonReadonly<Campaign>}, TContext>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof campaignsCreate>>,
-        TError,
-        {data: NonReadonly<Campaign>},
-        TContext
-      > => {
+export const useCampaignsCreate = <TError = unknown, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof campaignsCreate>>,
+      TError,
+      { data: NonReadonly<Campaign> },
+      TContext
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseMutationResult<
+  Awaited<ReturnType<typeof campaignsCreate>>,
+  TError,
+  { data: NonReadonly<Campaign> },
+  TContext
+> => {
+  const mutationOptions = getCampaignsCreateMutationOptions(options);
 
-      const mutationOptions = getCampaignsCreateMutationOptions(options);
+  return useMutation(mutationOptions, queryClient);
+};
 
-      return useMutation(mutationOptions, queryClient);
-    }
-    
 /**
  * @summary List campaign steps
  */
 export type campaignsStepsListResponse200 = {
-  data: CampaignStep[]
-  status: 200
-}
-    
-export type campaignsStepsListResponseSuccess = (campaignsStepsListResponse200) & {
+  data: CampaignStep[];
+  status: 200;
+};
+
+export type campaignsStepsListResponseSuccess = campaignsStepsListResponse200 & {
   headers: Headers;
 };
-;
 
-export type campaignsStepsListResponse = (campaignsStepsListResponseSuccess)
+export type campaignsStepsListResponse = campaignsStepsListResponseSuccess;
 
-export const getCampaignsStepsListUrl = (campaignId: string,) => {
+export const getCampaignsStepsListUrl = (campaignId: string) => {
+  return `/api/campaigns/${campaignId}/steps/`;
+};
 
-
-  
-
-  return `/api/campaigns/${campaignId}/steps/`
-}
-
-export const campaignsStepsList = async (campaignId: string, options?: RequestInit): Promise<campaignsStepsListResponse> => {
-  
-  return customFetch<campaignsStepsListResponse>(getCampaignsStepsListUrl(campaignId),
-  {      
+export const campaignsStepsList = async (
+  campaignId: string,
+  options?: RequestInit
+): Promise<campaignsStepsListResponse> => {
+  return customFetch<campaignsStepsListResponse>(getCampaignsStepsListUrl(campaignId), {
     ...options,
     method: 'GET'
-    
-    
+  });
+};
+
+export const getCampaignsStepsListInfiniteQueryKey = (campaignId?: string) => {
+  return ['infinite', `/api/campaigns/${campaignId}/steps/`] as const;
+};
+
+export const getCampaignsStepsListQueryKey = (campaignId?: string) => {
+  return [`/api/campaigns/${campaignId}/steps/`] as const;
+};
+
+export const getCampaignsStepsListInfiniteQueryOptions = <
+  TData = InfiniteData<Awaited<ReturnType<typeof campaignsStepsList>>>,
+  TError = unknown
+>(
+  campaignId: string,
+  options?: {
+    query?: Partial<
+      UseInfiniteQueryOptions<Awaited<ReturnType<typeof campaignsStepsList>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof customFetch>;
   }
-);}
-
-
-
-
-
-export const getCampaignsStepsListInfiniteQueryKey = (campaignId?: string,) => {
-    return [
-    'infinite', `/api/campaigns/${campaignId}/steps/`
-    ] as const;
-    }
-
-export const getCampaignsStepsListQueryKey = (campaignId?: string,) => {
-    return [
-    `/api/campaigns/${campaignId}/steps/`
-    ] as const;
-    }
-
-    
-export const getCampaignsStepsListInfiniteQueryOptions = <TData = InfiniteData<Awaited<ReturnType<typeof campaignsStepsList>>>, TError = unknown>(campaignId: string, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof campaignsStepsList>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
 ) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
 
-const {query: queryOptions, request: requestOptions} = options ?? {};
+  const queryKey = queryOptions?.queryKey ?? getCampaignsStepsListInfiniteQueryKey(campaignId);
 
-  const queryKey =  queryOptions?.queryKey ?? getCampaignsStepsListInfiniteQueryKey(campaignId);
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof campaignsStepsList>>> = ({ signal }) =>
+    campaignsStepsList(campaignId, { signal, ...requestOptions });
 
-  
+  return { queryKey, queryFn, enabled: !!campaignId, ...queryOptions } as UseInfiniteQueryOptions<
+    Awaited<ReturnType<typeof campaignsStepsList>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof campaignsStepsList>>> = ({ signal }) => campaignsStepsList(campaignId, { signal, ...requestOptions });
+export type CampaignsStepsListInfiniteQueryResult = NonNullable<
+  Awaited<ReturnType<typeof campaignsStepsList>>
+>;
+export type CampaignsStepsListInfiniteQueryError = unknown;
 
-      
-
-      
-
-   return  { queryKey, queryFn, enabled: !!(campaignId), ...queryOptions} as UseInfiniteQueryOptions<Awaited<ReturnType<typeof campaignsStepsList>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type CampaignsStepsListInfiniteQueryResult = NonNullable<Awaited<ReturnType<typeof campaignsStepsList>>>
-export type CampaignsStepsListInfiniteQueryError = unknown
-
-
-export function useCampaignsStepsListInfinite<TData = InfiniteData<Awaited<ReturnType<typeof campaignsStepsList>>>, TError = unknown>(
- campaignId: string, options: { query:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof campaignsStepsList>>, TError, TData>> & Pick<
+export function useCampaignsStepsListInfinite<
+  TData = InfiniteData<Awaited<ReturnType<typeof campaignsStepsList>>>,
+  TError = unknown
+>(
+  campaignId: string,
+  options: {
+    query: Partial<
+      UseInfiniteQueryOptions<Awaited<ReturnType<typeof campaignsStepsList>>, TError, TData>
+    > &
+      Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof campaignsStepsList>>,
           TError,
           Awaited<ReturnType<typeof campaignsStepsList>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  DefinedUseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useCampaignsStepsListInfinite<TData = InfiniteData<Awaited<ReturnType<typeof campaignsStepsList>>>, TError = unknown>(
- campaignId: string, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof campaignsStepsList>>, TError, TData>> & Pick<
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): DefinedUseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useCampaignsStepsListInfinite<
+  TData = InfiniteData<Awaited<ReturnType<typeof campaignsStepsList>>>,
+  TError = unknown
+>(
+  campaignId: string,
+  options?: {
+    query?: Partial<
+      UseInfiniteQueryOptions<Awaited<ReturnType<typeof campaignsStepsList>>, TError, TData>
+    > &
+      Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof campaignsStepsList>>,
           TError,
           Awaited<ReturnType<typeof campaignsStepsList>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useCampaignsStepsListInfinite<TData = InfiniteData<Awaited<ReturnType<typeof campaignsStepsList>>>, TError = unknown>(
- campaignId: string, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof campaignsStepsList>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useCampaignsStepsListInfinite<
+  TData = InfiniteData<Awaited<ReturnType<typeof campaignsStepsList>>>,
+  TError = unknown
+>(
+  campaignId: string,
+  options?: {
+    query?: Partial<
+      UseInfiniteQueryOptions<Awaited<ReturnType<typeof campaignsStepsList>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 /**
  * @summary List campaign steps
  */
 
-export function useCampaignsStepsListInfinite<TData = InfiniteData<Awaited<ReturnType<typeof campaignsStepsList>>>, TError = unknown>(
- campaignId: string, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof campaignsStepsList>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient 
- ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+export function useCampaignsStepsListInfinite<
+  TData = InfiniteData<Awaited<ReturnType<typeof campaignsStepsList>>>,
+  TError = unknown
+>(
+  campaignId: string,
+  options?: {
+    query?: Partial<
+      UseInfiniteQueryOptions<Awaited<ReturnType<typeof campaignsStepsList>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+  const queryOptions = getCampaignsStepsListInfiniteQueryOptions(campaignId, options);
 
-  const queryOptions = getCampaignsStepsListInfiniteQueryOptions(campaignId,options)
+  const query = useInfiniteQuery(queryOptions, queryClient) as UseInfiniteQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
 
-  const query = useInfiniteQuery(queryOptions, queryClient) as  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-
-  query.queryKey = queryOptions.queryKey ;
+  query.queryKey = queryOptions.queryKey;
 
   return query;
 }
 
-
-
-
-export const getCampaignsStepsListQueryOptions = <TData = Awaited<ReturnType<typeof campaignsStepsList>>, TError = unknown>(campaignId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof campaignsStepsList>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+export const getCampaignsStepsListQueryOptions = <
+  TData = Awaited<ReturnType<typeof campaignsStepsList>>,
+  TError = unknown
+>(
+  campaignId: string,
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof campaignsStepsList>>, TError, TData>>;
+    request?: SecondParameter<typeof customFetch>;
+  }
 ) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
 
-const {query: queryOptions, request: requestOptions} = options ?? {};
+  const queryKey = queryOptions?.queryKey ?? getCampaignsStepsListQueryKey(campaignId);
 
-  const queryKey =  queryOptions?.queryKey ?? getCampaignsStepsListQueryKey(campaignId);
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof campaignsStepsList>>> = ({ signal }) =>
+    campaignsStepsList(campaignId, { signal, ...requestOptions });
 
-  
+  return { queryKey, queryFn, enabled: !!campaignId, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof campaignsStepsList>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof campaignsStepsList>>> = ({ signal }) => campaignsStepsList(campaignId, { signal, ...requestOptions });
+export type CampaignsStepsListQueryResult = NonNullable<
+  Awaited<ReturnType<typeof campaignsStepsList>>
+>;
+export type CampaignsStepsListQueryError = unknown;
 
-      
-
-      
-
-   return  { queryKey, queryFn, enabled: !!(campaignId), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof campaignsStepsList>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type CampaignsStepsListQueryResult = NonNullable<Awaited<ReturnType<typeof campaignsStepsList>>>
-export type CampaignsStepsListQueryError = unknown
-
-
-export function useCampaignsStepsList<TData = Awaited<ReturnType<typeof campaignsStepsList>>, TError = unknown>(
- campaignId: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof campaignsStepsList>>, TError, TData>> & Pick<
+export function useCampaignsStepsList<
+  TData = Awaited<ReturnType<typeof campaignsStepsList>>,
+  TError = unknown
+>(
+  campaignId: string,
+  options: {
+    query: Partial<UseQueryOptions<Awaited<ReturnType<typeof campaignsStepsList>>, TError, TData>> &
+      Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof campaignsStepsList>>,
           TError,
           Awaited<ReturnType<typeof campaignsStepsList>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useCampaignsStepsList<TData = Awaited<ReturnType<typeof campaignsStepsList>>, TError = unknown>(
- campaignId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof campaignsStepsList>>, TError, TData>> & Pick<
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useCampaignsStepsList<
+  TData = Awaited<ReturnType<typeof campaignsStepsList>>,
+  TError = unknown
+>(
+  campaignId: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof campaignsStepsList>>, TError, TData>
+    > &
+      Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof campaignsStepsList>>,
           TError,
           Awaited<ReturnType<typeof campaignsStepsList>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useCampaignsStepsList<TData = Awaited<ReturnType<typeof campaignsStepsList>>, TError = unknown>(
- campaignId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof campaignsStepsList>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useCampaignsStepsList<
+  TData = Awaited<ReturnType<typeof campaignsStepsList>>,
+  TError = unknown
+>(
+  campaignId: string,
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof campaignsStepsList>>, TError, TData>>;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 /**
  * @summary List campaign steps
  */
 
-export function useCampaignsStepsList<TData = Awaited<ReturnType<typeof campaignsStepsList>>, TError = unknown>(
- campaignId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof campaignsStepsList>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient 
- ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+export function useCampaignsStepsList<
+  TData = Awaited<ReturnType<typeof campaignsStepsList>>,
+  TError = unknown
+>(
+  campaignId: string,
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof campaignsStepsList>>, TError, TData>>;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+  const queryOptions = getCampaignsStepsListQueryOptions(campaignId, options);
 
-  const queryOptions = getCampaignsStepsListQueryOptions(campaignId,options)
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+  };
 
-  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-
-  query.queryKey = queryOptions.queryKey ;
+  query.queryKey = queryOptions.queryKey;
 
   return query;
 }
-
-
-
-
 
 /**
  * @summary Create campaign step
  */
 export type campaignsStepsCreateResponse201 = {
-  data: CampaignStep
-  status: 201
-}
-    
-export type campaignsStepsCreateResponseSuccess = (campaignsStepsCreateResponse201) & {
+  data: CampaignStep;
+  status: 201;
+};
+
+export type campaignsStepsCreateResponseSuccess = campaignsStepsCreateResponse201 & {
   headers: Headers;
 };
-;
 
-export type campaignsStepsCreateResponse = (campaignsStepsCreateResponseSuccess)
+export type campaignsStepsCreateResponse = campaignsStepsCreateResponseSuccess;
 
-export const getCampaignsStepsCreateUrl = (campaignId: string,) => {
+export const getCampaignsStepsCreateUrl = (campaignId: string) => {
+  return `/api/campaigns/${campaignId}/steps/`;
+};
 
-
-  
-
-  return `/api/campaigns/${campaignId}/steps/`
-}
-
-export const campaignsStepsCreate = async (campaignId: string,
-    campaignStep: NonReadonly<CampaignStep>, options?: RequestInit): Promise<campaignsStepsCreateResponse> => {
-  
-  return customFetch<campaignsStepsCreateResponse>(getCampaignsStepsCreateUrl(campaignId),
-  {      
+export const campaignsStepsCreate = async (
+  campaignId: string,
+  campaignStep: NonReadonly<CampaignStep>,
+  options?: RequestInit
+): Promise<campaignsStepsCreateResponse> => {
+  return customFetch<campaignsStepsCreateResponse>(getCampaignsStepsCreateUrl(campaignId), {
     ...options,
     method: 'POST',
     headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(
-      campaignStep,)
-  }
-);}
+    body: JSON.stringify(campaignStep)
+  });
+};
 
+export const getCampaignsStepsCreateMutationOptions = <
+  TError = unknown,
+  TContext = unknown
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof campaignsStepsCreate>>,
+    TError,
+    { campaignId: string; data: NonReadonly<CampaignStep> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof campaignsStepsCreate>>,
+  TError,
+  { campaignId: string; data: NonReadonly<CampaignStep> },
+  TContext
+> => {
+  const mutationKey = ['campaignsStepsCreate'];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
 
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof campaignsStepsCreate>>,
+    { campaignId: string; data: NonReadonly<CampaignStep> }
+  > = (props) => {
+    const { campaignId, data } = props ?? {};
 
+    return campaignsStepsCreate(campaignId, data, requestOptions);
+  };
 
-export const getCampaignsStepsCreateMutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof campaignsStepsCreate>>, TError,{campaignId: string;data: NonReadonly<CampaignStep>}, TContext>, request?: SecondParameter<typeof customFetch>}
-): UseMutationOptions<Awaited<ReturnType<typeof campaignsStepsCreate>>, TError,{campaignId: string;data: NonReadonly<CampaignStep>}, TContext> => {
+  return { mutationFn, ...mutationOptions };
+};
 
-const mutationKey = ['campaignsStepsCreate'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
+export type CampaignsStepsCreateMutationResult = NonNullable<
+  Awaited<ReturnType<typeof campaignsStepsCreate>>
+>;
+export type CampaignsStepsCreateMutationBody = NonReadonly<CampaignStep>;
+export type CampaignsStepsCreateMutationError = unknown;
 
-      
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof campaignsStepsCreate>>, {campaignId: string;data: NonReadonly<CampaignStep>}> = (props) => {
-          const {campaignId,data} = props ?? {};
-
-          return  campaignsStepsCreate(campaignId,data,requestOptions)
-        }
-
-        
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type CampaignsStepsCreateMutationResult = NonNullable<Awaited<ReturnType<typeof campaignsStepsCreate>>>
-    export type CampaignsStepsCreateMutationBody = NonReadonly<CampaignStep>
-    export type CampaignsStepsCreateMutationError = unknown
-
-    /**
+/**
  * @summary Create campaign step
  */
-export const useCampaignsStepsCreate = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof campaignsStepsCreate>>, TError,{campaignId: string;data: NonReadonly<CampaignStep>}, TContext>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof campaignsStepsCreate>>,
-        TError,
-        {campaignId: string;data: NonReadonly<CampaignStep>},
-        TContext
-      > => {
+export const useCampaignsStepsCreate = <TError = unknown, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof campaignsStepsCreate>>,
+      TError,
+      { campaignId: string; data: NonReadonly<CampaignStep> },
+      TContext
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseMutationResult<
+  Awaited<ReturnType<typeof campaignsStepsCreate>>,
+  TError,
+  { campaignId: string; data: NonReadonly<CampaignStep> },
+  TContext
+> => {
+  const mutationOptions = getCampaignsStepsCreateMutationOptions(options);
 
-      const mutationOptions = getCampaignsStepsCreateMutationOptions(options);
+  return useMutation(mutationOptions, queryClient);
+};
 
-      return useMutation(mutationOptions, queryClient);
-    }
-    
 /**
  * @summary Patch campaign step
  */
 export type campaignsStepsPartialUpdateResponse200 = {
-  data: CampaignStep
-  status: 200
-}
-    
-export type campaignsStepsPartialUpdateResponseSuccess = (campaignsStepsPartialUpdateResponse200) & {
+  data: CampaignStep;
+  status: 200;
+};
+
+export type campaignsStepsPartialUpdateResponseSuccess = campaignsStepsPartialUpdateResponse200 & {
   headers: Headers;
 };
-;
 
-export type campaignsStepsPartialUpdateResponse = (campaignsStepsPartialUpdateResponseSuccess)
+export type campaignsStepsPartialUpdateResponse = campaignsStepsPartialUpdateResponseSuccess;
 
-export const getCampaignsStepsPartialUpdateUrl = (campaignId: string,
-    stepId: string,) => {
+export const getCampaignsStepsPartialUpdateUrl = (campaignId: string, stepId: string) => {
+  return `/api/campaigns/${campaignId}/steps/${stepId}/`;
+};
 
+export const campaignsStepsPartialUpdate = async (
+  campaignId: string,
+  stepId: string,
+  patchedCampaignStep: NonReadonly<PatchedCampaignStep>,
+  options?: RequestInit
+): Promise<campaignsStepsPartialUpdateResponse> => {
+  return customFetch<campaignsStepsPartialUpdateResponse>(
+    getCampaignsStepsPartialUpdateUrl(campaignId, stepId),
+    {
+      ...options,
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json', ...options?.headers },
+      body: JSON.stringify(patchedCampaignStep)
+    }
+  );
+};
 
-  
+export const getCampaignsStepsPartialUpdateMutationOptions = <
+  TError = unknown,
+  TContext = unknown
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof campaignsStepsPartialUpdate>>,
+    TError,
+    { campaignId: string; stepId: string; data: NonReadonly<PatchedCampaignStep> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof campaignsStepsPartialUpdate>>,
+  TError,
+  { campaignId: string; stepId: string; data: NonReadonly<PatchedCampaignStep> },
+  TContext
+> => {
+  const mutationKey = ['campaignsStepsPartialUpdate'];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
 
-  return `/api/campaigns/${campaignId}/steps/${stepId}/`
-}
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof campaignsStepsPartialUpdate>>,
+    { campaignId: string; stepId: string; data: NonReadonly<PatchedCampaignStep> }
+  > = (props) => {
+    const { campaignId, stepId, data } = props ?? {};
 
-export const campaignsStepsPartialUpdate = async (campaignId: string,
-    stepId: string,
-    patchedCampaignStep: NonReadonly<PatchedCampaignStep>, options?: RequestInit): Promise<campaignsStepsPartialUpdateResponse> => {
-  
-  return customFetch<campaignsStepsPartialUpdateResponse>(getCampaignsStepsPartialUpdateUrl(campaignId,stepId),
-  {      
-    ...options,
-    method: 'PATCH',
-    headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(
-      patchedCampaignStep,)
-  }
-);}
+    return campaignsStepsPartialUpdate(campaignId, stepId, data, requestOptions);
+  };
 
+  return { mutationFn, ...mutationOptions };
+};
 
+export type CampaignsStepsPartialUpdateMutationResult = NonNullable<
+  Awaited<ReturnType<typeof campaignsStepsPartialUpdate>>
+>;
+export type CampaignsStepsPartialUpdateMutationBody = NonReadonly<PatchedCampaignStep>;
+export type CampaignsStepsPartialUpdateMutationError = unknown;
 
-
-export const getCampaignsStepsPartialUpdateMutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof campaignsStepsPartialUpdate>>, TError,{campaignId: string;stepId: string;data: NonReadonly<PatchedCampaignStep>}, TContext>, request?: SecondParameter<typeof customFetch>}
-): UseMutationOptions<Awaited<ReturnType<typeof campaignsStepsPartialUpdate>>, TError,{campaignId: string;stepId: string;data: NonReadonly<PatchedCampaignStep>}, TContext> => {
-
-const mutationKey = ['campaignsStepsPartialUpdate'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
-
-      
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof campaignsStepsPartialUpdate>>, {campaignId: string;stepId: string;data: NonReadonly<PatchedCampaignStep>}> = (props) => {
-          const {campaignId,stepId,data} = props ?? {};
-
-          return  campaignsStepsPartialUpdate(campaignId,stepId,data,requestOptions)
-        }
-
-        
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type CampaignsStepsPartialUpdateMutationResult = NonNullable<Awaited<ReturnType<typeof campaignsStepsPartialUpdate>>>
-    export type CampaignsStepsPartialUpdateMutationBody = NonReadonly<PatchedCampaignStep>
-    export type CampaignsStepsPartialUpdateMutationError = unknown
-
-    /**
+/**
  * @summary Patch campaign step
  */
-export const useCampaignsStepsPartialUpdate = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof campaignsStepsPartialUpdate>>, TError,{campaignId: string;stepId: string;data: NonReadonly<PatchedCampaignStep>}, TContext>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof campaignsStepsPartialUpdate>>,
-        TError,
-        {campaignId: string;stepId: string;data: NonReadonly<PatchedCampaignStep>},
-        TContext
-      > => {
+export const useCampaignsStepsPartialUpdate = <TError = unknown, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof campaignsStepsPartialUpdate>>,
+      TError,
+      { campaignId: string; stepId: string; data: NonReadonly<PatchedCampaignStep> },
+      TContext
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseMutationResult<
+  Awaited<ReturnType<typeof campaignsStepsPartialUpdate>>,
+  TError,
+  { campaignId: string; stepId: string; data: NonReadonly<PatchedCampaignStep> },
+  TContext
+> => {
+  const mutationOptions = getCampaignsStepsPartialUpdateMutationOptions(options);
 
-      const mutationOptions = getCampaignsStepsPartialUpdateMutationOptions(options);
+  return useMutation(mutationOptions, queryClient);
+};
 
-      return useMutation(mutationOptions, queryClient);
-    }
-    
 /**
  * @summary Delete campaign step
  */
 export type campaignsStepsDestroyResponse204 = {
-  data: void
-  status: 204
-}
-    
-export type campaignsStepsDestroyResponseSuccess = (campaignsStepsDestroyResponse204) & {
+  data: void;
+  status: 204;
+};
+
+export type campaignsStepsDestroyResponseSuccess = campaignsStepsDestroyResponse204 & {
   headers: Headers;
 };
-;
 
-export type campaignsStepsDestroyResponse = (campaignsStepsDestroyResponseSuccess)
+export type campaignsStepsDestroyResponse = campaignsStepsDestroyResponseSuccess;
 
-export const getCampaignsStepsDestroyUrl = (campaignId: string,
-    stepId: string,) => {
+export const getCampaignsStepsDestroyUrl = (campaignId: string, stepId: string) => {
+  return `/api/campaigns/${campaignId}/steps/${stepId}/`;
+};
 
+export const campaignsStepsDestroy = async (
+  campaignId: string,
+  stepId: string,
+  options?: RequestInit
+): Promise<campaignsStepsDestroyResponse> => {
+  return customFetch<campaignsStepsDestroyResponse>(
+    getCampaignsStepsDestroyUrl(campaignId, stepId),
+    {
+      ...options,
+      method: 'DELETE'
+    }
+  );
+};
 
-  
+export const getCampaignsStepsDestroyMutationOptions = <
+  TError = unknown,
+  TContext = unknown
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof campaignsStepsDestroy>>,
+    TError,
+    { campaignId: string; stepId: string },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof campaignsStepsDestroy>>,
+  TError,
+  { campaignId: string; stepId: string },
+  TContext
+> => {
+  const mutationKey = ['campaignsStepsDestroy'];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
 
-  return `/api/campaigns/${campaignId}/steps/${stepId}/`
-}
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof campaignsStepsDestroy>>,
+    { campaignId: string; stepId: string }
+  > = (props) => {
+    const { campaignId, stepId } = props ?? {};
 
-export const campaignsStepsDestroy = async (campaignId: string,
-    stepId: string, options?: RequestInit): Promise<campaignsStepsDestroyResponse> => {
-  
-  return customFetch<campaignsStepsDestroyResponse>(getCampaignsStepsDestroyUrl(campaignId,stepId),
-  {      
-    ...options,
-    method: 'DELETE'
-    
-    
-  }
-);}
+    return campaignsStepsDestroy(campaignId, stepId, requestOptions);
+  };
 
+  return { mutationFn, ...mutationOptions };
+};
 
+export type CampaignsStepsDestroyMutationResult = NonNullable<
+  Awaited<ReturnType<typeof campaignsStepsDestroy>>
+>;
 
+export type CampaignsStepsDestroyMutationError = unknown;
 
-export const getCampaignsStepsDestroyMutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof campaignsStepsDestroy>>, TError,{campaignId: string;stepId: string}, TContext>, request?: SecondParameter<typeof customFetch>}
-): UseMutationOptions<Awaited<ReturnType<typeof campaignsStepsDestroy>>, TError,{campaignId: string;stepId: string}, TContext> => {
-
-const mutationKey = ['campaignsStepsDestroy'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
-
-      
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof campaignsStepsDestroy>>, {campaignId: string;stepId: string}> = (props) => {
-          const {campaignId,stepId} = props ?? {};
-
-          return  campaignsStepsDestroy(campaignId,stepId,requestOptions)
-        }
-
-        
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type CampaignsStepsDestroyMutationResult = NonNullable<Awaited<ReturnType<typeof campaignsStepsDestroy>>>
-    
-    export type CampaignsStepsDestroyMutationError = unknown
-
-    /**
+/**
  * @summary Delete campaign step
  */
-export const useCampaignsStepsDestroy = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof campaignsStepsDestroy>>, TError,{campaignId: string;stepId: string}, TContext>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof campaignsStepsDestroy>>,
-        TError,
-        {campaignId: string;stepId: string},
-        TContext
-      > => {
+export const useCampaignsStepsDestroy = <TError = unknown, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof campaignsStepsDestroy>>,
+      TError,
+      { campaignId: string; stepId: string },
+      TContext
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseMutationResult<
+  Awaited<ReturnType<typeof campaignsStepsDestroy>>,
+  TError,
+  { campaignId: string; stepId: string },
+  TContext
+> => {
+  const mutationOptions = getCampaignsStepsDestroyMutationOptions(options);
 
-      const mutationOptions = getCampaignsStepsDestroyMutationOptions(options);
+  return useMutation(mutationOptions, queryClient);
+};
 
-      return useMutation(mutationOptions, queryClient);
-    }
-    
 /**
  * @summary Get campaign by id
  */
 export type campaignsRetrieveResponse200 = {
-  data: Campaign
-  status: 200
-}
-    
-export type campaignsRetrieveResponseSuccess = (campaignsRetrieveResponse200) & {
+  data: Campaign;
+  status: 200;
+};
+
+export type campaignsRetrieveResponseSuccess = campaignsRetrieveResponse200 & {
   headers: Headers;
 };
-;
 
-export type campaignsRetrieveResponse = (campaignsRetrieveResponseSuccess)
+export type campaignsRetrieveResponse = campaignsRetrieveResponseSuccess;
 
-export const getCampaignsRetrieveUrl = (id: string,) => {
+export const getCampaignsRetrieveUrl = (id: string) => {
+  return `/api/campaigns/${id}/`;
+};
 
-
-  
-
-  return `/api/campaigns/${id}/`
-}
-
-export const campaignsRetrieve = async (id: string, options?: RequestInit): Promise<campaignsRetrieveResponse> => {
-  
-  return customFetch<campaignsRetrieveResponse>(getCampaignsRetrieveUrl(id),
-  {      
+export const campaignsRetrieve = async (
+  id: string,
+  options?: RequestInit
+): Promise<campaignsRetrieveResponse> => {
+  return customFetch<campaignsRetrieveResponse>(getCampaignsRetrieveUrl(id), {
     ...options,
     method: 'GET'
-    
-    
+  });
+};
+
+export const getCampaignsRetrieveInfiniteQueryKey = (id?: string) => {
+  return ['infinite', `/api/campaigns/${id}/`] as const;
+};
+
+export const getCampaignsRetrieveQueryKey = (id?: string) => {
+  return [`/api/campaigns/${id}/`] as const;
+};
+
+export const getCampaignsRetrieveInfiniteQueryOptions = <
+  TData = InfiniteData<Awaited<ReturnType<typeof campaignsRetrieve>>>,
+  TError = unknown
+>(
+  id: string,
+  options?: {
+    query?: Partial<
+      UseInfiniteQueryOptions<Awaited<ReturnType<typeof campaignsRetrieve>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof customFetch>;
   }
-);}
-
-
-
-
-
-export const getCampaignsRetrieveInfiniteQueryKey = (id?: string,) => {
-    return [
-    'infinite', `/api/campaigns/${id}/`
-    ] as const;
-    }
-
-export const getCampaignsRetrieveQueryKey = (id?: string,) => {
-    return [
-    `/api/campaigns/${id}/`
-    ] as const;
-    }
-
-    
-export const getCampaignsRetrieveInfiniteQueryOptions = <TData = InfiniteData<Awaited<ReturnType<typeof campaignsRetrieve>>>, TError = unknown>(id: string, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof campaignsRetrieve>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
 ) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
 
-const {query: queryOptions, request: requestOptions} = options ?? {};
+  const queryKey = queryOptions?.queryKey ?? getCampaignsRetrieveInfiniteQueryKey(id);
 
-  const queryKey =  queryOptions?.queryKey ?? getCampaignsRetrieveInfiniteQueryKey(id);
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof campaignsRetrieve>>> = ({ signal }) =>
+    campaignsRetrieve(id, { signal, ...requestOptions });
 
-  
+  return { queryKey, queryFn, enabled: !!id, ...queryOptions } as UseInfiniteQueryOptions<
+    Awaited<ReturnType<typeof campaignsRetrieve>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof campaignsRetrieve>>> = ({ signal }) => campaignsRetrieve(id, { signal, ...requestOptions });
+export type CampaignsRetrieveInfiniteQueryResult = NonNullable<
+  Awaited<ReturnType<typeof campaignsRetrieve>>
+>;
+export type CampaignsRetrieveInfiniteQueryError = unknown;
 
-      
-
-      
-
-   return  { queryKey, queryFn, enabled: !!(id), ...queryOptions} as UseInfiniteQueryOptions<Awaited<ReturnType<typeof campaignsRetrieve>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type CampaignsRetrieveInfiniteQueryResult = NonNullable<Awaited<ReturnType<typeof campaignsRetrieve>>>
-export type CampaignsRetrieveInfiniteQueryError = unknown
-
-
-export function useCampaignsRetrieveInfinite<TData = InfiniteData<Awaited<ReturnType<typeof campaignsRetrieve>>>, TError = unknown>(
- id: string, options: { query:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof campaignsRetrieve>>, TError, TData>> & Pick<
+export function useCampaignsRetrieveInfinite<
+  TData = InfiniteData<Awaited<ReturnType<typeof campaignsRetrieve>>>,
+  TError = unknown
+>(
+  id: string,
+  options: {
+    query: Partial<
+      UseInfiniteQueryOptions<Awaited<ReturnType<typeof campaignsRetrieve>>, TError, TData>
+    > &
+      Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof campaignsRetrieve>>,
           TError,
           Awaited<ReturnType<typeof campaignsRetrieve>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  DefinedUseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useCampaignsRetrieveInfinite<TData = InfiniteData<Awaited<ReturnType<typeof campaignsRetrieve>>>, TError = unknown>(
- id: string, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof campaignsRetrieve>>, TError, TData>> & Pick<
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): DefinedUseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useCampaignsRetrieveInfinite<
+  TData = InfiniteData<Awaited<ReturnType<typeof campaignsRetrieve>>>,
+  TError = unknown
+>(
+  id: string,
+  options?: {
+    query?: Partial<
+      UseInfiniteQueryOptions<Awaited<ReturnType<typeof campaignsRetrieve>>, TError, TData>
+    > &
+      Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof campaignsRetrieve>>,
           TError,
           Awaited<ReturnType<typeof campaignsRetrieve>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useCampaignsRetrieveInfinite<TData = InfiniteData<Awaited<ReturnType<typeof campaignsRetrieve>>>, TError = unknown>(
- id: string, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof campaignsRetrieve>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useCampaignsRetrieveInfinite<
+  TData = InfiniteData<Awaited<ReturnType<typeof campaignsRetrieve>>>,
+  TError = unknown
+>(
+  id: string,
+  options?: {
+    query?: Partial<
+      UseInfiniteQueryOptions<Awaited<ReturnType<typeof campaignsRetrieve>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 /**
  * @summary Get campaign by id
  */
 
-export function useCampaignsRetrieveInfinite<TData = InfiniteData<Awaited<ReturnType<typeof campaignsRetrieve>>>, TError = unknown>(
- id: string, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof campaignsRetrieve>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient 
- ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+export function useCampaignsRetrieveInfinite<
+  TData = InfiniteData<Awaited<ReturnType<typeof campaignsRetrieve>>>,
+  TError = unknown
+>(
+  id: string,
+  options?: {
+    query?: Partial<
+      UseInfiniteQueryOptions<Awaited<ReturnType<typeof campaignsRetrieve>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+  const queryOptions = getCampaignsRetrieveInfiniteQueryOptions(id, options);
 
-  const queryOptions = getCampaignsRetrieveInfiniteQueryOptions(id,options)
+  const query = useInfiniteQuery(queryOptions, queryClient) as UseInfiniteQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
 
-  const query = useInfiniteQuery(queryOptions, queryClient) as  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-
-  query.queryKey = queryOptions.queryKey ;
+  query.queryKey = queryOptions.queryKey;
 
   return query;
 }
 
-
-
-
-export const getCampaignsRetrieveQueryOptions = <TData = Awaited<ReturnType<typeof campaignsRetrieve>>, TError = unknown>(id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof campaignsRetrieve>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+export const getCampaignsRetrieveQueryOptions = <
+  TData = Awaited<ReturnType<typeof campaignsRetrieve>>,
+  TError = unknown
+>(
+  id: string,
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof campaignsRetrieve>>, TError, TData>>;
+    request?: SecondParameter<typeof customFetch>;
+  }
 ) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
 
-const {query: queryOptions, request: requestOptions} = options ?? {};
+  const queryKey = queryOptions?.queryKey ?? getCampaignsRetrieveQueryKey(id);
 
-  const queryKey =  queryOptions?.queryKey ?? getCampaignsRetrieveQueryKey(id);
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof campaignsRetrieve>>> = ({ signal }) =>
+    campaignsRetrieve(id, { signal, ...requestOptions });
 
-  
+  return { queryKey, queryFn, enabled: !!id, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof campaignsRetrieve>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof campaignsRetrieve>>> = ({ signal }) => campaignsRetrieve(id, { signal, ...requestOptions });
+export type CampaignsRetrieveQueryResult = NonNullable<
+  Awaited<ReturnType<typeof campaignsRetrieve>>
+>;
+export type CampaignsRetrieveQueryError = unknown;
 
-      
-
-      
-
-   return  { queryKey, queryFn, enabled: !!(id), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof campaignsRetrieve>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type CampaignsRetrieveQueryResult = NonNullable<Awaited<ReturnType<typeof campaignsRetrieve>>>
-export type CampaignsRetrieveQueryError = unknown
-
-
-export function useCampaignsRetrieve<TData = Awaited<ReturnType<typeof campaignsRetrieve>>, TError = unknown>(
- id: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof campaignsRetrieve>>, TError, TData>> & Pick<
+export function useCampaignsRetrieve<
+  TData = Awaited<ReturnType<typeof campaignsRetrieve>>,
+  TError = unknown
+>(
+  id: string,
+  options: {
+    query: Partial<UseQueryOptions<Awaited<ReturnType<typeof campaignsRetrieve>>, TError, TData>> &
+      Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof campaignsRetrieve>>,
           TError,
           Awaited<ReturnType<typeof campaignsRetrieve>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useCampaignsRetrieve<TData = Awaited<ReturnType<typeof campaignsRetrieve>>, TError = unknown>(
- id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof campaignsRetrieve>>, TError, TData>> & Pick<
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useCampaignsRetrieve<
+  TData = Awaited<ReturnType<typeof campaignsRetrieve>>,
+  TError = unknown
+>(
+  id: string,
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof campaignsRetrieve>>, TError, TData>> &
+      Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof campaignsRetrieve>>,
           TError,
           Awaited<ReturnType<typeof campaignsRetrieve>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useCampaignsRetrieve<TData = Awaited<ReturnType<typeof campaignsRetrieve>>, TError = unknown>(
- id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof campaignsRetrieve>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useCampaignsRetrieve<
+  TData = Awaited<ReturnType<typeof campaignsRetrieve>>,
+  TError = unknown
+>(
+  id: string,
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof campaignsRetrieve>>, TError, TData>>;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 /**
  * @summary Get campaign by id
  */
 
-export function useCampaignsRetrieve<TData = Awaited<ReturnType<typeof campaignsRetrieve>>, TError = unknown>(
- id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof campaignsRetrieve>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient 
- ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+export function useCampaignsRetrieve<
+  TData = Awaited<ReturnType<typeof campaignsRetrieve>>,
+  TError = unknown
+>(
+  id: string,
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof campaignsRetrieve>>, TError, TData>>;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+  const queryOptions = getCampaignsRetrieveQueryOptions(id, options);
 
-  const queryOptions = getCampaignsRetrieveQueryOptions(id,options)
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+  };
 
-  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-
-  query.queryKey = queryOptions.queryKey ;
+  query.queryKey = queryOptions.queryKey;
 
   return query;
 }
-
-
-
-
 
 /**
  * @summary Patch campaign by id
  */
 export type campaignsPartialUpdateResponse200 = {
-  data: Campaign
-  status: 200
-}
-    
-export type campaignsPartialUpdateResponseSuccess = (campaignsPartialUpdateResponse200) & {
+  data: Campaign;
+  status: 200;
+};
+
+export type campaignsPartialUpdateResponseSuccess = campaignsPartialUpdateResponse200 & {
   headers: Headers;
 };
-;
 
-export type campaignsPartialUpdateResponse = (campaignsPartialUpdateResponseSuccess)
+export type campaignsPartialUpdateResponse = campaignsPartialUpdateResponseSuccess;
 
-export const getCampaignsPartialUpdateUrl = (id: string,) => {
+export const getCampaignsPartialUpdateUrl = (id: string) => {
+  return `/api/campaigns/${id}/`;
+};
 
-
-  
-
-  return `/api/campaigns/${id}/`
-}
-
-export const campaignsPartialUpdate = async (id: string,
-    patchedCampaign: NonReadonly<PatchedCampaign>, options?: RequestInit): Promise<campaignsPartialUpdateResponse> => {
-  
-  return customFetch<campaignsPartialUpdateResponse>(getCampaignsPartialUpdateUrl(id),
-  {      
+export const campaignsPartialUpdate = async (
+  id: string,
+  patchedCampaign: NonReadonly<PatchedCampaign>,
+  options?: RequestInit
+): Promise<campaignsPartialUpdateResponse> => {
+  return customFetch<campaignsPartialUpdateResponse>(getCampaignsPartialUpdateUrl(id), {
     ...options,
     method: 'PATCH',
     headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(
-      patchedCampaign,)
-  }
-);}
+    body: JSON.stringify(patchedCampaign)
+  });
+};
 
+export const getCampaignsPartialUpdateMutationOptions = <
+  TError = unknown,
+  TContext = unknown
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof campaignsPartialUpdate>>,
+    TError,
+    { id: string; data: NonReadonly<PatchedCampaign> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof campaignsPartialUpdate>>,
+  TError,
+  { id: string; data: NonReadonly<PatchedCampaign> },
+  TContext
+> => {
+  const mutationKey = ['campaignsPartialUpdate'];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
 
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof campaignsPartialUpdate>>,
+    { id: string; data: NonReadonly<PatchedCampaign> }
+  > = (props) => {
+    const { id, data } = props ?? {};
 
+    return campaignsPartialUpdate(id, data, requestOptions);
+  };
 
-export const getCampaignsPartialUpdateMutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof campaignsPartialUpdate>>, TError,{id: string;data: NonReadonly<PatchedCampaign>}, TContext>, request?: SecondParameter<typeof customFetch>}
-): UseMutationOptions<Awaited<ReturnType<typeof campaignsPartialUpdate>>, TError,{id: string;data: NonReadonly<PatchedCampaign>}, TContext> => {
+  return { mutationFn, ...mutationOptions };
+};
 
-const mutationKey = ['campaignsPartialUpdate'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
+export type CampaignsPartialUpdateMutationResult = NonNullable<
+  Awaited<ReturnType<typeof campaignsPartialUpdate>>
+>;
+export type CampaignsPartialUpdateMutationBody = NonReadonly<PatchedCampaign>;
+export type CampaignsPartialUpdateMutationError = unknown;
 
-      
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof campaignsPartialUpdate>>, {id: string;data: NonReadonly<PatchedCampaign>}> = (props) => {
-          const {id,data} = props ?? {};
-
-          return  campaignsPartialUpdate(id,data,requestOptions)
-        }
-
-        
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type CampaignsPartialUpdateMutationResult = NonNullable<Awaited<ReturnType<typeof campaignsPartialUpdate>>>
-    export type CampaignsPartialUpdateMutationBody = NonReadonly<PatchedCampaign>
-    export type CampaignsPartialUpdateMutationError = unknown
-
-    /**
+/**
  * @summary Patch campaign by id
  */
-export const useCampaignsPartialUpdate = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof campaignsPartialUpdate>>, TError,{id: string;data: NonReadonly<PatchedCampaign>}, TContext>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof campaignsPartialUpdate>>,
-        TError,
-        {id: string;data: NonReadonly<PatchedCampaign>},
-        TContext
-      > => {
+export const useCampaignsPartialUpdate = <TError = unknown, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof campaignsPartialUpdate>>,
+      TError,
+      { id: string; data: NonReadonly<PatchedCampaign> },
+      TContext
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseMutationResult<
+  Awaited<ReturnType<typeof campaignsPartialUpdate>>,
+  TError,
+  { id: string; data: NonReadonly<PatchedCampaign> },
+  TContext
+> => {
+  const mutationOptions = getCampaignsPartialUpdateMutationOptions(options);
 
-      const mutationOptions = getCampaignsPartialUpdateMutationOptions(options);
+  return useMutation(mutationOptions, queryClient);
+};
 
-      return useMutation(mutationOptions, queryClient);
-    }
-    
 /**
  * @summary Delete campaign by id
  */
 export type campaignsDestroyResponse204 = {
-  data: void
-  status: 204
-}
-    
-export type campaignsDestroyResponseSuccess = (campaignsDestroyResponse204) & {
+  data: void;
+  status: 204;
+};
+
+export type campaignsDestroyResponseSuccess = campaignsDestroyResponse204 & {
   headers: Headers;
 };
-;
 
-export type campaignsDestroyResponse = (campaignsDestroyResponseSuccess)
+export type campaignsDestroyResponse = campaignsDestroyResponseSuccess;
 
-export const getCampaignsDestroyUrl = (id: string,) => {
+export const getCampaignsDestroyUrl = (id: string) => {
+  return `/api/campaigns/${id}/`;
+};
 
-
-  
-
-  return `/api/campaigns/${id}/`
-}
-
-export const campaignsDestroy = async (id: string, options?: RequestInit): Promise<campaignsDestroyResponse> => {
-  
-  return customFetch<campaignsDestroyResponse>(getCampaignsDestroyUrl(id),
-  {      
+export const campaignsDestroy = async (
+  id: string,
+  options?: RequestInit
+): Promise<campaignsDestroyResponse> => {
+  return customFetch<campaignsDestroyResponse>(getCampaignsDestroyUrl(id), {
     ...options,
     method: 'DELETE'
-    
-    
-  }
-);}
+  });
+};
 
+export const getCampaignsDestroyMutationOptions = <TError = unknown, TContext = unknown>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof campaignsDestroy>>,
+    TError,
+    { id: string },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof campaignsDestroy>>,
+  TError,
+  { id: string },
+  TContext
+> => {
+  const mutationKey = ['campaignsDestroy'];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
 
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof campaignsDestroy>>,
+    { id: string }
+  > = (props) => {
+    const { id } = props ?? {};
 
+    return campaignsDestroy(id, requestOptions);
+  };
 
-export const getCampaignsDestroyMutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof campaignsDestroy>>, TError,{id: string}, TContext>, request?: SecondParameter<typeof customFetch>}
-): UseMutationOptions<Awaited<ReturnType<typeof campaignsDestroy>>, TError,{id: string}, TContext> => {
+  return { mutationFn, ...mutationOptions };
+};
 
-const mutationKey = ['campaignsDestroy'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
+export type CampaignsDestroyMutationResult = NonNullable<
+  Awaited<ReturnType<typeof campaignsDestroy>>
+>;
 
-      
+export type CampaignsDestroyMutationError = unknown;
 
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof campaignsDestroy>>, {id: string}> = (props) => {
-          const {id} = props ?? {};
-
-          return  campaignsDestroy(id,requestOptions)
-        }
-
-        
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type CampaignsDestroyMutationResult = NonNullable<Awaited<ReturnType<typeof campaignsDestroy>>>
-    
-    export type CampaignsDestroyMutationError = unknown
-
-    /**
+/**
  * @summary Delete campaign by id
  */
-export const useCampaignsDestroy = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof campaignsDestroy>>, TError,{id: string}, TContext>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof campaignsDestroy>>,
-        TError,
-        {id: string},
-        TContext
-      > => {
+export const useCampaignsDestroy = <TError = unknown, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof campaignsDestroy>>,
+      TError,
+      { id: string },
+      TContext
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseMutationResult<
+  Awaited<ReturnType<typeof campaignsDestroy>>,
+  TError,
+  { id: string },
+  TContext
+> => {
+  const mutationOptions = getCampaignsDestroyMutationOptions(options);
 
-      const mutationOptions = getCampaignsDestroyMutationOptions(options);
+  return useMutation(mutationOptions, queryClient);
+};
 
-      return useMutation(mutationOptions, queryClient);
-    }
-    
 /**
  * @summary Cancel campaign
  */
 export type campaignsCancelCreateResponse200 = {
-  data: void
-  status: 200
-}
-    
-export type campaignsCancelCreateResponseSuccess = (campaignsCancelCreateResponse200) & {
+  data: void;
+  status: 200;
+};
+
+export type campaignsCancelCreateResponseSuccess = campaignsCancelCreateResponse200 & {
   headers: Headers;
 };
-;
 
-export type campaignsCancelCreateResponse = (campaignsCancelCreateResponseSuccess)
+export type campaignsCancelCreateResponse = campaignsCancelCreateResponseSuccess;
 
-export const getCampaignsCancelCreateUrl = (id: string,) => {
+export const getCampaignsCancelCreateUrl = (id: string) => {
+  return `/api/campaigns/${id}/cancel/`;
+};
 
-
-  
-
-  return `/api/campaigns/${id}/cancel/`
-}
-
-export const campaignsCancelCreate = async (id: string, options?: RequestInit): Promise<campaignsCancelCreateResponse> => {
-  
-  return customFetch<campaignsCancelCreateResponse>(getCampaignsCancelCreateUrl(id),
-  {      
+export const campaignsCancelCreate = async (
+  id: string,
+  options?: RequestInit
+): Promise<campaignsCancelCreateResponse> => {
+  return customFetch<campaignsCancelCreateResponse>(getCampaignsCancelCreateUrl(id), {
     ...options,
     method: 'POST'
-    
-    
-  }
-);}
+  });
+};
 
+export const getCampaignsCancelCreateMutationOptions = <
+  TError = unknown,
+  TContext = unknown
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof campaignsCancelCreate>>,
+    TError,
+    { id: string },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof campaignsCancelCreate>>,
+  TError,
+  { id: string },
+  TContext
+> => {
+  const mutationKey = ['campaignsCancelCreate'];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
 
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof campaignsCancelCreate>>,
+    { id: string }
+  > = (props) => {
+    const { id } = props ?? {};
 
+    return campaignsCancelCreate(id, requestOptions);
+  };
 
-export const getCampaignsCancelCreateMutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof campaignsCancelCreate>>, TError,{id: string}, TContext>, request?: SecondParameter<typeof customFetch>}
-): UseMutationOptions<Awaited<ReturnType<typeof campaignsCancelCreate>>, TError,{id: string}, TContext> => {
+  return { mutationFn, ...mutationOptions };
+};
 
-const mutationKey = ['campaignsCancelCreate'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
+export type CampaignsCancelCreateMutationResult = NonNullable<
+  Awaited<ReturnType<typeof campaignsCancelCreate>>
+>;
 
-      
+export type CampaignsCancelCreateMutationError = unknown;
 
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof campaignsCancelCreate>>, {id: string}> = (props) => {
-          const {id} = props ?? {};
-
-          return  campaignsCancelCreate(id,requestOptions)
-        }
-
-        
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type CampaignsCancelCreateMutationResult = NonNullable<Awaited<ReturnType<typeof campaignsCancelCreate>>>
-    
-    export type CampaignsCancelCreateMutationError = unknown
-
-    /**
+/**
  * @summary Cancel campaign
  */
-export const useCampaignsCancelCreate = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof campaignsCancelCreate>>, TError,{id: string}, TContext>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof campaignsCancelCreate>>,
-        TError,
-        {id: string},
-        TContext
-      > => {
+export const useCampaignsCancelCreate = <TError = unknown, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof campaignsCancelCreate>>,
+      TError,
+      { id: string },
+      TContext
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseMutationResult<
+  Awaited<ReturnType<typeof campaignsCancelCreate>>,
+  TError,
+  { id: string },
+  TContext
+> => {
+  const mutationOptions = getCampaignsCancelCreateMutationOptions(options);
 
-      const mutationOptions = getCampaignsCancelCreateMutationOptions(options);
+  return useMutation(mutationOptions, queryClient);
+};
 
-      return useMutation(mutationOptions, queryClient);
-    }
-    
 /**
  * @summary Pause campaign
  */
 export type campaignsPauseCreateResponse200 = {
-  data: void
-  status: 200
-}
-    
-export type campaignsPauseCreateResponseSuccess = (campaignsPauseCreateResponse200) & {
+  data: void;
+  status: 200;
+};
+
+export type campaignsPauseCreateResponseSuccess = campaignsPauseCreateResponse200 & {
   headers: Headers;
 };
-;
 
-export type campaignsPauseCreateResponse = (campaignsPauseCreateResponseSuccess)
+export type campaignsPauseCreateResponse = campaignsPauseCreateResponseSuccess;
 
-export const getCampaignsPauseCreateUrl = (id: string,) => {
+export const getCampaignsPauseCreateUrl = (id: string) => {
+  return `/api/campaigns/${id}/pause/`;
+};
 
-
-  
-
-  return `/api/campaigns/${id}/pause/`
-}
-
-export const campaignsPauseCreate = async (id: string, options?: RequestInit): Promise<campaignsPauseCreateResponse> => {
-  
-  return customFetch<campaignsPauseCreateResponse>(getCampaignsPauseCreateUrl(id),
-  {      
+export const campaignsPauseCreate = async (
+  id: string,
+  options?: RequestInit
+): Promise<campaignsPauseCreateResponse> => {
+  return customFetch<campaignsPauseCreateResponse>(getCampaignsPauseCreateUrl(id), {
     ...options,
     method: 'POST'
-    
-    
-  }
-);}
+  });
+};
 
+export const getCampaignsPauseCreateMutationOptions = <
+  TError = unknown,
+  TContext = unknown
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof campaignsPauseCreate>>,
+    TError,
+    { id: string },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof campaignsPauseCreate>>,
+  TError,
+  { id: string },
+  TContext
+> => {
+  const mutationKey = ['campaignsPauseCreate'];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
 
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof campaignsPauseCreate>>,
+    { id: string }
+  > = (props) => {
+    const { id } = props ?? {};
 
+    return campaignsPauseCreate(id, requestOptions);
+  };
 
-export const getCampaignsPauseCreateMutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof campaignsPauseCreate>>, TError,{id: string}, TContext>, request?: SecondParameter<typeof customFetch>}
-): UseMutationOptions<Awaited<ReturnType<typeof campaignsPauseCreate>>, TError,{id: string}, TContext> => {
+  return { mutationFn, ...mutationOptions };
+};
 
-const mutationKey = ['campaignsPauseCreate'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
+export type CampaignsPauseCreateMutationResult = NonNullable<
+  Awaited<ReturnType<typeof campaignsPauseCreate>>
+>;
 
-      
+export type CampaignsPauseCreateMutationError = unknown;
 
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof campaignsPauseCreate>>, {id: string}> = (props) => {
-          const {id} = props ?? {};
-
-          return  campaignsPauseCreate(id,requestOptions)
-        }
-
-        
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type CampaignsPauseCreateMutationResult = NonNullable<Awaited<ReturnType<typeof campaignsPauseCreate>>>
-    
-    export type CampaignsPauseCreateMutationError = unknown
-
-    /**
+/**
  * @summary Pause campaign
  */
-export const useCampaignsPauseCreate = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof campaignsPauseCreate>>, TError,{id: string}, TContext>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof campaignsPauseCreate>>,
-        TError,
-        {id: string},
-        TContext
-      > => {
+export const useCampaignsPauseCreate = <TError = unknown, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof campaignsPauseCreate>>,
+      TError,
+      { id: string },
+      TContext
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseMutationResult<
+  Awaited<ReturnType<typeof campaignsPauseCreate>>,
+  TError,
+  { id: string },
+  TContext
+> => {
+  const mutationOptions = getCampaignsPauseCreateMutationOptions(options);
 
-      const mutationOptions = getCampaignsPauseCreateMutationOptions(options);
+  return useMutation(mutationOptions, queryClient);
+};
 
-      return useMutation(mutationOptions, queryClient);
-    }
-    
 /**
  * @summary Resume campaign
  */
 export type campaignsResumeCreateResponse200 = {
-  data: void
-  status: 200
-}
-    
-export type campaignsResumeCreateResponseSuccess = (campaignsResumeCreateResponse200) & {
+  data: void;
+  status: 200;
+};
+
+export type campaignsResumeCreateResponseSuccess = campaignsResumeCreateResponse200 & {
   headers: Headers;
 };
-;
 
-export type campaignsResumeCreateResponse = (campaignsResumeCreateResponseSuccess)
+export type campaignsResumeCreateResponse = campaignsResumeCreateResponseSuccess;
 
-export const getCampaignsResumeCreateUrl = (id: string,) => {
+export const getCampaignsResumeCreateUrl = (id: string) => {
+  return `/api/campaigns/${id}/resume/`;
+};
 
-
-  
-
-  return `/api/campaigns/${id}/resume/`
-}
-
-export const campaignsResumeCreate = async (id: string, options?: RequestInit): Promise<campaignsResumeCreateResponse> => {
-  
-  return customFetch<campaignsResumeCreateResponse>(getCampaignsResumeCreateUrl(id),
-  {      
+export const campaignsResumeCreate = async (
+  id: string,
+  options?: RequestInit
+): Promise<campaignsResumeCreateResponse> => {
+  return customFetch<campaignsResumeCreateResponse>(getCampaignsResumeCreateUrl(id), {
     ...options,
     method: 'POST'
-    
-    
-  }
-);}
+  });
+};
 
+export const getCampaignsResumeCreateMutationOptions = <
+  TError = unknown,
+  TContext = unknown
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof campaignsResumeCreate>>,
+    TError,
+    { id: string },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof campaignsResumeCreate>>,
+  TError,
+  { id: string },
+  TContext
+> => {
+  const mutationKey = ['campaignsResumeCreate'];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
 
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof campaignsResumeCreate>>,
+    { id: string }
+  > = (props) => {
+    const { id } = props ?? {};
 
+    return campaignsResumeCreate(id, requestOptions);
+  };
 
-export const getCampaignsResumeCreateMutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof campaignsResumeCreate>>, TError,{id: string}, TContext>, request?: SecondParameter<typeof customFetch>}
-): UseMutationOptions<Awaited<ReturnType<typeof campaignsResumeCreate>>, TError,{id: string}, TContext> => {
+  return { mutationFn, ...mutationOptions };
+};
 
-const mutationKey = ['campaignsResumeCreate'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
+export type CampaignsResumeCreateMutationResult = NonNullable<
+  Awaited<ReturnType<typeof campaignsResumeCreate>>
+>;
 
-      
+export type CampaignsResumeCreateMutationError = unknown;
 
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof campaignsResumeCreate>>, {id: string}> = (props) => {
-          const {id} = props ?? {};
-
-          return  campaignsResumeCreate(id,requestOptions)
-        }
-
-        
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type CampaignsResumeCreateMutationResult = NonNullable<Awaited<ReturnType<typeof campaignsResumeCreate>>>
-    
-    export type CampaignsResumeCreateMutationError = unknown
-
-    /**
+/**
  * @summary Resume campaign
  */
-export const useCampaignsResumeCreate = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof campaignsResumeCreate>>, TError,{id: string}, TContext>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof campaignsResumeCreate>>,
-        TError,
-        {id: string},
-        TContext
-      > => {
+export const useCampaignsResumeCreate = <TError = unknown, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof campaignsResumeCreate>>,
+      TError,
+      { id: string },
+      TContext
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseMutationResult<
+  Awaited<ReturnType<typeof campaignsResumeCreate>>,
+  TError,
+  { id: string },
+  TContext
+> => {
+  const mutationOptions = getCampaignsResumeCreateMutationOptions(options);
 
-      const mutationOptions = getCampaignsResumeCreateMutationOptions(options);
+  return useMutation(mutationOptions, queryClient);
+};
 
-      return useMutation(mutationOptions, queryClient);
-    }
-    
 /**
  * @summary Schedule campaign
  */
 export type campaignsScheduleCreateResponse200 = {
-  data: CampaignSchedule
-  status: 200
-}
-    
-export type campaignsScheduleCreateResponseSuccess = (campaignsScheduleCreateResponse200) & {
+  data: CampaignSchedule;
+  status: 200;
+};
+
+export type campaignsScheduleCreateResponseSuccess = campaignsScheduleCreateResponse200 & {
   headers: Headers;
 };
-;
 
-export type campaignsScheduleCreateResponse = (campaignsScheduleCreateResponseSuccess)
+export type campaignsScheduleCreateResponse = campaignsScheduleCreateResponseSuccess;
 
-export const getCampaignsScheduleCreateUrl = (id: string,) => {
+export const getCampaignsScheduleCreateUrl = (id: string) => {
+  return `/api/campaigns/${id}/schedule/`;
+};
 
-
-  
-
-  return `/api/campaigns/${id}/schedule/`
-}
-
-export const campaignsScheduleCreate = async (id: string,
-    campaignSchedule: CampaignSchedule, options?: RequestInit): Promise<campaignsScheduleCreateResponse> => {
-  
-  return customFetch<campaignsScheduleCreateResponse>(getCampaignsScheduleCreateUrl(id),
-  {      
+export const campaignsScheduleCreate = async (
+  id: string,
+  campaignSchedule: CampaignSchedule,
+  options?: RequestInit
+): Promise<campaignsScheduleCreateResponse> => {
+  return customFetch<campaignsScheduleCreateResponse>(getCampaignsScheduleCreateUrl(id), {
     ...options,
     method: 'POST',
     headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(
-      campaignSchedule,)
-  }
-);}
+    body: JSON.stringify(campaignSchedule)
+  });
+};
 
+export const getCampaignsScheduleCreateMutationOptions = <
+  TError = unknown,
+  TContext = unknown
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof campaignsScheduleCreate>>,
+    TError,
+    { id: string; data: CampaignSchedule },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof campaignsScheduleCreate>>,
+  TError,
+  { id: string; data: CampaignSchedule },
+  TContext
+> => {
+  const mutationKey = ['campaignsScheduleCreate'];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
 
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof campaignsScheduleCreate>>,
+    { id: string; data: CampaignSchedule }
+  > = (props) => {
+    const { id, data } = props ?? {};
 
+    return campaignsScheduleCreate(id, data, requestOptions);
+  };
 
-export const getCampaignsScheduleCreateMutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof campaignsScheduleCreate>>, TError,{id: string;data: CampaignSchedule}, TContext>, request?: SecondParameter<typeof customFetch>}
-): UseMutationOptions<Awaited<ReturnType<typeof campaignsScheduleCreate>>, TError,{id: string;data: CampaignSchedule}, TContext> => {
+  return { mutationFn, ...mutationOptions };
+};
 
-const mutationKey = ['campaignsScheduleCreate'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
+export type CampaignsScheduleCreateMutationResult = NonNullable<
+  Awaited<ReturnType<typeof campaignsScheduleCreate>>
+>;
+export type CampaignsScheduleCreateMutationBody = CampaignSchedule;
+export type CampaignsScheduleCreateMutationError = unknown;
 
-      
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof campaignsScheduleCreate>>, {id: string;data: CampaignSchedule}> = (props) => {
-          const {id,data} = props ?? {};
-
-          return  campaignsScheduleCreate(id,data,requestOptions)
-        }
-
-        
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type CampaignsScheduleCreateMutationResult = NonNullable<Awaited<ReturnType<typeof campaignsScheduleCreate>>>
-    export type CampaignsScheduleCreateMutationBody = CampaignSchedule
-    export type CampaignsScheduleCreateMutationError = unknown
-
-    /**
+/**
  * @summary Schedule campaign
  */
-export const useCampaignsScheduleCreate = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof campaignsScheduleCreate>>, TError,{id: string;data: CampaignSchedule}, TContext>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof campaignsScheduleCreate>>,
-        TError,
-        {id: string;data: CampaignSchedule},
-        TContext
-      > => {
+export const useCampaignsScheduleCreate = <TError = unknown, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof campaignsScheduleCreate>>,
+      TError,
+      { id: string; data: CampaignSchedule },
+      TContext
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseMutationResult<
+  Awaited<ReturnType<typeof campaignsScheduleCreate>>,
+  TError,
+  { id: string; data: CampaignSchedule },
+  TContext
+> => {
+  const mutationOptions = getCampaignsScheduleCreateMutationOptions(options);
 
-      const mutationOptions = getCampaignsScheduleCreateMutationOptions(options);
+  return useMutation(mutationOptions, queryClient);
+};
 
-      return useMutation(mutationOptions, queryClient);
-    }
-    
 /**
  * @summary List contact lists
  */
 export type contactsListsListResponse200 = {
-  data: EmailList[]
-  status: 200
-}
-    
-export type contactsListsListResponseSuccess = (contactsListsListResponse200) & {
+  data: EmailList[];
+  status: 200;
+};
+
+export type contactsListsListResponseSuccess = contactsListsListResponse200 & {
   headers: Headers;
 };
-;
 
-export type contactsListsListResponse = (contactsListsListResponseSuccess)
+export type contactsListsListResponse = contactsListsListResponseSuccess;
 
-export const getContactsListsListUrl = (params?: ContactsListsListParams,) => {
+export const getContactsListsListUrl = (params?: ContactsListsListParams) => {
   const normalizedParams = new URLSearchParams();
 
   Object.entries(params || {}).forEach(([key, value]) => {
-    
     if (value !== undefined) {
-      normalizedParams.append(key, value === null ? 'null' : value.toString())
+      normalizedParams.append(key, value === null ? 'null' : value.toString());
     }
   });
 
   const stringifiedParams = normalizedParams.toString();
 
-  return stringifiedParams.length > 0 ? `/api/contacts/lists/?${stringifiedParams}` : `/api/contacts/lists/`
-}
+  return stringifiedParams.length > 0
+    ? `/api/contacts/lists/?${stringifiedParams}`
+    : `/api/contacts/lists/`;
+};
 
-export const contactsListsList = async (params?: ContactsListsListParams, options?: RequestInit): Promise<contactsListsListResponse> => {
-  
-  return customFetch<contactsListsListResponse>(getContactsListsListUrl(params),
-  {      
+export const contactsListsList = async (
+  params?: ContactsListsListParams,
+  options?: RequestInit
+): Promise<contactsListsListResponse> => {
+  return customFetch<contactsListsListResponse>(getContactsListsListUrl(params), {
     ...options,
     method: 'GET'
-    
-    
+  });
+};
+
+export const getContactsListsListInfiniteQueryKey = (params?: ContactsListsListParams) => {
+  return ['infinite', `/api/contacts/lists/`, ...(params ? [params] : [])] as const;
+};
+
+export const getContactsListsListQueryKey = (params?: ContactsListsListParams) => {
+  return [`/api/contacts/lists/`, ...(params ? [params] : [])] as const;
+};
+
+export const getContactsListsListInfiniteQueryOptions = <
+  TData = InfiniteData<Awaited<ReturnType<typeof contactsListsList>>>,
+  TError = unknown
+>(
+  params?: ContactsListsListParams,
+  options?: {
+    query?: Partial<
+      UseInfiniteQueryOptions<Awaited<ReturnType<typeof contactsListsList>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof customFetch>;
   }
-);}
-
-
-
-
-
-export const getContactsListsListInfiniteQueryKey = (params?: ContactsListsListParams,) => {
-    return [
-    'infinite', `/api/contacts/lists/`, ...(params ? [params]: [])
-    ] as const;
-    }
-
-export const getContactsListsListQueryKey = (params?: ContactsListsListParams,) => {
-    return [
-    `/api/contacts/lists/`, ...(params ? [params]: [])
-    ] as const;
-    }
-
-    
-export const getContactsListsListInfiniteQueryOptions = <TData = InfiniteData<Awaited<ReturnType<typeof contactsListsList>>>, TError = unknown>(params?: ContactsListsListParams, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof contactsListsList>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
 ) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
 
-const {query: queryOptions, request: requestOptions} = options ?? {};
+  const queryKey = queryOptions?.queryKey ?? getContactsListsListInfiniteQueryKey(params);
 
-  const queryKey =  queryOptions?.queryKey ?? getContactsListsListInfiniteQueryKey(params);
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof contactsListsList>>> = ({ signal }) =>
+    contactsListsList(params, { signal, ...requestOptions });
 
-  
+  return { queryKey, queryFn, ...queryOptions } as UseInfiniteQueryOptions<
+    Awaited<ReturnType<typeof contactsListsList>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof contactsListsList>>> = ({ signal }) => contactsListsList(params, { signal, ...requestOptions });
+export type ContactsListsListInfiniteQueryResult = NonNullable<
+  Awaited<ReturnType<typeof contactsListsList>>
+>;
+export type ContactsListsListInfiniteQueryError = unknown;
 
-      
-
-      
-
-   return  { queryKey, queryFn, ...queryOptions} as UseInfiniteQueryOptions<Awaited<ReturnType<typeof contactsListsList>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type ContactsListsListInfiniteQueryResult = NonNullable<Awaited<ReturnType<typeof contactsListsList>>>
-export type ContactsListsListInfiniteQueryError = unknown
-
-
-export function useContactsListsListInfinite<TData = InfiniteData<Awaited<ReturnType<typeof contactsListsList>>>, TError = unknown>(
- params: undefined |  ContactsListsListParams, options: { query:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof contactsListsList>>, TError, TData>> & Pick<
+export function useContactsListsListInfinite<
+  TData = InfiniteData<Awaited<ReturnType<typeof contactsListsList>>>,
+  TError = unknown
+>(
+  params: undefined | ContactsListsListParams,
+  options: {
+    query: Partial<
+      UseInfiniteQueryOptions<Awaited<ReturnType<typeof contactsListsList>>, TError, TData>
+    > &
+      Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof contactsListsList>>,
           TError,
           Awaited<ReturnType<typeof contactsListsList>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  DefinedUseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useContactsListsListInfinite<TData = InfiniteData<Awaited<ReturnType<typeof contactsListsList>>>, TError = unknown>(
- params?: ContactsListsListParams, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof contactsListsList>>, TError, TData>> & Pick<
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): DefinedUseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useContactsListsListInfinite<
+  TData = InfiniteData<Awaited<ReturnType<typeof contactsListsList>>>,
+  TError = unknown
+>(
+  params?: ContactsListsListParams,
+  options?: {
+    query?: Partial<
+      UseInfiniteQueryOptions<Awaited<ReturnType<typeof contactsListsList>>, TError, TData>
+    > &
+      Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof contactsListsList>>,
           TError,
           Awaited<ReturnType<typeof contactsListsList>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useContactsListsListInfinite<TData = InfiniteData<Awaited<ReturnType<typeof contactsListsList>>>, TError = unknown>(
- params?: ContactsListsListParams, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof contactsListsList>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useContactsListsListInfinite<
+  TData = InfiniteData<Awaited<ReturnType<typeof contactsListsList>>>,
+  TError = unknown
+>(
+  params?: ContactsListsListParams,
+  options?: {
+    query?: Partial<
+      UseInfiniteQueryOptions<Awaited<ReturnType<typeof contactsListsList>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 /**
  * @summary List contact lists
  */
 
-export function useContactsListsListInfinite<TData = InfiniteData<Awaited<ReturnType<typeof contactsListsList>>>, TError = unknown>(
- params?: ContactsListsListParams, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof contactsListsList>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient 
- ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+export function useContactsListsListInfinite<
+  TData = InfiniteData<Awaited<ReturnType<typeof contactsListsList>>>,
+  TError = unknown
+>(
+  params?: ContactsListsListParams,
+  options?: {
+    query?: Partial<
+      UseInfiniteQueryOptions<Awaited<ReturnType<typeof contactsListsList>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+  const queryOptions = getContactsListsListInfiniteQueryOptions(params, options);
 
-  const queryOptions = getContactsListsListInfiniteQueryOptions(params,options)
+  const query = useInfiniteQuery(queryOptions, queryClient) as UseInfiniteQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
 
-  const query = useInfiniteQuery(queryOptions, queryClient) as  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-
-  query.queryKey = queryOptions.queryKey ;
+  query.queryKey = queryOptions.queryKey;
 
   return query;
 }
 
-
-
-
-export const getContactsListsListQueryOptions = <TData = Awaited<ReturnType<typeof contactsListsList>>, TError = unknown>(params?: ContactsListsListParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof contactsListsList>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+export const getContactsListsListQueryOptions = <
+  TData = Awaited<ReturnType<typeof contactsListsList>>,
+  TError = unknown
+>(
+  params?: ContactsListsListParams,
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof contactsListsList>>, TError, TData>>;
+    request?: SecondParameter<typeof customFetch>;
+  }
 ) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
 
-const {query: queryOptions, request: requestOptions} = options ?? {};
+  const queryKey = queryOptions?.queryKey ?? getContactsListsListQueryKey(params);
 
-  const queryKey =  queryOptions?.queryKey ?? getContactsListsListQueryKey(params);
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof contactsListsList>>> = ({ signal }) =>
+    contactsListsList(params, { signal, ...requestOptions });
 
-  
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof contactsListsList>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof contactsListsList>>> = ({ signal }) => contactsListsList(params, { signal, ...requestOptions });
+export type ContactsListsListQueryResult = NonNullable<
+  Awaited<ReturnType<typeof contactsListsList>>
+>;
+export type ContactsListsListQueryError = unknown;
 
-      
-
-      
-
-   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof contactsListsList>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type ContactsListsListQueryResult = NonNullable<Awaited<ReturnType<typeof contactsListsList>>>
-export type ContactsListsListQueryError = unknown
-
-
-export function useContactsListsList<TData = Awaited<ReturnType<typeof contactsListsList>>, TError = unknown>(
- params: undefined |  ContactsListsListParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof contactsListsList>>, TError, TData>> & Pick<
+export function useContactsListsList<
+  TData = Awaited<ReturnType<typeof contactsListsList>>,
+  TError = unknown
+>(
+  params: undefined | ContactsListsListParams,
+  options: {
+    query: Partial<UseQueryOptions<Awaited<ReturnType<typeof contactsListsList>>, TError, TData>> &
+      Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof contactsListsList>>,
           TError,
           Awaited<ReturnType<typeof contactsListsList>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useContactsListsList<TData = Awaited<ReturnType<typeof contactsListsList>>, TError = unknown>(
- params?: ContactsListsListParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof contactsListsList>>, TError, TData>> & Pick<
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useContactsListsList<
+  TData = Awaited<ReturnType<typeof contactsListsList>>,
+  TError = unknown
+>(
+  params?: ContactsListsListParams,
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof contactsListsList>>, TError, TData>> &
+      Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof contactsListsList>>,
           TError,
           Awaited<ReturnType<typeof contactsListsList>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useContactsListsList<TData = Awaited<ReturnType<typeof contactsListsList>>, TError = unknown>(
- params?: ContactsListsListParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof contactsListsList>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useContactsListsList<
+  TData = Awaited<ReturnType<typeof contactsListsList>>,
+  TError = unknown
+>(
+  params?: ContactsListsListParams,
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof contactsListsList>>, TError, TData>>;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 /**
  * @summary List contact lists
  */
 
-export function useContactsListsList<TData = Awaited<ReturnType<typeof contactsListsList>>, TError = unknown>(
- params?: ContactsListsListParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof contactsListsList>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient 
- ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+export function useContactsListsList<
+  TData = Awaited<ReturnType<typeof contactsListsList>>,
+  TError = unknown
+>(
+  params?: ContactsListsListParams,
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof contactsListsList>>, TError, TData>>;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+  const queryOptions = getContactsListsListQueryOptions(params, options);
 
-  const queryOptions = getContactsListsListQueryOptions(params,options)
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+  };
 
-  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-
-  query.queryKey = queryOptions.queryKey ;
+  query.queryKey = queryOptions.queryKey;
 
   return query;
 }
-
-
-
-
 
 /**
  * @summary Create contact list
  */
 export type contactsListsCreateResponse201 = {
-  data: EmailList
-  status: 201
-}
-    
-export type contactsListsCreateResponseSuccess = (contactsListsCreateResponse201) & {
+  data: EmailList;
+  status: 201;
+};
+
+export type contactsListsCreateResponseSuccess = contactsListsCreateResponse201 & {
   headers: Headers;
 };
-;
 
-export type contactsListsCreateResponse = (contactsListsCreateResponseSuccess)
+export type contactsListsCreateResponse = contactsListsCreateResponseSuccess;
 
 export const getContactsListsCreateUrl = () => {
+  return `/api/contacts/lists/`;
+};
 
-
-  
-
-  return `/api/contacts/lists/`
-}
-
-export const contactsListsCreate = async (emailList: NonReadonly<EmailList>, options?: RequestInit): Promise<contactsListsCreateResponse> => {
-  
-  return customFetch<contactsListsCreateResponse>(getContactsListsCreateUrl(),
-  {      
+export const contactsListsCreate = async (
+  emailList: NonReadonly<EmailList>,
+  options?: RequestInit
+): Promise<contactsListsCreateResponse> => {
+  return customFetch<contactsListsCreateResponse>(getContactsListsCreateUrl(), {
     ...options,
     method: 'POST',
     headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(
-      emailList,)
-  }
-);}
+    body: JSON.stringify(emailList)
+  });
+};
 
+export const getContactsListsCreateMutationOptions = <
+  TError = unknown,
+  TContext = unknown
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof contactsListsCreate>>,
+    TError,
+    { data: NonReadonly<EmailList> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof contactsListsCreate>>,
+  TError,
+  { data: NonReadonly<EmailList> },
+  TContext
+> => {
+  const mutationKey = ['contactsListsCreate'];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
 
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof contactsListsCreate>>,
+    { data: NonReadonly<EmailList> }
+  > = (props) => {
+    const { data } = props ?? {};
 
+    return contactsListsCreate(data, requestOptions);
+  };
 
-export const getContactsListsCreateMutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof contactsListsCreate>>, TError,{data: NonReadonly<EmailList>}, TContext>, request?: SecondParameter<typeof customFetch>}
-): UseMutationOptions<Awaited<ReturnType<typeof contactsListsCreate>>, TError,{data: NonReadonly<EmailList>}, TContext> => {
+  return { mutationFn, ...mutationOptions };
+};
 
-const mutationKey = ['contactsListsCreate'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
+export type ContactsListsCreateMutationResult = NonNullable<
+  Awaited<ReturnType<typeof contactsListsCreate>>
+>;
+export type ContactsListsCreateMutationBody = NonReadonly<EmailList>;
+export type ContactsListsCreateMutationError = unknown;
 
-      
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof contactsListsCreate>>, {data: NonReadonly<EmailList>}> = (props) => {
-          const {data} = props ?? {};
-
-          return  contactsListsCreate(data,requestOptions)
-        }
-
-        
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type ContactsListsCreateMutationResult = NonNullable<Awaited<ReturnType<typeof contactsListsCreate>>>
-    export type ContactsListsCreateMutationBody = NonReadonly<EmailList>
-    export type ContactsListsCreateMutationError = unknown
-
-    /**
+/**
  * @summary Create contact list
  */
-export const useContactsListsCreate = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof contactsListsCreate>>, TError,{data: NonReadonly<EmailList>}, TContext>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof contactsListsCreate>>,
-        TError,
-        {data: NonReadonly<EmailList>},
-        TContext
-      > => {
+export const useContactsListsCreate = <TError = unknown, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof contactsListsCreate>>,
+      TError,
+      { data: NonReadonly<EmailList> },
+      TContext
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseMutationResult<
+  Awaited<ReturnType<typeof contactsListsCreate>>,
+  TError,
+  { data: NonReadonly<EmailList> },
+  TContext
+> => {
+  const mutationOptions = getContactsListsCreateMutationOptions(options);
 
-      const mutationOptions = getContactsListsCreateMutationOptions(options);
+  return useMutation(mutationOptions, queryClient);
+};
 
-      return useMutation(mutationOptions, queryClient);
-    }
-    
 /**
  * @summary List contacts by list id
  */
 export type contactsListsContactsListResponse200 = {
-  data: EmailContact[]
-  status: 200
-}
-    
-export type contactsListsContactsListResponseSuccess = (contactsListsContactsListResponse200) & {
+  data: EmailContact[];
+  status: 200;
+};
+
+export type contactsListsContactsListResponseSuccess = contactsListsContactsListResponse200 & {
   headers: Headers;
 };
-;
 
-export type contactsListsContactsListResponse = (contactsListsContactsListResponseSuccess)
+export type contactsListsContactsListResponse = contactsListsContactsListResponseSuccess;
 
-export const getContactsListsContactsListUrl = (listId: string,
-    params?: ContactsListsContactsListParams,) => {
+export const getContactsListsContactsListUrl = (
+  listId: string,
+  params?: ContactsListsContactsListParams
+) => {
   const normalizedParams = new URLSearchParams();
 
   Object.entries(params || {}).forEach(([key, value]) => {
-    
     if (value !== undefined) {
-      normalizedParams.append(key, value === null ? 'null' : value.toString())
+      normalizedParams.append(key, value === null ? 'null' : value.toString());
     }
   });
 
   const stringifiedParams = normalizedParams.toString();
 
-  return stringifiedParams.length > 0 ? `/api/contacts/lists/${listId}/contacts/?${stringifiedParams}` : `/api/contacts/lists/${listId}/contacts/`
-}
+  return stringifiedParams.length > 0
+    ? `/api/contacts/lists/${listId}/contacts/?${stringifiedParams}`
+    : `/api/contacts/lists/${listId}/contacts/`;
+};
 
-export const contactsListsContactsList = async (listId: string,
-    params?: ContactsListsContactsListParams, options?: RequestInit): Promise<contactsListsContactsListResponse> => {
-  
-  return customFetch<contactsListsContactsListResponse>(getContactsListsContactsListUrl(listId,params),
-  {      
-    ...options,
-    method: 'GET'
-    
-    
+export const contactsListsContactsList = async (
+  listId: string,
+  params?: ContactsListsContactsListParams,
+  options?: RequestInit
+): Promise<contactsListsContactsListResponse> => {
+  return customFetch<contactsListsContactsListResponse>(
+    getContactsListsContactsListUrl(listId, params),
+    {
+      ...options,
+      method: 'GET'
+    }
+  );
+};
+
+export const getContactsListsContactsListInfiniteQueryKey = (
+  listId?: string,
+  params?: ContactsListsContactsListParams
+) => {
+  return [
+    'infinite',
+    `/api/contacts/lists/${listId}/contacts/`,
+    ...(params ? [params] : [])
+  ] as const;
+};
+
+export const getContactsListsContactsListQueryKey = (
+  listId?: string,
+  params?: ContactsListsContactsListParams
+) => {
+  return [`/api/contacts/lists/${listId}/contacts/`, ...(params ? [params] : [])] as const;
+};
+
+export const getContactsListsContactsListInfiniteQueryOptions = <
+  TData = InfiniteData<Awaited<ReturnType<typeof contactsListsContactsList>>>,
+  TError = unknown
+>(
+  listId: string,
+  params?: ContactsListsContactsListParams,
+  options?: {
+    query?: Partial<
+      UseInfiniteQueryOptions<Awaited<ReturnType<typeof contactsListsContactsList>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof customFetch>;
   }
-);}
-
-
-
-
-
-export const getContactsListsContactsListInfiniteQueryKey = (listId?: string,
-    params?: ContactsListsContactsListParams,) => {
-    return [
-    'infinite', `/api/contacts/lists/${listId}/contacts/`, ...(params ? [params]: [])
-    ] as const;
-    }
-
-export const getContactsListsContactsListQueryKey = (listId?: string,
-    params?: ContactsListsContactsListParams,) => {
-    return [
-    `/api/contacts/lists/${listId}/contacts/`, ...(params ? [params]: [])
-    ] as const;
-    }
-
-    
-export const getContactsListsContactsListInfiniteQueryOptions = <TData = InfiniteData<Awaited<ReturnType<typeof contactsListsContactsList>>>, TError = unknown>(listId: string,
-    params?: ContactsListsContactsListParams, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof contactsListsContactsList>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
 ) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
 
-const {query: queryOptions, request: requestOptions} = options ?? {};
+  const queryKey =
+    queryOptions?.queryKey ?? getContactsListsContactsListInfiniteQueryKey(listId, params);
 
-  const queryKey =  queryOptions?.queryKey ?? getContactsListsContactsListInfiniteQueryKey(listId,params);
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof contactsListsContactsList>>> = ({
+    signal
+  }) => contactsListsContactsList(listId, params, { signal, ...requestOptions });
 
-  
+  return { queryKey, queryFn, enabled: !!listId, ...queryOptions } as UseInfiniteQueryOptions<
+    Awaited<ReturnType<typeof contactsListsContactsList>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof contactsListsContactsList>>> = ({ signal }) => contactsListsContactsList(listId,params, { signal, ...requestOptions });
+export type ContactsListsContactsListInfiniteQueryResult = NonNullable<
+  Awaited<ReturnType<typeof contactsListsContactsList>>
+>;
+export type ContactsListsContactsListInfiniteQueryError = unknown;
 
-      
-
-      
-
-   return  { queryKey, queryFn, enabled: !!(listId), ...queryOptions} as UseInfiniteQueryOptions<Awaited<ReturnType<typeof contactsListsContactsList>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type ContactsListsContactsListInfiniteQueryResult = NonNullable<Awaited<ReturnType<typeof contactsListsContactsList>>>
-export type ContactsListsContactsListInfiniteQueryError = unknown
-
-
-export function useContactsListsContactsListInfinite<TData = InfiniteData<Awaited<ReturnType<typeof contactsListsContactsList>>>, TError = unknown>(
- listId: string,
-    params: undefined |  ContactsListsContactsListParams, options: { query:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof contactsListsContactsList>>, TError, TData>> & Pick<
+export function useContactsListsContactsListInfinite<
+  TData = InfiniteData<Awaited<ReturnType<typeof contactsListsContactsList>>>,
+  TError = unknown
+>(
+  listId: string,
+  params: undefined | ContactsListsContactsListParams,
+  options: {
+    query: Partial<
+      UseInfiniteQueryOptions<Awaited<ReturnType<typeof contactsListsContactsList>>, TError, TData>
+    > &
+      Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof contactsListsContactsList>>,
           TError,
           Awaited<ReturnType<typeof contactsListsContactsList>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  DefinedUseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useContactsListsContactsListInfinite<TData = InfiniteData<Awaited<ReturnType<typeof contactsListsContactsList>>>, TError = unknown>(
- listId: string,
-    params?: ContactsListsContactsListParams, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof contactsListsContactsList>>, TError, TData>> & Pick<
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): DefinedUseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useContactsListsContactsListInfinite<
+  TData = InfiniteData<Awaited<ReturnType<typeof contactsListsContactsList>>>,
+  TError = unknown
+>(
+  listId: string,
+  params?: ContactsListsContactsListParams,
+  options?: {
+    query?: Partial<
+      UseInfiniteQueryOptions<Awaited<ReturnType<typeof contactsListsContactsList>>, TError, TData>
+    > &
+      Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof contactsListsContactsList>>,
           TError,
           Awaited<ReturnType<typeof contactsListsContactsList>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useContactsListsContactsListInfinite<TData = InfiniteData<Awaited<ReturnType<typeof contactsListsContactsList>>>, TError = unknown>(
- listId: string,
-    params?: ContactsListsContactsListParams, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof contactsListsContactsList>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useContactsListsContactsListInfinite<
+  TData = InfiniteData<Awaited<ReturnType<typeof contactsListsContactsList>>>,
+  TError = unknown
+>(
+  listId: string,
+  params?: ContactsListsContactsListParams,
+  options?: {
+    query?: Partial<
+      UseInfiniteQueryOptions<Awaited<ReturnType<typeof contactsListsContactsList>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 /**
  * @summary List contacts by list id
  */
 
-export function useContactsListsContactsListInfinite<TData = InfiniteData<Awaited<ReturnType<typeof contactsListsContactsList>>>, TError = unknown>(
- listId: string,
-    params?: ContactsListsContactsListParams, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof contactsListsContactsList>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient 
- ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+export function useContactsListsContactsListInfinite<
+  TData = InfiniteData<Awaited<ReturnType<typeof contactsListsContactsList>>>,
+  TError = unknown
+>(
+  listId: string,
+  params?: ContactsListsContactsListParams,
+  options?: {
+    query?: Partial<
+      UseInfiniteQueryOptions<Awaited<ReturnType<typeof contactsListsContactsList>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+  const queryOptions = getContactsListsContactsListInfiniteQueryOptions(listId, params, options);
 
-  const queryOptions = getContactsListsContactsListInfiniteQueryOptions(listId,params,options)
+  const query = useInfiniteQuery(queryOptions, queryClient) as UseInfiniteQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
 
-  const query = useInfiniteQuery(queryOptions, queryClient) as  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-
-  query.queryKey = queryOptions.queryKey ;
+  query.queryKey = queryOptions.queryKey;
 
   return query;
 }
 
-
-
-
-export const getContactsListsContactsListQueryOptions = <TData = Awaited<ReturnType<typeof contactsListsContactsList>>, TError = unknown>(listId: string,
-    params?: ContactsListsContactsListParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof contactsListsContactsList>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+export const getContactsListsContactsListQueryOptions = <
+  TData = Awaited<ReturnType<typeof contactsListsContactsList>>,
+  TError = unknown
+>(
+  listId: string,
+  params?: ContactsListsContactsListParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof contactsListsContactsList>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  }
 ) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
 
-const {query: queryOptions, request: requestOptions} = options ?? {};
+  const queryKey = queryOptions?.queryKey ?? getContactsListsContactsListQueryKey(listId, params);
 
-  const queryKey =  queryOptions?.queryKey ?? getContactsListsContactsListQueryKey(listId,params);
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof contactsListsContactsList>>> = ({
+    signal
+  }) => contactsListsContactsList(listId, params, { signal, ...requestOptions });
 
-  
+  return { queryKey, queryFn, enabled: !!listId, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof contactsListsContactsList>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof contactsListsContactsList>>> = ({ signal }) => contactsListsContactsList(listId,params, { signal, ...requestOptions });
+export type ContactsListsContactsListQueryResult = NonNullable<
+  Awaited<ReturnType<typeof contactsListsContactsList>>
+>;
+export type ContactsListsContactsListQueryError = unknown;
 
-      
-
-      
-
-   return  { queryKey, queryFn, enabled: !!(listId), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof contactsListsContactsList>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type ContactsListsContactsListQueryResult = NonNullable<Awaited<ReturnType<typeof contactsListsContactsList>>>
-export type ContactsListsContactsListQueryError = unknown
-
-
-export function useContactsListsContactsList<TData = Awaited<ReturnType<typeof contactsListsContactsList>>, TError = unknown>(
- listId: string,
-    params: undefined |  ContactsListsContactsListParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof contactsListsContactsList>>, TError, TData>> & Pick<
+export function useContactsListsContactsList<
+  TData = Awaited<ReturnType<typeof contactsListsContactsList>>,
+  TError = unknown
+>(
+  listId: string,
+  params: undefined | ContactsListsContactsListParams,
+  options: {
+    query: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof contactsListsContactsList>>, TError, TData>
+    > &
+      Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof contactsListsContactsList>>,
           TError,
           Awaited<ReturnType<typeof contactsListsContactsList>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useContactsListsContactsList<TData = Awaited<ReturnType<typeof contactsListsContactsList>>, TError = unknown>(
- listId: string,
-    params?: ContactsListsContactsListParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof contactsListsContactsList>>, TError, TData>> & Pick<
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useContactsListsContactsList<
+  TData = Awaited<ReturnType<typeof contactsListsContactsList>>,
+  TError = unknown
+>(
+  listId: string,
+  params?: ContactsListsContactsListParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof contactsListsContactsList>>, TError, TData>
+    > &
+      Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof contactsListsContactsList>>,
           TError,
           Awaited<ReturnType<typeof contactsListsContactsList>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useContactsListsContactsList<TData = Awaited<ReturnType<typeof contactsListsContactsList>>, TError = unknown>(
- listId: string,
-    params?: ContactsListsContactsListParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof contactsListsContactsList>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useContactsListsContactsList<
+  TData = Awaited<ReturnType<typeof contactsListsContactsList>>,
+  TError = unknown
+>(
+  listId: string,
+  params?: ContactsListsContactsListParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof contactsListsContactsList>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 /**
  * @summary List contacts by list id
  */
 
-export function useContactsListsContactsList<TData = Awaited<ReturnType<typeof contactsListsContactsList>>, TError = unknown>(
- listId: string,
-    params?: ContactsListsContactsListParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof contactsListsContactsList>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient 
- ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+export function useContactsListsContactsList<
+  TData = Awaited<ReturnType<typeof contactsListsContactsList>>,
+  TError = unknown
+>(
+  listId: string,
+  params?: ContactsListsContactsListParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof contactsListsContactsList>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+  const queryOptions = getContactsListsContactsListQueryOptions(listId, params, options);
 
-  const queryOptions = getContactsListsContactsListQueryOptions(listId,params,options)
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+  };
 
-  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-
-  query.queryKey = queryOptions.queryKey ;
+  query.queryKey = queryOptions.queryKey;
 
   return query;
 }
-
-
-
-
 
 /**
  * @summary Create contact in list
  */
 export type contactsListsContactsCreateResponse201 = {
-  data: EmailContact
-  status: 201
-}
-    
-export type contactsListsContactsCreateResponseSuccess = (contactsListsContactsCreateResponse201) & {
+  data: EmailContact;
+  status: 201;
+};
+
+export type contactsListsContactsCreateResponseSuccess = contactsListsContactsCreateResponse201 & {
   headers: Headers;
 };
-;
 
-export type contactsListsContactsCreateResponse = (contactsListsContactsCreateResponseSuccess)
+export type contactsListsContactsCreateResponse = contactsListsContactsCreateResponseSuccess;
 
-export const getContactsListsContactsCreateUrl = (listId: string,) => {
+export const getContactsListsContactsCreateUrl = (listId: string) => {
+  return `/api/contacts/lists/${listId}/contacts/`;
+};
 
+export const contactsListsContactsCreate = async (
+  listId: string,
+  emailContact: NonReadonly<EmailContact>,
+  options?: RequestInit
+): Promise<contactsListsContactsCreateResponse> => {
+  return customFetch<contactsListsContactsCreateResponse>(
+    getContactsListsContactsCreateUrl(listId),
+    {
+      ...options,
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', ...options?.headers },
+      body: JSON.stringify(emailContact)
+    }
+  );
+};
 
-  
+export const getContactsListsContactsCreateMutationOptions = <
+  TError = unknown,
+  TContext = unknown
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof contactsListsContactsCreate>>,
+    TError,
+    { listId: string; data: NonReadonly<EmailContact> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof contactsListsContactsCreate>>,
+  TError,
+  { listId: string; data: NonReadonly<EmailContact> },
+  TContext
+> => {
+  const mutationKey = ['contactsListsContactsCreate'];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
 
-  return `/api/contacts/lists/${listId}/contacts/`
-}
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof contactsListsContactsCreate>>,
+    { listId: string; data: NonReadonly<EmailContact> }
+  > = (props) => {
+    const { listId, data } = props ?? {};
 
-export const contactsListsContactsCreate = async (listId: string,
-    emailContact: NonReadonly<EmailContact>, options?: RequestInit): Promise<contactsListsContactsCreateResponse> => {
-  
-  return customFetch<contactsListsContactsCreateResponse>(getContactsListsContactsCreateUrl(listId),
-  {      
-    ...options,
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(
-      emailContact,)
-  }
-);}
+    return contactsListsContactsCreate(listId, data, requestOptions);
+  };
 
+  return { mutationFn, ...mutationOptions };
+};
 
+export type ContactsListsContactsCreateMutationResult = NonNullable<
+  Awaited<ReturnType<typeof contactsListsContactsCreate>>
+>;
+export type ContactsListsContactsCreateMutationBody = NonReadonly<EmailContact>;
+export type ContactsListsContactsCreateMutationError = unknown;
 
-
-export const getContactsListsContactsCreateMutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof contactsListsContactsCreate>>, TError,{listId: string;data: NonReadonly<EmailContact>}, TContext>, request?: SecondParameter<typeof customFetch>}
-): UseMutationOptions<Awaited<ReturnType<typeof contactsListsContactsCreate>>, TError,{listId: string;data: NonReadonly<EmailContact>}, TContext> => {
-
-const mutationKey = ['contactsListsContactsCreate'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
-
-      
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof contactsListsContactsCreate>>, {listId: string;data: NonReadonly<EmailContact>}> = (props) => {
-          const {listId,data} = props ?? {};
-
-          return  contactsListsContactsCreate(listId,data,requestOptions)
-        }
-
-        
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type ContactsListsContactsCreateMutationResult = NonNullable<Awaited<ReturnType<typeof contactsListsContactsCreate>>>
-    export type ContactsListsContactsCreateMutationBody = NonReadonly<EmailContact>
-    export type ContactsListsContactsCreateMutationError = unknown
-
-    /**
+/**
  * @summary Create contact in list
  */
-export const useContactsListsContactsCreate = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof contactsListsContactsCreate>>, TError,{listId: string;data: NonReadonly<EmailContact>}, TContext>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof contactsListsContactsCreate>>,
-        TError,
-        {listId: string;data: NonReadonly<EmailContact>},
-        TContext
-      > => {
+export const useContactsListsContactsCreate = <TError = unknown, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof contactsListsContactsCreate>>,
+      TError,
+      { listId: string; data: NonReadonly<EmailContact> },
+      TContext
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseMutationResult<
+  Awaited<ReturnType<typeof contactsListsContactsCreate>>,
+  TError,
+  { listId: string; data: NonReadonly<EmailContact> },
+  TContext
+> => {
+  const mutationOptions = getContactsListsContactsCreateMutationOptions(options);
 
-      const mutationOptions = getContactsListsContactsCreateMutationOptions(options);
+  return useMutation(mutationOptions, queryClient);
+};
 
-      return useMutation(mutationOptions, queryClient);
-    }
-    
 /**
  * @summary Patch contact by id in list
  */
 export type contactsListsContactsPartialUpdateResponse200 = {
-  data: EmailContact
-  status: 200
-}
-    
-export type contactsListsContactsPartialUpdateResponseSuccess = (contactsListsContactsPartialUpdateResponse200) & {
-  headers: Headers;
+  data: EmailContact;
+  status: 200;
 };
-;
 
-export type contactsListsContactsPartialUpdateResponse = (contactsListsContactsPartialUpdateResponseSuccess)
+export type contactsListsContactsPartialUpdateResponseSuccess =
+  contactsListsContactsPartialUpdateResponse200 & {
+    headers: Headers;
+  };
 
-export const getContactsListsContactsPartialUpdateUrl = (listId: string,
-    contactId: string,) => {
+export type contactsListsContactsPartialUpdateResponse =
+  contactsListsContactsPartialUpdateResponseSuccess;
 
+export const getContactsListsContactsPartialUpdateUrl = (listId: string, contactId: string) => {
+  return `/api/contacts/lists/${listId}/contacts/${contactId}/`;
+};
 
-  
+export const contactsListsContactsPartialUpdate = async (
+  listId: string,
+  contactId: string,
+  patchedEmailContact: NonReadonly<PatchedEmailContact>,
+  options?: RequestInit
+): Promise<contactsListsContactsPartialUpdateResponse> => {
+  return customFetch<contactsListsContactsPartialUpdateResponse>(
+    getContactsListsContactsPartialUpdateUrl(listId, contactId),
+    {
+      ...options,
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json', ...options?.headers },
+      body: JSON.stringify(patchedEmailContact)
+    }
+  );
+};
 
-  return `/api/contacts/lists/${listId}/contacts/${contactId}/`
-}
+export const getContactsListsContactsPartialUpdateMutationOptions = <
+  TError = unknown,
+  TContext = unknown
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof contactsListsContactsPartialUpdate>>,
+    TError,
+    { listId: string; contactId: string; data: NonReadonly<PatchedEmailContact> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof contactsListsContactsPartialUpdate>>,
+  TError,
+  { listId: string; contactId: string; data: NonReadonly<PatchedEmailContact> },
+  TContext
+> => {
+  const mutationKey = ['contactsListsContactsPartialUpdate'];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
 
-export const contactsListsContactsPartialUpdate = async (listId: string,
-    contactId: string,
-    patchedEmailContact: NonReadonly<PatchedEmailContact>, options?: RequestInit): Promise<contactsListsContactsPartialUpdateResponse> => {
-  
-  return customFetch<contactsListsContactsPartialUpdateResponse>(getContactsListsContactsPartialUpdateUrl(listId,contactId),
-  {      
-    ...options,
-    method: 'PATCH',
-    headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(
-      patchedEmailContact,)
-  }
-);}
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof contactsListsContactsPartialUpdate>>,
+    { listId: string; contactId: string; data: NonReadonly<PatchedEmailContact> }
+  > = (props) => {
+    const { listId, contactId, data } = props ?? {};
 
+    return contactsListsContactsPartialUpdate(listId, contactId, data, requestOptions);
+  };
 
+  return { mutationFn, ...mutationOptions };
+};
 
+export type ContactsListsContactsPartialUpdateMutationResult = NonNullable<
+  Awaited<ReturnType<typeof contactsListsContactsPartialUpdate>>
+>;
+export type ContactsListsContactsPartialUpdateMutationBody = NonReadonly<PatchedEmailContact>;
+export type ContactsListsContactsPartialUpdateMutationError = unknown;
 
-export const getContactsListsContactsPartialUpdateMutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof contactsListsContactsPartialUpdate>>, TError,{listId: string;contactId: string;data: NonReadonly<PatchedEmailContact>}, TContext>, request?: SecondParameter<typeof customFetch>}
-): UseMutationOptions<Awaited<ReturnType<typeof contactsListsContactsPartialUpdate>>, TError,{listId: string;contactId: string;data: NonReadonly<PatchedEmailContact>}, TContext> => {
-
-const mutationKey = ['contactsListsContactsPartialUpdate'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
-
-      
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof contactsListsContactsPartialUpdate>>, {listId: string;contactId: string;data: NonReadonly<PatchedEmailContact>}> = (props) => {
-          const {listId,contactId,data} = props ?? {};
-
-          return  contactsListsContactsPartialUpdate(listId,contactId,data,requestOptions)
-        }
-
-        
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type ContactsListsContactsPartialUpdateMutationResult = NonNullable<Awaited<ReturnType<typeof contactsListsContactsPartialUpdate>>>
-    export type ContactsListsContactsPartialUpdateMutationBody = NonReadonly<PatchedEmailContact>
-    export type ContactsListsContactsPartialUpdateMutationError = unknown
-
-    /**
+/**
  * @summary Patch contact by id in list
  */
-export const useContactsListsContactsPartialUpdate = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof contactsListsContactsPartialUpdate>>, TError,{listId: string;contactId: string;data: NonReadonly<PatchedEmailContact>}, TContext>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof contactsListsContactsPartialUpdate>>,
-        TError,
-        {listId: string;contactId: string;data: NonReadonly<PatchedEmailContact>},
-        TContext
-      > => {
+export const useContactsListsContactsPartialUpdate = <TError = unknown, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof contactsListsContactsPartialUpdate>>,
+      TError,
+      { listId: string; contactId: string; data: NonReadonly<PatchedEmailContact> },
+      TContext
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseMutationResult<
+  Awaited<ReturnType<typeof contactsListsContactsPartialUpdate>>,
+  TError,
+  { listId: string; contactId: string; data: NonReadonly<PatchedEmailContact> },
+  TContext
+> => {
+  const mutationOptions = getContactsListsContactsPartialUpdateMutationOptions(options);
 
-      const mutationOptions = getContactsListsContactsPartialUpdateMutationOptions(options);
+  return useMutation(mutationOptions, queryClient);
+};
 
-      return useMutation(mutationOptions, queryClient);
-    }
-    
 /**
  * @summary Delete contact by id in list
  */
 export type contactsListsContactsDestroyResponse204 = {
-  data: void
-  status: 204
-}
-    
-export type contactsListsContactsDestroyResponseSuccess = (contactsListsContactsDestroyResponse204) & {
-  headers: Headers;
+  data: void;
+  status: 204;
 };
-;
 
-export type contactsListsContactsDestroyResponse = (contactsListsContactsDestroyResponseSuccess)
+export type contactsListsContactsDestroyResponseSuccess =
+  contactsListsContactsDestroyResponse204 & {
+    headers: Headers;
+  };
 
-export const getContactsListsContactsDestroyUrl = (listId: string,
-    contactId: string,) => {
+export type contactsListsContactsDestroyResponse = contactsListsContactsDestroyResponseSuccess;
 
+export const getContactsListsContactsDestroyUrl = (listId: string, contactId: string) => {
+  return `/api/contacts/lists/${listId}/contacts/${contactId}/`;
+};
 
-  
+export const contactsListsContactsDestroy = async (
+  listId: string,
+  contactId: string,
+  options?: RequestInit
+): Promise<contactsListsContactsDestroyResponse> => {
+  return customFetch<contactsListsContactsDestroyResponse>(
+    getContactsListsContactsDestroyUrl(listId, contactId),
+    {
+      ...options,
+      method: 'DELETE'
+    }
+  );
+};
 
-  return `/api/contacts/lists/${listId}/contacts/${contactId}/`
-}
+export const getContactsListsContactsDestroyMutationOptions = <
+  TError = unknown,
+  TContext = unknown
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof contactsListsContactsDestroy>>,
+    TError,
+    { listId: string; contactId: string },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof contactsListsContactsDestroy>>,
+  TError,
+  { listId: string; contactId: string },
+  TContext
+> => {
+  const mutationKey = ['contactsListsContactsDestroy'];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
 
-export const contactsListsContactsDestroy = async (listId: string,
-    contactId: string, options?: RequestInit): Promise<contactsListsContactsDestroyResponse> => {
-  
-  return customFetch<contactsListsContactsDestroyResponse>(getContactsListsContactsDestroyUrl(listId,contactId),
-  {      
-    ...options,
-    method: 'DELETE'
-    
-    
-  }
-);}
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof contactsListsContactsDestroy>>,
+    { listId: string; contactId: string }
+  > = (props) => {
+    const { listId, contactId } = props ?? {};
 
+    return contactsListsContactsDestroy(listId, contactId, requestOptions);
+  };
 
+  return { mutationFn, ...mutationOptions };
+};
 
+export type ContactsListsContactsDestroyMutationResult = NonNullable<
+  Awaited<ReturnType<typeof contactsListsContactsDestroy>>
+>;
 
-export const getContactsListsContactsDestroyMutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof contactsListsContactsDestroy>>, TError,{listId: string;contactId: string}, TContext>, request?: SecondParameter<typeof customFetch>}
-): UseMutationOptions<Awaited<ReturnType<typeof contactsListsContactsDestroy>>, TError,{listId: string;contactId: string}, TContext> => {
+export type ContactsListsContactsDestroyMutationError = unknown;
 
-const mutationKey = ['contactsListsContactsDestroy'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
-
-      
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof contactsListsContactsDestroy>>, {listId: string;contactId: string}> = (props) => {
-          const {listId,contactId} = props ?? {};
-
-          return  contactsListsContactsDestroy(listId,contactId,requestOptions)
-        }
-
-        
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type ContactsListsContactsDestroyMutationResult = NonNullable<Awaited<ReturnType<typeof contactsListsContactsDestroy>>>
-    
-    export type ContactsListsContactsDestroyMutationError = unknown
-
-    /**
+/**
  * @summary Delete contact by id in list
  */
-export const useContactsListsContactsDestroy = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof contactsListsContactsDestroy>>, TError,{listId: string;contactId: string}, TContext>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof contactsListsContactsDestroy>>,
-        TError,
-        {listId: string;contactId: string},
-        TContext
-      > => {
+export const useContactsListsContactsDestroy = <TError = unknown, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof contactsListsContactsDestroy>>,
+      TError,
+      { listId: string; contactId: string },
+      TContext
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseMutationResult<
+  Awaited<ReturnType<typeof contactsListsContactsDestroy>>,
+  TError,
+  { listId: string; contactId: string },
+  TContext
+> => {
+  const mutationOptions = getContactsListsContactsDestroyMutationOptions(options);
 
-      const mutationOptions = getContactsListsContactsDestroyMutationOptions(options);
+  return useMutation(mutationOptions, queryClient);
+};
 
-      return useMutation(mutationOptions, queryClient);
-    }
-    
 /**
  * @summary Get contact list by id
  */
 export type contactsListsRetrieveResponse200 = {
-  data: EmailList
-  status: 200
-}
-    
-export type contactsListsRetrieveResponseSuccess = (contactsListsRetrieveResponse200) & {
+  data: EmailList;
+  status: 200;
+};
+
+export type contactsListsRetrieveResponseSuccess = contactsListsRetrieveResponse200 & {
   headers: Headers;
 };
-;
 
-export type contactsListsRetrieveResponse = (contactsListsRetrieveResponseSuccess)
+export type contactsListsRetrieveResponse = contactsListsRetrieveResponseSuccess;
 
-export const getContactsListsRetrieveUrl = (id: string,) => {
+export const getContactsListsRetrieveUrl = (id: string) => {
+  return `/api/contacts/lists/${id}/`;
+};
 
-
-  
-
-  return `/api/contacts/lists/${id}/`
-}
-
-export const contactsListsRetrieve = async (id: string, options?: RequestInit): Promise<contactsListsRetrieveResponse> => {
-  
-  return customFetch<contactsListsRetrieveResponse>(getContactsListsRetrieveUrl(id),
-  {      
+export const contactsListsRetrieve = async (
+  id: string,
+  options?: RequestInit
+): Promise<contactsListsRetrieveResponse> => {
+  return customFetch<contactsListsRetrieveResponse>(getContactsListsRetrieveUrl(id), {
     ...options,
     method: 'GET'
-    
-    
+  });
+};
+
+export const getContactsListsRetrieveInfiniteQueryKey = (id?: string) => {
+  return ['infinite', `/api/contacts/lists/${id}/`] as const;
+};
+
+export const getContactsListsRetrieveQueryKey = (id?: string) => {
+  return [`/api/contacts/lists/${id}/`] as const;
+};
+
+export const getContactsListsRetrieveInfiniteQueryOptions = <
+  TData = InfiniteData<Awaited<ReturnType<typeof contactsListsRetrieve>>>,
+  TError = unknown
+>(
+  id: string,
+  options?: {
+    query?: Partial<
+      UseInfiniteQueryOptions<Awaited<ReturnType<typeof contactsListsRetrieve>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof customFetch>;
   }
-);}
-
-
-
-
-
-export const getContactsListsRetrieveInfiniteQueryKey = (id?: string,) => {
-    return [
-    'infinite', `/api/contacts/lists/${id}/`
-    ] as const;
-    }
-
-export const getContactsListsRetrieveQueryKey = (id?: string,) => {
-    return [
-    `/api/contacts/lists/${id}/`
-    ] as const;
-    }
-
-    
-export const getContactsListsRetrieveInfiniteQueryOptions = <TData = InfiniteData<Awaited<ReturnType<typeof contactsListsRetrieve>>>, TError = unknown>(id: string, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof contactsListsRetrieve>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
 ) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
 
-const {query: queryOptions, request: requestOptions} = options ?? {};
+  const queryKey = queryOptions?.queryKey ?? getContactsListsRetrieveInfiniteQueryKey(id);
 
-  const queryKey =  queryOptions?.queryKey ?? getContactsListsRetrieveInfiniteQueryKey(id);
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof contactsListsRetrieve>>> = ({ signal }) =>
+    contactsListsRetrieve(id, { signal, ...requestOptions });
 
-  
+  return { queryKey, queryFn, enabled: !!id, ...queryOptions } as UseInfiniteQueryOptions<
+    Awaited<ReturnType<typeof contactsListsRetrieve>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof contactsListsRetrieve>>> = ({ signal }) => contactsListsRetrieve(id, { signal, ...requestOptions });
+export type ContactsListsRetrieveInfiniteQueryResult = NonNullable<
+  Awaited<ReturnType<typeof contactsListsRetrieve>>
+>;
+export type ContactsListsRetrieveInfiniteQueryError = unknown;
 
-      
-
-      
-
-   return  { queryKey, queryFn, enabled: !!(id), ...queryOptions} as UseInfiniteQueryOptions<Awaited<ReturnType<typeof contactsListsRetrieve>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type ContactsListsRetrieveInfiniteQueryResult = NonNullable<Awaited<ReturnType<typeof contactsListsRetrieve>>>
-export type ContactsListsRetrieveInfiniteQueryError = unknown
-
-
-export function useContactsListsRetrieveInfinite<TData = InfiniteData<Awaited<ReturnType<typeof contactsListsRetrieve>>>, TError = unknown>(
- id: string, options: { query:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof contactsListsRetrieve>>, TError, TData>> & Pick<
+export function useContactsListsRetrieveInfinite<
+  TData = InfiniteData<Awaited<ReturnType<typeof contactsListsRetrieve>>>,
+  TError = unknown
+>(
+  id: string,
+  options: {
+    query: Partial<
+      UseInfiniteQueryOptions<Awaited<ReturnType<typeof contactsListsRetrieve>>, TError, TData>
+    > &
+      Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof contactsListsRetrieve>>,
           TError,
           Awaited<ReturnType<typeof contactsListsRetrieve>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  DefinedUseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useContactsListsRetrieveInfinite<TData = InfiniteData<Awaited<ReturnType<typeof contactsListsRetrieve>>>, TError = unknown>(
- id: string, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof contactsListsRetrieve>>, TError, TData>> & Pick<
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): DefinedUseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useContactsListsRetrieveInfinite<
+  TData = InfiniteData<Awaited<ReturnType<typeof contactsListsRetrieve>>>,
+  TError = unknown
+>(
+  id: string,
+  options?: {
+    query?: Partial<
+      UseInfiniteQueryOptions<Awaited<ReturnType<typeof contactsListsRetrieve>>, TError, TData>
+    > &
+      Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof contactsListsRetrieve>>,
           TError,
           Awaited<ReturnType<typeof contactsListsRetrieve>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useContactsListsRetrieveInfinite<TData = InfiniteData<Awaited<ReturnType<typeof contactsListsRetrieve>>>, TError = unknown>(
- id: string, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof contactsListsRetrieve>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useContactsListsRetrieveInfinite<
+  TData = InfiniteData<Awaited<ReturnType<typeof contactsListsRetrieve>>>,
+  TError = unknown
+>(
+  id: string,
+  options?: {
+    query?: Partial<
+      UseInfiniteQueryOptions<Awaited<ReturnType<typeof contactsListsRetrieve>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 /**
  * @summary Get contact list by id
  */
 
-export function useContactsListsRetrieveInfinite<TData = InfiniteData<Awaited<ReturnType<typeof contactsListsRetrieve>>>, TError = unknown>(
- id: string, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof contactsListsRetrieve>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient 
- ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+export function useContactsListsRetrieveInfinite<
+  TData = InfiniteData<Awaited<ReturnType<typeof contactsListsRetrieve>>>,
+  TError = unknown
+>(
+  id: string,
+  options?: {
+    query?: Partial<
+      UseInfiniteQueryOptions<Awaited<ReturnType<typeof contactsListsRetrieve>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+  const queryOptions = getContactsListsRetrieveInfiniteQueryOptions(id, options);
 
-  const queryOptions = getContactsListsRetrieveInfiniteQueryOptions(id,options)
+  const query = useInfiniteQuery(queryOptions, queryClient) as UseInfiniteQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
 
-  const query = useInfiniteQuery(queryOptions, queryClient) as  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-
-  query.queryKey = queryOptions.queryKey ;
+  query.queryKey = queryOptions.queryKey;
 
   return query;
 }
 
-
-
-
-export const getContactsListsRetrieveQueryOptions = <TData = Awaited<ReturnType<typeof contactsListsRetrieve>>, TError = unknown>(id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof contactsListsRetrieve>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+export const getContactsListsRetrieveQueryOptions = <
+  TData = Awaited<ReturnType<typeof contactsListsRetrieve>>,
+  TError = unknown
+>(
+  id: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof contactsListsRetrieve>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  }
 ) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
 
-const {query: queryOptions, request: requestOptions} = options ?? {};
+  const queryKey = queryOptions?.queryKey ?? getContactsListsRetrieveQueryKey(id);
 
-  const queryKey =  queryOptions?.queryKey ?? getContactsListsRetrieveQueryKey(id);
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof contactsListsRetrieve>>> = ({ signal }) =>
+    contactsListsRetrieve(id, { signal, ...requestOptions });
 
-  
+  return { queryKey, queryFn, enabled: !!id, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof contactsListsRetrieve>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof contactsListsRetrieve>>> = ({ signal }) => contactsListsRetrieve(id, { signal, ...requestOptions });
+export type ContactsListsRetrieveQueryResult = NonNullable<
+  Awaited<ReturnType<typeof contactsListsRetrieve>>
+>;
+export type ContactsListsRetrieveQueryError = unknown;
 
-      
-
-      
-
-   return  { queryKey, queryFn, enabled: !!(id), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof contactsListsRetrieve>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type ContactsListsRetrieveQueryResult = NonNullable<Awaited<ReturnType<typeof contactsListsRetrieve>>>
-export type ContactsListsRetrieveQueryError = unknown
-
-
-export function useContactsListsRetrieve<TData = Awaited<ReturnType<typeof contactsListsRetrieve>>, TError = unknown>(
- id: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof contactsListsRetrieve>>, TError, TData>> & Pick<
+export function useContactsListsRetrieve<
+  TData = Awaited<ReturnType<typeof contactsListsRetrieve>>,
+  TError = unknown
+>(
+  id: string,
+  options: {
+    query: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof contactsListsRetrieve>>, TError, TData>
+    > &
+      Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof contactsListsRetrieve>>,
           TError,
           Awaited<ReturnType<typeof contactsListsRetrieve>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useContactsListsRetrieve<TData = Awaited<ReturnType<typeof contactsListsRetrieve>>, TError = unknown>(
- id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof contactsListsRetrieve>>, TError, TData>> & Pick<
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useContactsListsRetrieve<
+  TData = Awaited<ReturnType<typeof contactsListsRetrieve>>,
+  TError = unknown
+>(
+  id: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof contactsListsRetrieve>>, TError, TData>
+    > &
+      Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof contactsListsRetrieve>>,
           TError,
           Awaited<ReturnType<typeof contactsListsRetrieve>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useContactsListsRetrieve<TData = Awaited<ReturnType<typeof contactsListsRetrieve>>, TError = unknown>(
- id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof contactsListsRetrieve>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useContactsListsRetrieve<
+  TData = Awaited<ReturnType<typeof contactsListsRetrieve>>,
+  TError = unknown
+>(
+  id: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof contactsListsRetrieve>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 /**
  * @summary Get contact list by id
  */
 
-export function useContactsListsRetrieve<TData = Awaited<ReturnType<typeof contactsListsRetrieve>>, TError = unknown>(
- id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof contactsListsRetrieve>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient 
- ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+export function useContactsListsRetrieve<
+  TData = Awaited<ReturnType<typeof contactsListsRetrieve>>,
+  TError = unknown
+>(
+  id: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof contactsListsRetrieve>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+  const queryOptions = getContactsListsRetrieveQueryOptions(id, options);
 
-  const queryOptions = getContactsListsRetrieveQueryOptions(id,options)
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+  };
 
-  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-
-  query.queryKey = queryOptions.queryKey ;
+  query.queryKey = queryOptions.queryKey;
 
   return query;
 }
-
-
-
-
 
 /**
  * @summary Patch contact list by id
  */
 export type contactsListsPartialUpdateResponse200 = {
-  data: EmailList
-  status: 200
-}
-    
-export type contactsListsPartialUpdateResponseSuccess = (contactsListsPartialUpdateResponse200) & {
+  data: EmailList;
+  status: 200;
+};
+
+export type contactsListsPartialUpdateResponseSuccess = contactsListsPartialUpdateResponse200 & {
   headers: Headers;
 };
-;
 
-export type contactsListsPartialUpdateResponse = (contactsListsPartialUpdateResponseSuccess)
+export type contactsListsPartialUpdateResponse = contactsListsPartialUpdateResponseSuccess;
 
-export const getContactsListsPartialUpdateUrl = (id: string,) => {
+export const getContactsListsPartialUpdateUrl = (id: string) => {
+  return `/api/contacts/lists/${id}/`;
+};
 
-
-  
-
-  return `/api/contacts/lists/${id}/`
-}
-
-export const contactsListsPartialUpdate = async (id: string,
-    patchedEmailList: NonReadonly<PatchedEmailList>, options?: RequestInit): Promise<contactsListsPartialUpdateResponse> => {
-  
-  return customFetch<contactsListsPartialUpdateResponse>(getContactsListsPartialUpdateUrl(id),
-  {      
+export const contactsListsPartialUpdate = async (
+  id: string,
+  patchedEmailList: NonReadonly<PatchedEmailList>,
+  options?: RequestInit
+): Promise<contactsListsPartialUpdateResponse> => {
+  return customFetch<contactsListsPartialUpdateResponse>(getContactsListsPartialUpdateUrl(id), {
     ...options,
     method: 'PATCH',
     headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(
-      patchedEmailList,)
-  }
-);}
+    body: JSON.stringify(patchedEmailList)
+  });
+};
 
+export const getContactsListsPartialUpdateMutationOptions = <
+  TError = unknown,
+  TContext = unknown
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof contactsListsPartialUpdate>>,
+    TError,
+    { id: string; data: NonReadonly<PatchedEmailList> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof contactsListsPartialUpdate>>,
+  TError,
+  { id: string; data: NonReadonly<PatchedEmailList> },
+  TContext
+> => {
+  const mutationKey = ['contactsListsPartialUpdate'];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
 
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof contactsListsPartialUpdate>>,
+    { id: string; data: NonReadonly<PatchedEmailList> }
+  > = (props) => {
+    const { id, data } = props ?? {};
 
+    return contactsListsPartialUpdate(id, data, requestOptions);
+  };
 
-export const getContactsListsPartialUpdateMutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof contactsListsPartialUpdate>>, TError,{id: string;data: NonReadonly<PatchedEmailList>}, TContext>, request?: SecondParameter<typeof customFetch>}
-): UseMutationOptions<Awaited<ReturnType<typeof contactsListsPartialUpdate>>, TError,{id: string;data: NonReadonly<PatchedEmailList>}, TContext> => {
+  return { mutationFn, ...mutationOptions };
+};
 
-const mutationKey = ['contactsListsPartialUpdate'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
+export type ContactsListsPartialUpdateMutationResult = NonNullable<
+  Awaited<ReturnType<typeof contactsListsPartialUpdate>>
+>;
+export type ContactsListsPartialUpdateMutationBody = NonReadonly<PatchedEmailList>;
+export type ContactsListsPartialUpdateMutationError = unknown;
 
-      
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof contactsListsPartialUpdate>>, {id: string;data: NonReadonly<PatchedEmailList>}> = (props) => {
-          const {id,data} = props ?? {};
-
-          return  contactsListsPartialUpdate(id,data,requestOptions)
-        }
-
-        
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type ContactsListsPartialUpdateMutationResult = NonNullable<Awaited<ReturnType<typeof contactsListsPartialUpdate>>>
-    export type ContactsListsPartialUpdateMutationBody = NonReadonly<PatchedEmailList>
-    export type ContactsListsPartialUpdateMutationError = unknown
-
-    /**
+/**
  * @summary Patch contact list by id
  */
-export const useContactsListsPartialUpdate = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof contactsListsPartialUpdate>>, TError,{id: string;data: NonReadonly<PatchedEmailList>}, TContext>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof contactsListsPartialUpdate>>,
-        TError,
-        {id: string;data: NonReadonly<PatchedEmailList>},
-        TContext
-      > => {
+export const useContactsListsPartialUpdate = <TError = unknown, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof contactsListsPartialUpdate>>,
+      TError,
+      { id: string; data: NonReadonly<PatchedEmailList> },
+      TContext
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseMutationResult<
+  Awaited<ReturnType<typeof contactsListsPartialUpdate>>,
+  TError,
+  { id: string; data: NonReadonly<PatchedEmailList> },
+  TContext
+> => {
+  const mutationOptions = getContactsListsPartialUpdateMutationOptions(options);
 
-      const mutationOptions = getContactsListsPartialUpdateMutationOptions(options);
+  return useMutation(mutationOptions, queryClient);
+};
 
-      return useMutation(mutationOptions, queryClient);
-    }
-    
 /**
  * @summary Delete contact list by id
  */
 export type contactsListsDestroyResponse204 = {
-  data: void
-  status: 204
-}
-    
-export type contactsListsDestroyResponseSuccess = (contactsListsDestroyResponse204) & {
+  data: void;
+  status: 204;
+};
+
+export type contactsListsDestroyResponseSuccess = contactsListsDestroyResponse204 & {
   headers: Headers;
 };
-;
 
-export type contactsListsDestroyResponse = (contactsListsDestroyResponseSuccess)
+export type contactsListsDestroyResponse = contactsListsDestroyResponseSuccess;
 
-export const getContactsListsDestroyUrl = (id: string,) => {
+export const getContactsListsDestroyUrl = (id: string) => {
+  return `/api/contacts/lists/${id}/`;
+};
 
-
-  
-
-  return `/api/contacts/lists/${id}/`
-}
-
-export const contactsListsDestroy = async (id: string, options?: RequestInit): Promise<contactsListsDestroyResponse> => {
-  
-  return customFetch<contactsListsDestroyResponse>(getContactsListsDestroyUrl(id),
-  {      
+export const contactsListsDestroy = async (
+  id: string,
+  options?: RequestInit
+): Promise<contactsListsDestroyResponse> => {
+  return customFetch<contactsListsDestroyResponse>(getContactsListsDestroyUrl(id), {
     ...options,
     method: 'DELETE'
-    
-    
-  }
-);}
+  });
+};
 
+export const getContactsListsDestroyMutationOptions = <
+  TError = unknown,
+  TContext = unknown
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof contactsListsDestroy>>,
+    TError,
+    { id: string },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof contactsListsDestroy>>,
+  TError,
+  { id: string },
+  TContext
+> => {
+  const mutationKey = ['contactsListsDestroy'];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
 
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof contactsListsDestroy>>,
+    { id: string }
+  > = (props) => {
+    const { id } = props ?? {};
 
+    return contactsListsDestroy(id, requestOptions);
+  };
 
-export const getContactsListsDestroyMutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof contactsListsDestroy>>, TError,{id: string}, TContext>, request?: SecondParameter<typeof customFetch>}
-): UseMutationOptions<Awaited<ReturnType<typeof contactsListsDestroy>>, TError,{id: string}, TContext> => {
+  return { mutationFn, ...mutationOptions };
+};
 
-const mutationKey = ['contactsListsDestroy'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
+export type ContactsListsDestroyMutationResult = NonNullable<
+  Awaited<ReturnType<typeof contactsListsDestroy>>
+>;
 
-      
+export type ContactsListsDestroyMutationError = unknown;
 
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof contactsListsDestroy>>, {id: string}> = (props) => {
-          const {id} = props ?? {};
-
-          return  contactsListsDestroy(id,requestOptions)
-        }
-
-        
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type ContactsListsDestroyMutationResult = NonNullable<Awaited<ReturnType<typeof contactsListsDestroy>>>
-    
-    export type ContactsListsDestroyMutationError = unknown
-
-    /**
+/**
  * @summary Delete contact list by id
  */
-export const useContactsListsDestroy = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof contactsListsDestroy>>, TError,{id: string}, TContext>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof contactsListsDestroy>>,
-        TError,
-        {id: string},
-        TContext
-      > => {
+export const useContactsListsDestroy = <TError = unknown, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof contactsListsDestroy>>,
+      TError,
+      { id: string },
+      TContext
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseMutationResult<
+  Awaited<ReturnType<typeof contactsListsDestroy>>,
+  TError,
+  { id: string },
+  TContext
+> => {
+  const mutationOptions = getContactsListsDestroyMutationOptions(options);
 
-      const mutationOptions = getContactsListsDestroyMutationOptions(options);
+  return useMutation(mutationOptions, queryClient);
+};
 
-      return useMutation(mutationOptions, queryClient);
-    }
-    
 /**
  * @summary List email send logs
  */
 export type emailDeliveryLogsListResponse200 = {
-  data: EmailSendLog[]
-  status: 200
-}
-    
-export type emailDeliveryLogsListResponseSuccess = (emailDeliveryLogsListResponse200) & {
+  data: EmailSendLog[];
+  status: 200;
+};
+
+export type emailDeliveryLogsListResponseSuccess = emailDeliveryLogsListResponse200 & {
   headers: Headers;
 };
-;
 
-export type emailDeliveryLogsListResponse = (emailDeliveryLogsListResponseSuccess)
+export type emailDeliveryLogsListResponse = emailDeliveryLogsListResponseSuccess;
 
-export const getEmailDeliveryLogsListUrl = (params?: EmailDeliveryLogsListParams,) => {
+export const getEmailDeliveryLogsListUrl = (params?: EmailDeliveryLogsListParams) => {
   const normalizedParams = new URLSearchParams();
 
   Object.entries(params || {}).forEach(([key, value]) => {
-    
     if (value !== undefined) {
-      normalizedParams.append(key, value === null ? 'null' : value.toString())
+      normalizedParams.append(key, value === null ? 'null' : value.toString());
     }
   });
 
   const stringifiedParams = normalizedParams.toString();
 
-  return stringifiedParams.length > 0 ? `/api/email-delivery/logs/?${stringifiedParams}` : `/api/email-delivery/logs/`
-}
+  return stringifiedParams.length > 0
+    ? `/api/email-delivery/logs/?${stringifiedParams}`
+    : `/api/email-delivery/logs/`;
+};
 
-export const emailDeliveryLogsList = async (params?: EmailDeliveryLogsListParams, options?: RequestInit): Promise<emailDeliveryLogsListResponse> => {
-  
-  return customFetch<emailDeliveryLogsListResponse>(getEmailDeliveryLogsListUrl(params),
-  {      
+export const emailDeliveryLogsList = async (
+  params?: EmailDeliveryLogsListParams,
+  options?: RequestInit
+): Promise<emailDeliveryLogsListResponse> => {
+  return customFetch<emailDeliveryLogsListResponse>(getEmailDeliveryLogsListUrl(params), {
     ...options,
     method: 'GET'
-    
-    
+  });
+};
+
+export const getEmailDeliveryLogsListInfiniteQueryKey = (params?: EmailDeliveryLogsListParams) => {
+  return ['infinite', `/api/email-delivery/logs/`, ...(params ? [params] : [])] as const;
+};
+
+export const getEmailDeliveryLogsListQueryKey = (params?: EmailDeliveryLogsListParams) => {
+  return [`/api/email-delivery/logs/`, ...(params ? [params] : [])] as const;
+};
+
+export const getEmailDeliveryLogsListInfiniteQueryOptions = <
+  TData = InfiniteData<Awaited<ReturnType<typeof emailDeliveryLogsList>>>,
+  TError = unknown
+>(
+  params?: EmailDeliveryLogsListParams,
+  options?: {
+    query?: Partial<
+      UseInfiniteQueryOptions<Awaited<ReturnType<typeof emailDeliveryLogsList>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof customFetch>;
   }
-);}
-
-
-
-
-
-export const getEmailDeliveryLogsListInfiniteQueryKey = (params?: EmailDeliveryLogsListParams,) => {
-    return [
-    'infinite', `/api/email-delivery/logs/`, ...(params ? [params]: [])
-    ] as const;
-    }
-
-export const getEmailDeliveryLogsListQueryKey = (params?: EmailDeliveryLogsListParams,) => {
-    return [
-    `/api/email-delivery/logs/`, ...(params ? [params]: [])
-    ] as const;
-    }
-
-    
-export const getEmailDeliveryLogsListInfiniteQueryOptions = <TData = InfiniteData<Awaited<ReturnType<typeof emailDeliveryLogsList>>>, TError = unknown>(params?: EmailDeliveryLogsListParams, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof emailDeliveryLogsList>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
 ) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
 
-const {query: queryOptions, request: requestOptions} = options ?? {};
+  const queryKey = queryOptions?.queryKey ?? getEmailDeliveryLogsListInfiniteQueryKey(params);
 
-  const queryKey =  queryOptions?.queryKey ?? getEmailDeliveryLogsListInfiniteQueryKey(params);
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof emailDeliveryLogsList>>> = ({ signal }) =>
+    emailDeliveryLogsList(params, { signal, ...requestOptions });
 
-  
+  return { queryKey, queryFn, ...queryOptions } as UseInfiniteQueryOptions<
+    Awaited<ReturnType<typeof emailDeliveryLogsList>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof emailDeliveryLogsList>>> = ({ signal }) => emailDeliveryLogsList(params, { signal, ...requestOptions });
+export type EmailDeliveryLogsListInfiniteQueryResult = NonNullable<
+  Awaited<ReturnType<typeof emailDeliveryLogsList>>
+>;
+export type EmailDeliveryLogsListInfiniteQueryError = unknown;
 
-      
-
-      
-
-   return  { queryKey, queryFn, ...queryOptions} as UseInfiniteQueryOptions<Awaited<ReturnType<typeof emailDeliveryLogsList>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type EmailDeliveryLogsListInfiniteQueryResult = NonNullable<Awaited<ReturnType<typeof emailDeliveryLogsList>>>
-export type EmailDeliveryLogsListInfiniteQueryError = unknown
-
-
-export function useEmailDeliveryLogsListInfinite<TData = InfiniteData<Awaited<ReturnType<typeof emailDeliveryLogsList>>>, TError = unknown>(
- params: undefined |  EmailDeliveryLogsListParams, options: { query:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof emailDeliveryLogsList>>, TError, TData>> & Pick<
+export function useEmailDeliveryLogsListInfinite<
+  TData = InfiniteData<Awaited<ReturnType<typeof emailDeliveryLogsList>>>,
+  TError = unknown
+>(
+  params: undefined | EmailDeliveryLogsListParams,
+  options: {
+    query: Partial<
+      UseInfiniteQueryOptions<Awaited<ReturnType<typeof emailDeliveryLogsList>>, TError, TData>
+    > &
+      Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof emailDeliveryLogsList>>,
           TError,
           Awaited<ReturnType<typeof emailDeliveryLogsList>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  DefinedUseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useEmailDeliveryLogsListInfinite<TData = InfiniteData<Awaited<ReturnType<typeof emailDeliveryLogsList>>>, TError = unknown>(
- params?: EmailDeliveryLogsListParams, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof emailDeliveryLogsList>>, TError, TData>> & Pick<
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): DefinedUseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useEmailDeliveryLogsListInfinite<
+  TData = InfiniteData<Awaited<ReturnType<typeof emailDeliveryLogsList>>>,
+  TError = unknown
+>(
+  params?: EmailDeliveryLogsListParams,
+  options?: {
+    query?: Partial<
+      UseInfiniteQueryOptions<Awaited<ReturnType<typeof emailDeliveryLogsList>>, TError, TData>
+    > &
+      Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof emailDeliveryLogsList>>,
           TError,
           Awaited<ReturnType<typeof emailDeliveryLogsList>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useEmailDeliveryLogsListInfinite<TData = InfiniteData<Awaited<ReturnType<typeof emailDeliveryLogsList>>>, TError = unknown>(
- params?: EmailDeliveryLogsListParams, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof emailDeliveryLogsList>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useEmailDeliveryLogsListInfinite<
+  TData = InfiniteData<Awaited<ReturnType<typeof emailDeliveryLogsList>>>,
+  TError = unknown
+>(
+  params?: EmailDeliveryLogsListParams,
+  options?: {
+    query?: Partial<
+      UseInfiniteQueryOptions<Awaited<ReturnType<typeof emailDeliveryLogsList>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 /**
  * @summary List email send logs
  */
 
-export function useEmailDeliveryLogsListInfinite<TData = InfiniteData<Awaited<ReturnType<typeof emailDeliveryLogsList>>>, TError = unknown>(
- params?: EmailDeliveryLogsListParams, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof emailDeliveryLogsList>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient 
- ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+export function useEmailDeliveryLogsListInfinite<
+  TData = InfiniteData<Awaited<ReturnType<typeof emailDeliveryLogsList>>>,
+  TError = unknown
+>(
+  params?: EmailDeliveryLogsListParams,
+  options?: {
+    query?: Partial<
+      UseInfiniteQueryOptions<Awaited<ReturnType<typeof emailDeliveryLogsList>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+  const queryOptions = getEmailDeliveryLogsListInfiniteQueryOptions(params, options);
 
-  const queryOptions = getEmailDeliveryLogsListInfiniteQueryOptions(params,options)
+  const query = useInfiniteQuery(queryOptions, queryClient) as UseInfiniteQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
 
-  const query = useInfiniteQuery(queryOptions, queryClient) as  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-
-  query.queryKey = queryOptions.queryKey ;
+  query.queryKey = queryOptions.queryKey;
 
   return query;
 }
 
-
-
-
-export const getEmailDeliveryLogsListQueryOptions = <TData = Awaited<ReturnType<typeof emailDeliveryLogsList>>, TError = unknown>(params?: EmailDeliveryLogsListParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof emailDeliveryLogsList>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+export const getEmailDeliveryLogsListQueryOptions = <
+  TData = Awaited<ReturnType<typeof emailDeliveryLogsList>>,
+  TError = unknown
+>(
+  params?: EmailDeliveryLogsListParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof emailDeliveryLogsList>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  }
 ) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
 
-const {query: queryOptions, request: requestOptions} = options ?? {};
+  const queryKey = queryOptions?.queryKey ?? getEmailDeliveryLogsListQueryKey(params);
 
-  const queryKey =  queryOptions?.queryKey ?? getEmailDeliveryLogsListQueryKey(params);
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof emailDeliveryLogsList>>> = ({ signal }) =>
+    emailDeliveryLogsList(params, { signal, ...requestOptions });
 
-  
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof emailDeliveryLogsList>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof emailDeliveryLogsList>>> = ({ signal }) => emailDeliveryLogsList(params, { signal, ...requestOptions });
+export type EmailDeliveryLogsListQueryResult = NonNullable<
+  Awaited<ReturnType<typeof emailDeliveryLogsList>>
+>;
+export type EmailDeliveryLogsListQueryError = unknown;
 
-      
-
-      
-
-   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof emailDeliveryLogsList>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type EmailDeliveryLogsListQueryResult = NonNullable<Awaited<ReturnType<typeof emailDeliveryLogsList>>>
-export type EmailDeliveryLogsListQueryError = unknown
-
-
-export function useEmailDeliveryLogsList<TData = Awaited<ReturnType<typeof emailDeliveryLogsList>>, TError = unknown>(
- params: undefined |  EmailDeliveryLogsListParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof emailDeliveryLogsList>>, TError, TData>> & Pick<
+export function useEmailDeliveryLogsList<
+  TData = Awaited<ReturnType<typeof emailDeliveryLogsList>>,
+  TError = unknown
+>(
+  params: undefined | EmailDeliveryLogsListParams,
+  options: {
+    query: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof emailDeliveryLogsList>>, TError, TData>
+    > &
+      Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof emailDeliveryLogsList>>,
           TError,
           Awaited<ReturnType<typeof emailDeliveryLogsList>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useEmailDeliveryLogsList<TData = Awaited<ReturnType<typeof emailDeliveryLogsList>>, TError = unknown>(
- params?: EmailDeliveryLogsListParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof emailDeliveryLogsList>>, TError, TData>> & Pick<
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useEmailDeliveryLogsList<
+  TData = Awaited<ReturnType<typeof emailDeliveryLogsList>>,
+  TError = unknown
+>(
+  params?: EmailDeliveryLogsListParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof emailDeliveryLogsList>>, TError, TData>
+    > &
+      Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof emailDeliveryLogsList>>,
           TError,
           Awaited<ReturnType<typeof emailDeliveryLogsList>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useEmailDeliveryLogsList<TData = Awaited<ReturnType<typeof emailDeliveryLogsList>>, TError = unknown>(
- params?: EmailDeliveryLogsListParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof emailDeliveryLogsList>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useEmailDeliveryLogsList<
+  TData = Awaited<ReturnType<typeof emailDeliveryLogsList>>,
+  TError = unknown
+>(
+  params?: EmailDeliveryLogsListParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof emailDeliveryLogsList>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 /**
  * @summary List email send logs
  */
 
-export function useEmailDeliveryLogsList<TData = Awaited<ReturnType<typeof emailDeliveryLogsList>>, TError = unknown>(
- params?: EmailDeliveryLogsListParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof emailDeliveryLogsList>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient 
- ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+export function useEmailDeliveryLogsList<
+  TData = Awaited<ReturnType<typeof emailDeliveryLogsList>>,
+  TError = unknown
+>(
+  params?: EmailDeliveryLogsListParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof emailDeliveryLogsList>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+  const queryOptions = getEmailDeliveryLogsListQueryOptions(params, options);
 
-  const queryOptions = getEmailDeliveryLogsListQueryOptions(params,options)
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+  };
 
-  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-
-  query.queryKey = queryOptions.queryKey ;
+  query.queryKey = queryOptions.queryKey;
 
   return query;
 }
-
-
-
-
 
 /**
  * @summary Get email send log by id
  */
 export type emailDeliveryLogsRetrieveResponse200 = {
-  data: EmailSendLog
-  status: 200
-}
-    
-export type emailDeliveryLogsRetrieveResponseSuccess = (emailDeliveryLogsRetrieveResponse200) & {
+  data: EmailSendLog;
+  status: 200;
+};
+
+export type emailDeliveryLogsRetrieveResponseSuccess = emailDeliveryLogsRetrieveResponse200 & {
   headers: Headers;
 };
-;
 
-export type emailDeliveryLogsRetrieveResponse = (emailDeliveryLogsRetrieveResponseSuccess)
+export type emailDeliveryLogsRetrieveResponse = emailDeliveryLogsRetrieveResponseSuccess;
 
-export const getEmailDeliveryLogsRetrieveUrl = (id: string,) => {
+export const getEmailDeliveryLogsRetrieveUrl = (id: string) => {
+  return `/api/email-delivery/logs/${id}/`;
+};
 
-
-  
-
-  return `/api/email-delivery/logs/${id}/`
-}
-
-export const emailDeliveryLogsRetrieve = async (id: string, options?: RequestInit): Promise<emailDeliveryLogsRetrieveResponse> => {
-  
-  return customFetch<emailDeliveryLogsRetrieveResponse>(getEmailDeliveryLogsRetrieveUrl(id),
-  {      
+export const emailDeliveryLogsRetrieve = async (
+  id: string,
+  options?: RequestInit
+): Promise<emailDeliveryLogsRetrieveResponse> => {
+  return customFetch<emailDeliveryLogsRetrieveResponse>(getEmailDeliveryLogsRetrieveUrl(id), {
     ...options,
     method: 'GET'
-    
-    
+  });
+};
+
+export const getEmailDeliveryLogsRetrieveInfiniteQueryKey = (id?: string) => {
+  return ['infinite', `/api/email-delivery/logs/${id}/`] as const;
+};
+
+export const getEmailDeliveryLogsRetrieveQueryKey = (id?: string) => {
+  return [`/api/email-delivery/logs/${id}/`] as const;
+};
+
+export const getEmailDeliveryLogsRetrieveInfiniteQueryOptions = <
+  TData = InfiniteData<Awaited<ReturnType<typeof emailDeliveryLogsRetrieve>>>,
+  TError = unknown
+>(
+  id: string,
+  options?: {
+    query?: Partial<
+      UseInfiniteQueryOptions<Awaited<ReturnType<typeof emailDeliveryLogsRetrieve>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof customFetch>;
   }
-);}
-
-
-
-
-
-export const getEmailDeliveryLogsRetrieveInfiniteQueryKey = (id?: string,) => {
-    return [
-    'infinite', `/api/email-delivery/logs/${id}/`
-    ] as const;
-    }
-
-export const getEmailDeliveryLogsRetrieveQueryKey = (id?: string,) => {
-    return [
-    `/api/email-delivery/logs/${id}/`
-    ] as const;
-    }
-
-    
-export const getEmailDeliveryLogsRetrieveInfiniteQueryOptions = <TData = InfiniteData<Awaited<ReturnType<typeof emailDeliveryLogsRetrieve>>>, TError = unknown>(id: string, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof emailDeliveryLogsRetrieve>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
 ) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
 
-const {query: queryOptions, request: requestOptions} = options ?? {};
+  const queryKey = queryOptions?.queryKey ?? getEmailDeliveryLogsRetrieveInfiniteQueryKey(id);
 
-  const queryKey =  queryOptions?.queryKey ?? getEmailDeliveryLogsRetrieveInfiniteQueryKey(id);
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof emailDeliveryLogsRetrieve>>> = ({
+    signal
+  }) => emailDeliveryLogsRetrieve(id, { signal, ...requestOptions });
 
-  
+  return { queryKey, queryFn, enabled: !!id, ...queryOptions } as UseInfiniteQueryOptions<
+    Awaited<ReturnType<typeof emailDeliveryLogsRetrieve>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof emailDeliveryLogsRetrieve>>> = ({ signal }) => emailDeliveryLogsRetrieve(id, { signal, ...requestOptions });
+export type EmailDeliveryLogsRetrieveInfiniteQueryResult = NonNullable<
+  Awaited<ReturnType<typeof emailDeliveryLogsRetrieve>>
+>;
+export type EmailDeliveryLogsRetrieveInfiniteQueryError = unknown;
 
-      
-
-      
-
-   return  { queryKey, queryFn, enabled: !!(id), ...queryOptions} as UseInfiniteQueryOptions<Awaited<ReturnType<typeof emailDeliveryLogsRetrieve>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type EmailDeliveryLogsRetrieveInfiniteQueryResult = NonNullable<Awaited<ReturnType<typeof emailDeliveryLogsRetrieve>>>
-export type EmailDeliveryLogsRetrieveInfiniteQueryError = unknown
-
-
-export function useEmailDeliveryLogsRetrieveInfinite<TData = InfiniteData<Awaited<ReturnType<typeof emailDeliveryLogsRetrieve>>>, TError = unknown>(
- id: string, options: { query:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof emailDeliveryLogsRetrieve>>, TError, TData>> & Pick<
+export function useEmailDeliveryLogsRetrieveInfinite<
+  TData = InfiniteData<Awaited<ReturnType<typeof emailDeliveryLogsRetrieve>>>,
+  TError = unknown
+>(
+  id: string,
+  options: {
+    query: Partial<
+      UseInfiniteQueryOptions<Awaited<ReturnType<typeof emailDeliveryLogsRetrieve>>, TError, TData>
+    > &
+      Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof emailDeliveryLogsRetrieve>>,
           TError,
           Awaited<ReturnType<typeof emailDeliveryLogsRetrieve>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  DefinedUseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useEmailDeliveryLogsRetrieveInfinite<TData = InfiniteData<Awaited<ReturnType<typeof emailDeliveryLogsRetrieve>>>, TError = unknown>(
- id: string, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof emailDeliveryLogsRetrieve>>, TError, TData>> & Pick<
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): DefinedUseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useEmailDeliveryLogsRetrieveInfinite<
+  TData = InfiniteData<Awaited<ReturnType<typeof emailDeliveryLogsRetrieve>>>,
+  TError = unknown
+>(
+  id: string,
+  options?: {
+    query?: Partial<
+      UseInfiniteQueryOptions<Awaited<ReturnType<typeof emailDeliveryLogsRetrieve>>, TError, TData>
+    > &
+      Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof emailDeliveryLogsRetrieve>>,
           TError,
           Awaited<ReturnType<typeof emailDeliveryLogsRetrieve>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useEmailDeliveryLogsRetrieveInfinite<TData = InfiniteData<Awaited<ReturnType<typeof emailDeliveryLogsRetrieve>>>, TError = unknown>(
- id: string, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof emailDeliveryLogsRetrieve>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useEmailDeliveryLogsRetrieveInfinite<
+  TData = InfiniteData<Awaited<ReturnType<typeof emailDeliveryLogsRetrieve>>>,
+  TError = unknown
+>(
+  id: string,
+  options?: {
+    query?: Partial<
+      UseInfiniteQueryOptions<Awaited<ReturnType<typeof emailDeliveryLogsRetrieve>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 /**
  * @summary Get email send log by id
  */
 
-export function useEmailDeliveryLogsRetrieveInfinite<TData = InfiniteData<Awaited<ReturnType<typeof emailDeliveryLogsRetrieve>>>, TError = unknown>(
- id: string, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof emailDeliveryLogsRetrieve>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient 
- ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+export function useEmailDeliveryLogsRetrieveInfinite<
+  TData = InfiniteData<Awaited<ReturnType<typeof emailDeliveryLogsRetrieve>>>,
+  TError = unknown
+>(
+  id: string,
+  options?: {
+    query?: Partial<
+      UseInfiniteQueryOptions<Awaited<ReturnType<typeof emailDeliveryLogsRetrieve>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+  const queryOptions = getEmailDeliveryLogsRetrieveInfiniteQueryOptions(id, options);
 
-  const queryOptions = getEmailDeliveryLogsRetrieveInfiniteQueryOptions(id,options)
+  const query = useInfiniteQuery(queryOptions, queryClient) as UseInfiniteQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
 
-  const query = useInfiniteQuery(queryOptions, queryClient) as  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-
-  query.queryKey = queryOptions.queryKey ;
+  query.queryKey = queryOptions.queryKey;
 
   return query;
 }
 
-
-
-
-export const getEmailDeliveryLogsRetrieveQueryOptions = <TData = Awaited<ReturnType<typeof emailDeliveryLogsRetrieve>>, TError = unknown>(id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof emailDeliveryLogsRetrieve>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+export const getEmailDeliveryLogsRetrieveQueryOptions = <
+  TData = Awaited<ReturnType<typeof emailDeliveryLogsRetrieve>>,
+  TError = unknown
+>(
+  id: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof emailDeliveryLogsRetrieve>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  }
 ) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
 
-const {query: queryOptions, request: requestOptions} = options ?? {};
+  const queryKey = queryOptions?.queryKey ?? getEmailDeliveryLogsRetrieveQueryKey(id);
 
-  const queryKey =  queryOptions?.queryKey ?? getEmailDeliveryLogsRetrieveQueryKey(id);
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof emailDeliveryLogsRetrieve>>> = ({
+    signal
+  }) => emailDeliveryLogsRetrieve(id, { signal, ...requestOptions });
 
-  
+  return { queryKey, queryFn, enabled: !!id, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof emailDeliveryLogsRetrieve>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof emailDeliveryLogsRetrieve>>> = ({ signal }) => emailDeliveryLogsRetrieve(id, { signal, ...requestOptions });
+export type EmailDeliveryLogsRetrieveQueryResult = NonNullable<
+  Awaited<ReturnType<typeof emailDeliveryLogsRetrieve>>
+>;
+export type EmailDeliveryLogsRetrieveQueryError = unknown;
 
-      
-
-      
-
-   return  { queryKey, queryFn, enabled: !!(id), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof emailDeliveryLogsRetrieve>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type EmailDeliveryLogsRetrieveQueryResult = NonNullable<Awaited<ReturnType<typeof emailDeliveryLogsRetrieve>>>
-export type EmailDeliveryLogsRetrieveQueryError = unknown
-
-
-export function useEmailDeliveryLogsRetrieve<TData = Awaited<ReturnType<typeof emailDeliveryLogsRetrieve>>, TError = unknown>(
- id: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof emailDeliveryLogsRetrieve>>, TError, TData>> & Pick<
+export function useEmailDeliveryLogsRetrieve<
+  TData = Awaited<ReturnType<typeof emailDeliveryLogsRetrieve>>,
+  TError = unknown
+>(
+  id: string,
+  options: {
+    query: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof emailDeliveryLogsRetrieve>>, TError, TData>
+    > &
+      Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof emailDeliveryLogsRetrieve>>,
           TError,
           Awaited<ReturnType<typeof emailDeliveryLogsRetrieve>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useEmailDeliveryLogsRetrieve<TData = Awaited<ReturnType<typeof emailDeliveryLogsRetrieve>>, TError = unknown>(
- id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof emailDeliveryLogsRetrieve>>, TError, TData>> & Pick<
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useEmailDeliveryLogsRetrieve<
+  TData = Awaited<ReturnType<typeof emailDeliveryLogsRetrieve>>,
+  TError = unknown
+>(
+  id: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof emailDeliveryLogsRetrieve>>, TError, TData>
+    > &
+      Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof emailDeliveryLogsRetrieve>>,
           TError,
           Awaited<ReturnType<typeof emailDeliveryLogsRetrieve>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useEmailDeliveryLogsRetrieve<TData = Awaited<ReturnType<typeof emailDeliveryLogsRetrieve>>, TError = unknown>(
- id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof emailDeliveryLogsRetrieve>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useEmailDeliveryLogsRetrieve<
+  TData = Awaited<ReturnType<typeof emailDeliveryLogsRetrieve>>,
+  TError = unknown
+>(
+  id: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof emailDeliveryLogsRetrieve>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 /**
  * @summary Get email send log by id
  */
 
-export function useEmailDeliveryLogsRetrieve<TData = Awaited<ReturnType<typeof emailDeliveryLogsRetrieve>>, TError = unknown>(
- id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof emailDeliveryLogsRetrieve>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient 
- ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+export function useEmailDeliveryLogsRetrieve<
+  TData = Awaited<ReturnType<typeof emailDeliveryLogsRetrieve>>,
+  TError = unknown
+>(
+  id: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof emailDeliveryLogsRetrieve>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+  const queryOptions = getEmailDeliveryLogsRetrieveQueryOptions(id, options);
 
-  const queryOptions = getEmailDeliveryLogsRetrieveQueryOptions(id,options)
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+  };
 
-  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-
-  query.queryKey = queryOptions.queryKey ;
+  query.queryKey = queryOptions.queryKey;
 
   return query;
 }
-
-
-
-
 
 /**
  * @summary Retry failed email send
  */
 export type emailDeliveryLogsRetryCreateResponse200 = {
-  data: EmailSendLog
-  status: 200
-}
-    
-export type emailDeliveryLogsRetryCreateResponseSuccess = (emailDeliveryLogsRetryCreateResponse200) & {
-  headers: Headers;
+  data: EmailSendLog;
+  status: 200;
 };
-;
 
-export type emailDeliveryLogsRetryCreateResponse = (emailDeliveryLogsRetryCreateResponseSuccess)
+export type emailDeliveryLogsRetryCreateResponseSuccess =
+  emailDeliveryLogsRetryCreateResponse200 & {
+    headers: Headers;
+  };
 
-export const getEmailDeliveryLogsRetryCreateUrl = (id: string,) => {
+export type emailDeliveryLogsRetryCreateResponse = emailDeliveryLogsRetryCreateResponseSuccess;
 
+export const getEmailDeliveryLogsRetryCreateUrl = (id: string) => {
+  return `/api/email-delivery/logs/${id}/retry/`;
+};
 
-  
-
-  return `/api/email-delivery/logs/${id}/retry/`
-}
-
-export const emailDeliveryLogsRetryCreate = async (id: string,
-    emailSendLog: NonReadonly<EmailSendLog>, options?: RequestInit): Promise<emailDeliveryLogsRetryCreateResponse> => {
-  
-  return customFetch<emailDeliveryLogsRetryCreateResponse>(getEmailDeliveryLogsRetryCreateUrl(id),
-  {      
+export const emailDeliveryLogsRetryCreate = async (
+  id: string,
+  emailSendLog: NonReadonly<EmailSendLog>,
+  options?: RequestInit
+): Promise<emailDeliveryLogsRetryCreateResponse> => {
+  return customFetch<emailDeliveryLogsRetryCreateResponse>(getEmailDeliveryLogsRetryCreateUrl(id), {
     ...options,
     method: 'POST',
     headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(
-      emailSendLog,)
-  }
-);}
+    body: JSON.stringify(emailSendLog)
+  });
+};
 
+export const getEmailDeliveryLogsRetryCreateMutationOptions = <
+  TError = unknown,
+  TContext = unknown
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof emailDeliveryLogsRetryCreate>>,
+    TError,
+    { id: string; data: NonReadonly<EmailSendLog> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof emailDeliveryLogsRetryCreate>>,
+  TError,
+  { id: string; data: NonReadonly<EmailSendLog> },
+  TContext
+> => {
+  const mutationKey = ['emailDeliveryLogsRetryCreate'];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
 
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof emailDeliveryLogsRetryCreate>>,
+    { id: string; data: NonReadonly<EmailSendLog> }
+  > = (props) => {
+    const { id, data } = props ?? {};
 
+    return emailDeliveryLogsRetryCreate(id, data, requestOptions);
+  };
 
-export const getEmailDeliveryLogsRetryCreateMutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof emailDeliveryLogsRetryCreate>>, TError,{id: string;data: NonReadonly<EmailSendLog>}, TContext>, request?: SecondParameter<typeof customFetch>}
-): UseMutationOptions<Awaited<ReturnType<typeof emailDeliveryLogsRetryCreate>>, TError,{id: string;data: NonReadonly<EmailSendLog>}, TContext> => {
+  return { mutationFn, ...mutationOptions };
+};
 
-const mutationKey = ['emailDeliveryLogsRetryCreate'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
+export type EmailDeliveryLogsRetryCreateMutationResult = NonNullable<
+  Awaited<ReturnType<typeof emailDeliveryLogsRetryCreate>>
+>;
+export type EmailDeliveryLogsRetryCreateMutationBody = NonReadonly<EmailSendLog>;
+export type EmailDeliveryLogsRetryCreateMutationError = unknown;
 
-      
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof emailDeliveryLogsRetryCreate>>, {id: string;data: NonReadonly<EmailSendLog>}> = (props) => {
-          const {id,data} = props ?? {};
-
-          return  emailDeliveryLogsRetryCreate(id,data,requestOptions)
-        }
-
-        
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type EmailDeliveryLogsRetryCreateMutationResult = NonNullable<Awaited<ReturnType<typeof emailDeliveryLogsRetryCreate>>>
-    export type EmailDeliveryLogsRetryCreateMutationBody = NonReadonly<EmailSendLog>
-    export type EmailDeliveryLogsRetryCreateMutationError = unknown
-
-    /**
+/**
  * @summary Retry failed email send
  */
-export const useEmailDeliveryLogsRetryCreate = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof emailDeliveryLogsRetryCreate>>, TError,{id: string;data: NonReadonly<EmailSendLog>}, TContext>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof emailDeliveryLogsRetryCreate>>,
-        TError,
-        {id: string;data: NonReadonly<EmailSendLog>},
-        TContext
-      > => {
+export const useEmailDeliveryLogsRetryCreate = <TError = unknown, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof emailDeliveryLogsRetryCreate>>,
+      TError,
+      { id: string; data: NonReadonly<EmailSendLog> },
+      TContext
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseMutationResult<
+  Awaited<ReturnType<typeof emailDeliveryLogsRetryCreate>>,
+  TError,
+  { id: string; data: NonReadonly<EmailSendLog> },
+  TContext
+> => {
+  const mutationOptions = getEmailDeliveryLogsRetryCreateMutationOptions(options);
 
-      const mutationOptions = getEmailDeliveryLogsRetryCreateMutationOptions(options);
+  return useMutation(mutationOptions, queryClient);
+};
 
-      return useMutation(mutationOptions, queryClient);
-    }
-    
 /**
  * @summary List email templates
  */
 export type emailTemplatesListResponse200 = {
-  data: EmailTemplate[]
-  status: 200
-}
-    
-export type emailTemplatesListResponseSuccess = (emailTemplatesListResponse200) & {
+  data: EmailTemplate[];
+  status: 200;
+};
+
+export type emailTemplatesListResponseSuccess = emailTemplatesListResponse200 & {
   headers: Headers;
 };
-;
 
-export type emailTemplatesListResponse = (emailTemplatesListResponseSuccess)
+export type emailTemplatesListResponse = emailTemplatesListResponseSuccess;
 
-export const getEmailTemplatesListUrl = (params?: EmailTemplatesListParams,) => {
+export const getEmailTemplatesListUrl = (params?: EmailTemplatesListParams) => {
   const normalizedParams = new URLSearchParams();
 
   Object.entries(params || {}).forEach(([key, value]) => {
-    
     if (value !== undefined) {
-      normalizedParams.append(key, value === null ? 'null' : value.toString())
+      normalizedParams.append(key, value === null ? 'null' : value.toString());
     }
   });
 
   const stringifiedParams = normalizedParams.toString();
 
-  return stringifiedParams.length > 0 ? `/api/email-templates/?${stringifiedParams}` : `/api/email-templates/`
-}
+  return stringifiedParams.length > 0
+    ? `/api/email-templates/?${stringifiedParams}`
+    : `/api/email-templates/`;
+};
 
-export const emailTemplatesList = async (params?: EmailTemplatesListParams, options?: RequestInit): Promise<emailTemplatesListResponse> => {
-  
-  return customFetch<emailTemplatesListResponse>(getEmailTemplatesListUrl(params),
-  {      
+export const emailTemplatesList = async (
+  params?: EmailTemplatesListParams,
+  options?: RequestInit
+): Promise<emailTemplatesListResponse> => {
+  return customFetch<emailTemplatesListResponse>(getEmailTemplatesListUrl(params), {
     ...options,
     method: 'GET'
-    
-    
+  });
+};
+
+export const getEmailTemplatesListInfiniteQueryKey = (params?: EmailTemplatesListParams) => {
+  return ['infinite', `/api/email-templates/`, ...(params ? [params] : [])] as const;
+};
+
+export const getEmailTemplatesListQueryKey = (params?: EmailTemplatesListParams) => {
+  return [`/api/email-templates/`, ...(params ? [params] : [])] as const;
+};
+
+export const getEmailTemplatesListInfiniteQueryOptions = <
+  TData = InfiniteData<Awaited<ReturnType<typeof emailTemplatesList>>>,
+  TError = unknown
+>(
+  params?: EmailTemplatesListParams,
+  options?: {
+    query?: Partial<
+      UseInfiniteQueryOptions<Awaited<ReturnType<typeof emailTemplatesList>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof customFetch>;
   }
-);}
-
-
-
-
-
-export const getEmailTemplatesListInfiniteQueryKey = (params?: EmailTemplatesListParams,) => {
-    return [
-    'infinite', `/api/email-templates/`, ...(params ? [params]: [])
-    ] as const;
-    }
-
-export const getEmailTemplatesListQueryKey = (params?: EmailTemplatesListParams,) => {
-    return [
-    `/api/email-templates/`, ...(params ? [params]: [])
-    ] as const;
-    }
-
-    
-export const getEmailTemplatesListInfiniteQueryOptions = <TData = InfiniteData<Awaited<ReturnType<typeof emailTemplatesList>>>, TError = unknown>(params?: EmailTemplatesListParams, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof emailTemplatesList>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
 ) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
 
-const {query: queryOptions, request: requestOptions} = options ?? {};
+  const queryKey = queryOptions?.queryKey ?? getEmailTemplatesListInfiniteQueryKey(params);
 
-  const queryKey =  queryOptions?.queryKey ?? getEmailTemplatesListInfiniteQueryKey(params);
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof emailTemplatesList>>> = ({ signal }) =>
+    emailTemplatesList(params, { signal, ...requestOptions });
 
-  
+  return { queryKey, queryFn, ...queryOptions } as UseInfiniteQueryOptions<
+    Awaited<ReturnType<typeof emailTemplatesList>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof emailTemplatesList>>> = ({ signal }) => emailTemplatesList(params, { signal, ...requestOptions });
+export type EmailTemplatesListInfiniteQueryResult = NonNullable<
+  Awaited<ReturnType<typeof emailTemplatesList>>
+>;
+export type EmailTemplatesListInfiniteQueryError = unknown;
 
-      
-
-      
-
-   return  { queryKey, queryFn, ...queryOptions} as UseInfiniteQueryOptions<Awaited<ReturnType<typeof emailTemplatesList>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type EmailTemplatesListInfiniteQueryResult = NonNullable<Awaited<ReturnType<typeof emailTemplatesList>>>
-export type EmailTemplatesListInfiniteQueryError = unknown
-
-
-export function useEmailTemplatesListInfinite<TData = InfiniteData<Awaited<ReturnType<typeof emailTemplatesList>>>, TError = unknown>(
- params: undefined |  EmailTemplatesListParams, options: { query:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof emailTemplatesList>>, TError, TData>> & Pick<
+export function useEmailTemplatesListInfinite<
+  TData = InfiniteData<Awaited<ReturnType<typeof emailTemplatesList>>>,
+  TError = unknown
+>(
+  params: undefined | EmailTemplatesListParams,
+  options: {
+    query: Partial<
+      UseInfiniteQueryOptions<Awaited<ReturnType<typeof emailTemplatesList>>, TError, TData>
+    > &
+      Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof emailTemplatesList>>,
           TError,
           Awaited<ReturnType<typeof emailTemplatesList>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  DefinedUseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useEmailTemplatesListInfinite<TData = InfiniteData<Awaited<ReturnType<typeof emailTemplatesList>>>, TError = unknown>(
- params?: EmailTemplatesListParams, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof emailTemplatesList>>, TError, TData>> & Pick<
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): DefinedUseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useEmailTemplatesListInfinite<
+  TData = InfiniteData<Awaited<ReturnType<typeof emailTemplatesList>>>,
+  TError = unknown
+>(
+  params?: EmailTemplatesListParams,
+  options?: {
+    query?: Partial<
+      UseInfiniteQueryOptions<Awaited<ReturnType<typeof emailTemplatesList>>, TError, TData>
+    > &
+      Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof emailTemplatesList>>,
           TError,
           Awaited<ReturnType<typeof emailTemplatesList>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useEmailTemplatesListInfinite<TData = InfiniteData<Awaited<ReturnType<typeof emailTemplatesList>>>, TError = unknown>(
- params?: EmailTemplatesListParams, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof emailTemplatesList>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useEmailTemplatesListInfinite<
+  TData = InfiniteData<Awaited<ReturnType<typeof emailTemplatesList>>>,
+  TError = unknown
+>(
+  params?: EmailTemplatesListParams,
+  options?: {
+    query?: Partial<
+      UseInfiniteQueryOptions<Awaited<ReturnType<typeof emailTemplatesList>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 /**
  * @summary List email templates
  */
 
-export function useEmailTemplatesListInfinite<TData = InfiniteData<Awaited<ReturnType<typeof emailTemplatesList>>>, TError = unknown>(
- params?: EmailTemplatesListParams, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof emailTemplatesList>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient 
- ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+export function useEmailTemplatesListInfinite<
+  TData = InfiniteData<Awaited<ReturnType<typeof emailTemplatesList>>>,
+  TError = unknown
+>(
+  params?: EmailTemplatesListParams,
+  options?: {
+    query?: Partial<
+      UseInfiniteQueryOptions<Awaited<ReturnType<typeof emailTemplatesList>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+  const queryOptions = getEmailTemplatesListInfiniteQueryOptions(params, options);
 
-  const queryOptions = getEmailTemplatesListInfiniteQueryOptions(params,options)
+  const query = useInfiniteQuery(queryOptions, queryClient) as UseInfiniteQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
 
-  const query = useInfiniteQuery(queryOptions, queryClient) as  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-
-  query.queryKey = queryOptions.queryKey ;
+  query.queryKey = queryOptions.queryKey;
 
   return query;
 }
 
-
-
-
-export const getEmailTemplatesListQueryOptions = <TData = Awaited<ReturnType<typeof emailTemplatesList>>, TError = unknown>(params?: EmailTemplatesListParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof emailTemplatesList>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+export const getEmailTemplatesListQueryOptions = <
+  TData = Awaited<ReturnType<typeof emailTemplatesList>>,
+  TError = unknown
+>(
+  params?: EmailTemplatesListParams,
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof emailTemplatesList>>, TError, TData>>;
+    request?: SecondParameter<typeof customFetch>;
+  }
 ) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
 
-const {query: queryOptions, request: requestOptions} = options ?? {};
+  const queryKey = queryOptions?.queryKey ?? getEmailTemplatesListQueryKey(params);
 
-  const queryKey =  queryOptions?.queryKey ?? getEmailTemplatesListQueryKey(params);
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof emailTemplatesList>>> = ({ signal }) =>
+    emailTemplatesList(params, { signal, ...requestOptions });
 
-  
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof emailTemplatesList>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof emailTemplatesList>>> = ({ signal }) => emailTemplatesList(params, { signal, ...requestOptions });
+export type EmailTemplatesListQueryResult = NonNullable<
+  Awaited<ReturnType<typeof emailTemplatesList>>
+>;
+export type EmailTemplatesListQueryError = unknown;
 
-      
-
-      
-
-   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof emailTemplatesList>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type EmailTemplatesListQueryResult = NonNullable<Awaited<ReturnType<typeof emailTemplatesList>>>
-export type EmailTemplatesListQueryError = unknown
-
-
-export function useEmailTemplatesList<TData = Awaited<ReturnType<typeof emailTemplatesList>>, TError = unknown>(
- params: undefined |  EmailTemplatesListParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof emailTemplatesList>>, TError, TData>> & Pick<
+export function useEmailTemplatesList<
+  TData = Awaited<ReturnType<typeof emailTemplatesList>>,
+  TError = unknown
+>(
+  params: undefined | EmailTemplatesListParams,
+  options: {
+    query: Partial<UseQueryOptions<Awaited<ReturnType<typeof emailTemplatesList>>, TError, TData>> &
+      Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof emailTemplatesList>>,
           TError,
           Awaited<ReturnType<typeof emailTemplatesList>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useEmailTemplatesList<TData = Awaited<ReturnType<typeof emailTemplatesList>>, TError = unknown>(
- params?: EmailTemplatesListParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof emailTemplatesList>>, TError, TData>> & Pick<
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useEmailTemplatesList<
+  TData = Awaited<ReturnType<typeof emailTemplatesList>>,
+  TError = unknown
+>(
+  params?: EmailTemplatesListParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof emailTemplatesList>>, TError, TData>
+    > &
+      Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof emailTemplatesList>>,
           TError,
           Awaited<ReturnType<typeof emailTemplatesList>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useEmailTemplatesList<TData = Awaited<ReturnType<typeof emailTemplatesList>>, TError = unknown>(
- params?: EmailTemplatesListParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof emailTemplatesList>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useEmailTemplatesList<
+  TData = Awaited<ReturnType<typeof emailTemplatesList>>,
+  TError = unknown
+>(
+  params?: EmailTemplatesListParams,
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof emailTemplatesList>>, TError, TData>>;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 /**
  * @summary List email templates
  */
 
-export function useEmailTemplatesList<TData = Awaited<ReturnType<typeof emailTemplatesList>>, TError = unknown>(
- params?: EmailTemplatesListParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof emailTemplatesList>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient 
- ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+export function useEmailTemplatesList<
+  TData = Awaited<ReturnType<typeof emailTemplatesList>>,
+  TError = unknown
+>(
+  params?: EmailTemplatesListParams,
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof emailTemplatesList>>, TError, TData>>;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+  const queryOptions = getEmailTemplatesListQueryOptions(params, options);
 
-  const queryOptions = getEmailTemplatesListQueryOptions(params,options)
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+  };
 
-  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-
-  query.queryKey = queryOptions.queryKey ;
+  query.queryKey = queryOptions.queryKey;
 
   return query;
 }
-
-
-
-
 
 /**
  * @summary Create email template
  */
 export type emailTemplatesCreateResponse201 = {
-  data: EmailTemplate
-  status: 201
-}
-    
-export type emailTemplatesCreateResponseSuccess = (emailTemplatesCreateResponse201) & {
+  data: EmailTemplate;
+  status: 201;
+};
+
+export type emailTemplatesCreateResponseSuccess = emailTemplatesCreateResponse201 & {
   headers: Headers;
 };
-;
 
-export type emailTemplatesCreateResponse = (emailTemplatesCreateResponseSuccess)
+export type emailTemplatesCreateResponse = emailTemplatesCreateResponseSuccess;
 
 export const getEmailTemplatesCreateUrl = () => {
+  return `/api/email-templates/`;
+};
 
-
-  
-
-  return `/api/email-templates/`
-}
-
-export const emailTemplatesCreate = async (emailTemplate: NonReadonly<EmailTemplate>, options?: RequestInit): Promise<emailTemplatesCreateResponse> => {
-  
-  return customFetch<emailTemplatesCreateResponse>(getEmailTemplatesCreateUrl(),
-  {      
+export const emailTemplatesCreate = async (
+  emailTemplate: NonReadonly<EmailTemplate>,
+  options?: RequestInit
+): Promise<emailTemplatesCreateResponse> => {
+  return customFetch<emailTemplatesCreateResponse>(getEmailTemplatesCreateUrl(), {
     ...options,
     method: 'POST',
     headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(
-      emailTemplate,)
-  }
-);}
+    body: JSON.stringify(emailTemplate)
+  });
+};
 
+export const getEmailTemplatesCreateMutationOptions = <
+  TError = unknown,
+  TContext = unknown
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof emailTemplatesCreate>>,
+    TError,
+    { data: NonReadonly<EmailTemplate> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof emailTemplatesCreate>>,
+  TError,
+  { data: NonReadonly<EmailTemplate> },
+  TContext
+> => {
+  const mutationKey = ['emailTemplatesCreate'];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
 
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof emailTemplatesCreate>>,
+    { data: NonReadonly<EmailTemplate> }
+  > = (props) => {
+    const { data } = props ?? {};
 
+    return emailTemplatesCreate(data, requestOptions);
+  };
 
-export const getEmailTemplatesCreateMutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof emailTemplatesCreate>>, TError,{data: NonReadonly<EmailTemplate>}, TContext>, request?: SecondParameter<typeof customFetch>}
-): UseMutationOptions<Awaited<ReturnType<typeof emailTemplatesCreate>>, TError,{data: NonReadonly<EmailTemplate>}, TContext> => {
+  return { mutationFn, ...mutationOptions };
+};
 
-const mutationKey = ['emailTemplatesCreate'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
+export type EmailTemplatesCreateMutationResult = NonNullable<
+  Awaited<ReturnType<typeof emailTemplatesCreate>>
+>;
+export type EmailTemplatesCreateMutationBody = NonReadonly<EmailTemplate>;
+export type EmailTemplatesCreateMutationError = unknown;
 
-      
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof emailTemplatesCreate>>, {data: NonReadonly<EmailTemplate>}> = (props) => {
-          const {data} = props ?? {};
-
-          return  emailTemplatesCreate(data,requestOptions)
-        }
-
-        
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type EmailTemplatesCreateMutationResult = NonNullable<Awaited<ReturnType<typeof emailTemplatesCreate>>>
-    export type EmailTemplatesCreateMutationBody = NonReadonly<EmailTemplate>
-    export type EmailTemplatesCreateMutationError = unknown
-
-    /**
+/**
  * @summary Create email template
  */
-export const useEmailTemplatesCreate = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof emailTemplatesCreate>>, TError,{data: NonReadonly<EmailTemplate>}, TContext>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof emailTemplatesCreate>>,
-        TError,
-        {data: NonReadonly<EmailTemplate>},
-        TContext
-      > => {
+export const useEmailTemplatesCreate = <TError = unknown, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof emailTemplatesCreate>>,
+      TError,
+      { data: NonReadonly<EmailTemplate> },
+      TContext
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseMutationResult<
+  Awaited<ReturnType<typeof emailTemplatesCreate>>,
+  TError,
+  { data: NonReadonly<EmailTemplate> },
+  TContext
+> => {
+  const mutationOptions = getEmailTemplatesCreateMutationOptions(options);
 
-      const mutationOptions = getEmailTemplatesCreateMutationOptions(options);
+  return useMutation(mutationOptions, queryClient);
+};
 
-      return useMutation(mutationOptions, queryClient);
-    }
-    
 /**
  * @summary Get email template by id
  */
 export type emailTemplatesRetrieveResponse200 = {
-  data: EmailTemplate
-  status: 200
-}
-    
-export type emailTemplatesRetrieveResponseSuccess = (emailTemplatesRetrieveResponse200) & {
+  data: EmailTemplate;
+  status: 200;
+};
+
+export type emailTemplatesRetrieveResponseSuccess = emailTemplatesRetrieveResponse200 & {
   headers: Headers;
 };
-;
 
-export type emailTemplatesRetrieveResponse = (emailTemplatesRetrieveResponseSuccess)
+export type emailTemplatesRetrieveResponse = emailTemplatesRetrieveResponseSuccess;
 
-export const getEmailTemplatesRetrieveUrl = (id: string,) => {
+export const getEmailTemplatesRetrieveUrl = (id: string) => {
+  return `/api/email-templates/${id}/`;
+};
 
-
-  
-
-  return `/api/email-templates/${id}/`
-}
-
-export const emailTemplatesRetrieve = async (id: string, options?: RequestInit): Promise<emailTemplatesRetrieveResponse> => {
-  
-  return customFetch<emailTemplatesRetrieveResponse>(getEmailTemplatesRetrieveUrl(id),
-  {      
+export const emailTemplatesRetrieve = async (
+  id: string,
+  options?: RequestInit
+): Promise<emailTemplatesRetrieveResponse> => {
+  return customFetch<emailTemplatesRetrieveResponse>(getEmailTemplatesRetrieveUrl(id), {
     ...options,
     method: 'GET'
-    
-    
+  });
+};
+
+export const getEmailTemplatesRetrieveInfiniteQueryKey = (id?: string) => {
+  return ['infinite', `/api/email-templates/${id}/`] as const;
+};
+
+export const getEmailTemplatesRetrieveQueryKey = (id?: string) => {
+  return [`/api/email-templates/${id}/`] as const;
+};
+
+export const getEmailTemplatesRetrieveInfiniteQueryOptions = <
+  TData = InfiniteData<Awaited<ReturnType<typeof emailTemplatesRetrieve>>>,
+  TError = unknown
+>(
+  id: string,
+  options?: {
+    query?: Partial<
+      UseInfiniteQueryOptions<Awaited<ReturnType<typeof emailTemplatesRetrieve>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof customFetch>;
   }
-);}
-
-
-
-
-
-export const getEmailTemplatesRetrieveInfiniteQueryKey = (id?: string,) => {
-    return [
-    'infinite', `/api/email-templates/${id}/`
-    ] as const;
-    }
-
-export const getEmailTemplatesRetrieveQueryKey = (id?: string,) => {
-    return [
-    `/api/email-templates/${id}/`
-    ] as const;
-    }
-
-    
-export const getEmailTemplatesRetrieveInfiniteQueryOptions = <TData = InfiniteData<Awaited<ReturnType<typeof emailTemplatesRetrieve>>>, TError = unknown>(id: string, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof emailTemplatesRetrieve>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
 ) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
 
-const {query: queryOptions, request: requestOptions} = options ?? {};
+  const queryKey = queryOptions?.queryKey ?? getEmailTemplatesRetrieveInfiniteQueryKey(id);
 
-  const queryKey =  queryOptions?.queryKey ?? getEmailTemplatesRetrieveInfiniteQueryKey(id);
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof emailTemplatesRetrieve>>> = ({ signal }) =>
+    emailTemplatesRetrieve(id, { signal, ...requestOptions });
 
-  
+  return { queryKey, queryFn, enabled: !!id, ...queryOptions } as UseInfiniteQueryOptions<
+    Awaited<ReturnType<typeof emailTemplatesRetrieve>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof emailTemplatesRetrieve>>> = ({ signal }) => emailTemplatesRetrieve(id, { signal, ...requestOptions });
+export type EmailTemplatesRetrieveInfiniteQueryResult = NonNullable<
+  Awaited<ReturnType<typeof emailTemplatesRetrieve>>
+>;
+export type EmailTemplatesRetrieveInfiniteQueryError = unknown;
 
-      
-
-      
-
-   return  { queryKey, queryFn, enabled: !!(id), ...queryOptions} as UseInfiniteQueryOptions<Awaited<ReturnType<typeof emailTemplatesRetrieve>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type EmailTemplatesRetrieveInfiniteQueryResult = NonNullable<Awaited<ReturnType<typeof emailTemplatesRetrieve>>>
-export type EmailTemplatesRetrieveInfiniteQueryError = unknown
-
-
-export function useEmailTemplatesRetrieveInfinite<TData = InfiniteData<Awaited<ReturnType<typeof emailTemplatesRetrieve>>>, TError = unknown>(
- id: string, options: { query:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof emailTemplatesRetrieve>>, TError, TData>> & Pick<
+export function useEmailTemplatesRetrieveInfinite<
+  TData = InfiniteData<Awaited<ReturnType<typeof emailTemplatesRetrieve>>>,
+  TError = unknown
+>(
+  id: string,
+  options: {
+    query: Partial<
+      UseInfiniteQueryOptions<Awaited<ReturnType<typeof emailTemplatesRetrieve>>, TError, TData>
+    > &
+      Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof emailTemplatesRetrieve>>,
           TError,
           Awaited<ReturnType<typeof emailTemplatesRetrieve>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  DefinedUseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useEmailTemplatesRetrieveInfinite<TData = InfiniteData<Awaited<ReturnType<typeof emailTemplatesRetrieve>>>, TError = unknown>(
- id: string, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof emailTemplatesRetrieve>>, TError, TData>> & Pick<
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): DefinedUseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useEmailTemplatesRetrieveInfinite<
+  TData = InfiniteData<Awaited<ReturnType<typeof emailTemplatesRetrieve>>>,
+  TError = unknown
+>(
+  id: string,
+  options?: {
+    query?: Partial<
+      UseInfiniteQueryOptions<Awaited<ReturnType<typeof emailTemplatesRetrieve>>, TError, TData>
+    > &
+      Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof emailTemplatesRetrieve>>,
           TError,
           Awaited<ReturnType<typeof emailTemplatesRetrieve>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useEmailTemplatesRetrieveInfinite<TData = InfiniteData<Awaited<ReturnType<typeof emailTemplatesRetrieve>>>, TError = unknown>(
- id: string, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof emailTemplatesRetrieve>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useEmailTemplatesRetrieveInfinite<
+  TData = InfiniteData<Awaited<ReturnType<typeof emailTemplatesRetrieve>>>,
+  TError = unknown
+>(
+  id: string,
+  options?: {
+    query?: Partial<
+      UseInfiniteQueryOptions<Awaited<ReturnType<typeof emailTemplatesRetrieve>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 /**
  * @summary Get email template by id
  */
 
-export function useEmailTemplatesRetrieveInfinite<TData = InfiniteData<Awaited<ReturnType<typeof emailTemplatesRetrieve>>>, TError = unknown>(
- id: string, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof emailTemplatesRetrieve>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient 
- ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+export function useEmailTemplatesRetrieveInfinite<
+  TData = InfiniteData<Awaited<ReturnType<typeof emailTemplatesRetrieve>>>,
+  TError = unknown
+>(
+  id: string,
+  options?: {
+    query?: Partial<
+      UseInfiniteQueryOptions<Awaited<ReturnType<typeof emailTemplatesRetrieve>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+  const queryOptions = getEmailTemplatesRetrieveInfiniteQueryOptions(id, options);
 
-  const queryOptions = getEmailTemplatesRetrieveInfiniteQueryOptions(id,options)
+  const query = useInfiniteQuery(queryOptions, queryClient) as UseInfiniteQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
 
-  const query = useInfiniteQuery(queryOptions, queryClient) as  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-
-  query.queryKey = queryOptions.queryKey ;
+  query.queryKey = queryOptions.queryKey;
 
   return query;
 }
 
-
-
-
-export const getEmailTemplatesRetrieveQueryOptions = <TData = Awaited<ReturnType<typeof emailTemplatesRetrieve>>, TError = unknown>(id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof emailTemplatesRetrieve>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+export const getEmailTemplatesRetrieveQueryOptions = <
+  TData = Awaited<ReturnType<typeof emailTemplatesRetrieve>>,
+  TError = unknown
+>(
+  id: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof emailTemplatesRetrieve>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  }
 ) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
 
-const {query: queryOptions, request: requestOptions} = options ?? {};
+  const queryKey = queryOptions?.queryKey ?? getEmailTemplatesRetrieveQueryKey(id);
 
-  const queryKey =  queryOptions?.queryKey ?? getEmailTemplatesRetrieveQueryKey(id);
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof emailTemplatesRetrieve>>> = ({ signal }) =>
+    emailTemplatesRetrieve(id, { signal, ...requestOptions });
 
-  
+  return { queryKey, queryFn, enabled: !!id, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof emailTemplatesRetrieve>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof emailTemplatesRetrieve>>> = ({ signal }) => emailTemplatesRetrieve(id, { signal, ...requestOptions });
+export type EmailTemplatesRetrieveQueryResult = NonNullable<
+  Awaited<ReturnType<typeof emailTemplatesRetrieve>>
+>;
+export type EmailTemplatesRetrieveQueryError = unknown;
 
-      
-
-      
-
-   return  { queryKey, queryFn, enabled: !!(id), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof emailTemplatesRetrieve>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type EmailTemplatesRetrieveQueryResult = NonNullable<Awaited<ReturnType<typeof emailTemplatesRetrieve>>>
-export type EmailTemplatesRetrieveQueryError = unknown
-
-
-export function useEmailTemplatesRetrieve<TData = Awaited<ReturnType<typeof emailTemplatesRetrieve>>, TError = unknown>(
- id: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof emailTemplatesRetrieve>>, TError, TData>> & Pick<
+export function useEmailTemplatesRetrieve<
+  TData = Awaited<ReturnType<typeof emailTemplatesRetrieve>>,
+  TError = unknown
+>(
+  id: string,
+  options: {
+    query: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof emailTemplatesRetrieve>>, TError, TData>
+    > &
+      Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof emailTemplatesRetrieve>>,
           TError,
           Awaited<ReturnType<typeof emailTemplatesRetrieve>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useEmailTemplatesRetrieve<TData = Awaited<ReturnType<typeof emailTemplatesRetrieve>>, TError = unknown>(
- id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof emailTemplatesRetrieve>>, TError, TData>> & Pick<
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useEmailTemplatesRetrieve<
+  TData = Awaited<ReturnType<typeof emailTemplatesRetrieve>>,
+  TError = unknown
+>(
+  id: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof emailTemplatesRetrieve>>, TError, TData>
+    > &
+      Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof emailTemplatesRetrieve>>,
           TError,
           Awaited<ReturnType<typeof emailTemplatesRetrieve>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useEmailTemplatesRetrieve<TData = Awaited<ReturnType<typeof emailTemplatesRetrieve>>, TError = unknown>(
- id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof emailTemplatesRetrieve>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useEmailTemplatesRetrieve<
+  TData = Awaited<ReturnType<typeof emailTemplatesRetrieve>>,
+  TError = unknown
+>(
+  id: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof emailTemplatesRetrieve>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 /**
  * @summary Get email template by id
  */
 
-export function useEmailTemplatesRetrieve<TData = Awaited<ReturnType<typeof emailTemplatesRetrieve>>, TError = unknown>(
- id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof emailTemplatesRetrieve>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient 
- ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+export function useEmailTemplatesRetrieve<
+  TData = Awaited<ReturnType<typeof emailTemplatesRetrieve>>,
+  TError = unknown
+>(
+  id: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof emailTemplatesRetrieve>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+  const queryOptions = getEmailTemplatesRetrieveQueryOptions(id, options);
 
-  const queryOptions = getEmailTemplatesRetrieveQueryOptions(id,options)
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+  };
 
-  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-
-  query.queryKey = queryOptions.queryKey ;
+  query.queryKey = queryOptions.queryKey;
 
   return query;
 }
-
-
-
-
 
 /**
  * @summary Patch email template by id
  */
 export type emailTemplatesPartialUpdateResponse200 = {
-  data: EmailTemplate
-  status: 200
-}
-    
-export type emailTemplatesPartialUpdateResponseSuccess = (emailTemplatesPartialUpdateResponse200) & {
+  data: EmailTemplate;
+  status: 200;
+};
+
+export type emailTemplatesPartialUpdateResponseSuccess = emailTemplatesPartialUpdateResponse200 & {
   headers: Headers;
 };
-;
 
-export type emailTemplatesPartialUpdateResponse = (emailTemplatesPartialUpdateResponseSuccess)
+export type emailTemplatesPartialUpdateResponse = emailTemplatesPartialUpdateResponseSuccess;
 
-export const getEmailTemplatesPartialUpdateUrl = (id: string,) => {
+export const getEmailTemplatesPartialUpdateUrl = (id: string) => {
+  return `/api/email-templates/${id}/`;
+};
 
-
-  
-
-  return `/api/email-templates/${id}/`
-}
-
-export const emailTemplatesPartialUpdate = async (id: string,
-    patchedEmailTemplate: NonReadonly<PatchedEmailTemplate>, options?: RequestInit): Promise<emailTemplatesPartialUpdateResponse> => {
-  
-  return customFetch<emailTemplatesPartialUpdateResponse>(getEmailTemplatesPartialUpdateUrl(id),
-  {      
+export const emailTemplatesPartialUpdate = async (
+  id: string,
+  patchedEmailTemplate: NonReadonly<PatchedEmailTemplate>,
+  options?: RequestInit
+): Promise<emailTemplatesPartialUpdateResponse> => {
+  return customFetch<emailTemplatesPartialUpdateResponse>(getEmailTemplatesPartialUpdateUrl(id), {
     ...options,
     method: 'PATCH',
     headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(
-      patchedEmailTemplate,)
-  }
-);}
+    body: JSON.stringify(patchedEmailTemplate)
+  });
+};
 
+export const getEmailTemplatesPartialUpdateMutationOptions = <
+  TError = unknown,
+  TContext = unknown
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof emailTemplatesPartialUpdate>>,
+    TError,
+    { id: string; data: NonReadonly<PatchedEmailTemplate> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof emailTemplatesPartialUpdate>>,
+  TError,
+  { id: string; data: NonReadonly<PatchedEmailTemplate> },
+  TContext
+> => {
+  const mutationKey = ['emailTemplatesPartialUpdate'];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
 
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof emailTemplatesPartialUpdate>>,
+    { id: string; data: NonReadonly<PatchedEmailTemplate> }
+  > = (props) => {
+    const { id, data } = props ?? {};
 
+    return emailTemplatesPartialUpdate(id, data, requestOptions);
+  };
 
-export const getEmailTemplatesPartialUpdateMutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof emailTemplatesPartialUpdate>>, TError,{id: string;data: NonReadonly<PatchedEmailTemplate>}, TContext>, request?: SecondParameter<typeof customFetch>}
-): UseMutationOptions<Awaited<ReturnType<typeof emailTemplatesPartialUpdate>>, TError,{id: string;data: NonReadonly<PatchedEmailTemplate>}, TContext> => {
+  return { mutationFn, ...mutationOptions };
+};
 
-const mutationKey = ['emailTemplatesPartialUpdate'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
+export type EmailTemplatesPartialUpdateMutationResult = NonNullable<
+  Awaited<ReturnType<typeof emailTemplatesPartialUpdate>>
+>;
+export type EmailTemplatesPartialUpdateMutationBody = NonReadonly<PatchedEmailTemplate>;
+export type EmailTemplatesPartialUpdateMutationError = unknown;
 
-      
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof emailTemplatesPartialUpdate>>, {id: string;data: NonReadonly<PatchedEmailTemplate>}> = (props) => {
-          const {id,data} = props ?? {};
-
-          return  emailTemplatesPartialUpdate(id,data,requestOptions)
-        }
-
-        
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type EmailTemplatesPartialUpdateMutationResult = NonNullable<Awaited<ReturnType<typeof emailTemplatesPartialUpdate>>>
-    export type EmailTemplatesPartialUpdateMutationBody = NonReadonly<PatchedEmailTemplate>
-    export type EmailTemplatesPartialUpdateMutationError = unknown
-
-    /**
+/**
  * @summary Patch email template by id
  */
-export const useEmailTemplatesPartialUpdate = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof emailTemplatesPartialUpdate>>, TError,{id: string;data: NonReadonly<PatchedEmailTemplate>}, TContext>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof emailTemplatesPartialUpdate>>,
-        TError,
-        {id: string;data: NonReadonly<PatchedEmailTemplate>},
-        TContext
-      > => {
+export const useEmailTemplatesPartialUpdate = <TError = unknown, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof emailTemplatesPartialUpdate>>,
+      TError,
+      { id: string; data: NonReadonly<PatchedEmailTemplate> },
+      TContext
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseMutationResult<
+  Awaited<ReturnType<typeof emailTemplatesPartialUpdate>>,
+  TError,
+  { id: string; data: NonReadonly<PatchedEmailTemplate> },
+  TContext
+> => {
+  const mutationOptions = getEmailTemplatesPartialUpdateMutationOptions(options);
 
-      const mutationOptions = getEmailTemplatesPartialUpdateMutationOptions(options);
+  return useMutation(mutationOptions, queryClient);
+};
 
-      return useMutation(mutationOptions, queryClient);
-    }
-    
 /**
  * @summary Delete email template by id
  */
 export type emailTemplatesDestroyResponse204 = {
-  data: void
-  status: 204
-}
-    
-export type emailTemplatesDestroyResponseSuccess = (emailTemplatesDestroyResponse204) & {
+  data: void;
+  status: 204;
+};
+
+export type emailTemplatesDestroyResponseSuccess = emailTemplatesDestroyResponse204 & {
   headers: Headers;
 };
-;
 
-export type emailTemplatesDestroyResponse = (emailTemplatesDestroyResponseSuccess)
+export type emailTemplatesDestroyResponse = emailTemplatesDestroyResponseSuccess;
 
-export const getEmailTemplatesDestroyUrl = (id: string,) => {
+export const getEmailTemplatesDestroyUrl = (id: string) => {
+  return `/api/email-templates/${id}/`;
+};
 
-
-  
-
-  return `/api/email-templates/${id}/`
-}
-
-export const emailTemplatesDestroy = async (id: string, options?: RequestInit): Promise<emailTemplatesDestroyResponse> => {
-  
-  return customFetch<emailTemplatesDestroyResponse>(getEmailTemplatesDestroyUrl(id),
-  {      
+export const emailTemplatesDestroy = async (
+  id: string,
+  options?: RequestInit
+): Promise<emailTemplatesDestroyResponse> => {
+  return customFetch<emailTemplatesDestroyResponse>(getEmailTemplatesDestroyUrl(id), {
     ...options,
     method: 'DELETE'
-    
-    
-  }
-);}
+  });
+};
 
+export const getEmailTemplatesDestroyMutationOptions = <
+  TError = unknown,
+  TContext = unknown
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof emailTemplatesDestroy>>,
+    TError,
+    { id: string },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof emailTemplatesDestroy>>,
+  TError,
+  { id: string },
+  TContext
+> => {
+  const mutationKey = ['emailTemplatesDestroy'];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
 
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof emailTemplatesDestroy>>,
+    { id: string }
+  > = (props) => {
+    const { id } = props ?? {};
 
+    return emailTemplatesDestroy(id, requestOptions);
+  };
 
-export const getEmailTemplatesDestroyMutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof emailTemplatesDestroy>>, TError,{id: string}, TContext>, request?: SecondParameter<typeof customFetch>}
-): UseMutationOptions<Awaited<ReturnType<typeof emailTemplatesDestroy>>, TError,{id: string}, TContext> => {
+  return { mutationFn, ...mutationOptions };
+};
 
-const mutationKey = ['emailTemplatesDestroy'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
+export type EmailTemplatesDestroyMutationResult = NonNullable<
+  Awaited<ReturnType<typeof emailTemplatesDestroy>>
+>;
 
-      
+export type EmailTemplatesDestroyMutationError = unknown;
 
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof emailTemplatesDestroy>>, {id: string}> = (props) => {
-          const {id} = props ?? {};
-
-          return  emailTemplatesDestroy(id,requestOptions)
-        }
-
-        
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type EmailTemplatesDestroyMutationResult = NonNullable<Awaited<ReturnType<typeof emailTemplatesDestroy>>>
-    
-    export type EmailTemplatesDestroyMutationError = unknown
-
-    /**
+/**
  * @summary Delete email template by id
  */
-export const useEmailTemplatesDestroy = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof emailTemplatesDestroy>>, TError,{id: string}, TContext>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof emailTemplatesDestroy>>,
-        TError,
-        {id: string},
-        TContext
-      > => {
+export const useEmailTemplatesDestroy = <TError = unknown, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof emailTemplatesDestroy>>,
+      TError,
+      { id: string },
+      TContext
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseMutationResult<
+  Awaited<ReturnType<typeof emailTemplatesDestroy>>,
+  TError,
+  { id: string },
+  TContext
+> => {
+  const mutationOptions = getEmailTemplatesDestroyMutationOptions(options);
 
-      const mutationOptions = getEmailTemplatesDestroyMutationOptions(options);
+  return useMutation(mutationOptions, queryClient);
+};
 
-      return useMutation(mutationOptions, queryClient);
-    }
-    
 /**
  * @summary Preview email template
  */
 export type emailTemplatesPreviewCreateResponse200 = {
-  data: EmailTemplatePreview
-  status: 200
-}
-    
-export type emailTemplatesPreviewCreateResponseSuccess = (emailTemplatesPreviewCreateResponse200) & {
+  data: EmailTemplatePreview;
+  status: 200;
+};
+
+export type emailTemplatesPreviewCreateResponseSuccess = emailTemplatesPreviewCreateResponse200 & {
   headers: Headers;
 };
-;
 
-export type emailTemplatesPreviewCreateResponse = (emailTemplatesPreviewCreateResponseSuccess)
+export type emailTemplatesPreviewCreateResponse = emailTemplatesPreviewCreateResponseSuccess;
 
-export const getEmailTemplatesPreviewCreateUrl = (id: string,) => {
+export const getEmailTemplatesPreviewCreateUrl = (id: string) => {
+  return `/api/email-templates/${id}/preview/`;
+};
 
-
-  
-
-  return `/api/email-templates/${id}/preview/`
-}
-
-export const emailTemplatesPreviewCreate = async (id: string,
-    emailTemplatePreview: EmailTemplatePreview, options?: RequestInit): Promise<emailTemplatesPreviewCreateResponse> => {
-  
-  return customFetch<emailTemplatesPreviewCreateResponse>(getEmailTemplatesPreviewCreateUrl(id),
-  {      
+export const emailTemplatesPreviewCreate = async (
+  id: string,
+  emailTemplatePreview: EmailTemplatePreview,
+  options?: RequestInit
+): Promise<emailTemplatesPreviewCreateResponse> => {
+  return customFetch<emailTemplatesPreviewCreateResponse>(getEmailTemplatesPreviewCreateUrl(id), {
     ...options,
     method: 'POST',
     headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(
-      emailTemplatePreview,)
-  }
-);}
+    body: JSON.stringify(emailTemplatePreview)
+  });
+};
 
+export const getEmailTemplatesPreviewCreateMutationOptions = <
+  TError = unknown,
+  TContext = unknown
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof emailTemplatesPreviewCreate>>,
+    TError,
+    { id: string; data: EmailTemplatePreview },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof emailTemplatesPreviewCreate>>,
+  TError,
+  { id: string; data: EmailTemplatePreview },
+  TContext
+> => {
+  const mutationKey = ['emailTemplatesPreviewCreate'];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
 
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof emailTemplatesPreviewCreate>>,
+    { id: string; data: EmailTemplatePreview }
+  > = (props) => {
+    const { id, data } = props ?? {};
 
+    return emailTemplatesPreviewCreate(id, data, requestOptions);
+  };
 
-export const getEmailTemplatesPreviewCreateMutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof emailTemplatesPreviewCreate>>, TError,{id: string;data: EmailTemplatePreview}, TContext>, request?: SecondParameter<typeof customFetch>}
-): UseMutationOptions<Awaited<ReturnType<typeof emailTemplatesPreviewCreate>>, TError,{id: string;data: EmailTemplatePreview}, TContext> => {
+  return { mutationFn, ...mutationOptions };
+};
 
-const mutationKey = ['emailTemplatesPreviewCreate'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
+export type EmailTemplatesPreviewCreateMutationResult = NonNullable<
+  Awaited<ReturnType<typeof emailTemplatesPreviewCreate>>
+>;
+export type EmailTemplatesPreviewCreateMutationBody = EmailTemplatePreview;
+export type EmailTemplatesPreviewCreateMutationError = unknown;
 
-      
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof emailTemplatesPreviewCreate>>, {id: string;data: EmailTemplatePreview}> = (props) => {
-          const {id,data} = props ?? {};
-
-          return  emailTemplatesPreviewCreate(id,data,requestOptions)
-        }
-
-        
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type EmailTemplatesPreviewCreateMutationResult = NonNullable<Awaited<ReturnType<typeof emailTemplatesPreviewCreate>>>
-    export type EmailTemplatesPreviewCreateMutationBody = EmailTemplatePreview
-    export type EmailTemplatesPreviewCreateMutationError = unknown
-
-    /**
+/**
  * @summary Preview email template
  */
-export const useEmailTemplatesPreviewCreate = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof emailTemplatesPreviewCreate>>, TError,{id: string;data: EmailTemplatePreview}, TContext>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof emailTemplatesPreviewCreate>>,
-        TError,
-        {id: string;data: EmailTemplatePreview},
-        TContext
-      > => {
+export const useEmailTemplatesPreviewCreate = <TError = unknown, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof emailTemplatesPreviewCreate>>,
+      TError,
+      { id: string; data: EmailTemplatePreview },
+      TContext
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseMutationResult<
+  Awaited<ReturnType<typeof emailTemplatesPreviewCreate>>,
+  TError,
+  { id: string; data: EmailTemplatePreview },
+  TContext
+> => {
+  const mutationOptions = getEmailTemplatesPreviewCreateMutationOptions(options);
 
-      const mutationOptions = getEmailTemplatesPreviewCreateMutationOptions(options);
+  return useMutation(mutationOptions, queryClient);
+};
 
-      return useMutation(mutationOptions, queryClient);
-    }
-    
 /**
  * Authenticates user and returns JWT access/refresh tokens. Access token may include tenant_id claim.
  * @summary Login
  */
 export type loginCreateResponse200 = {
-  data: TokenPairResponse
-  status: 200
-}
+  data: TokenPairResponse;
+  status: 200;
+};
 
 export type loginCreateResponse400 = {
-  data: ErrorResponse
-  status: 400
-}
-    
-export type loginCreateResponseSuccess = (loginCreateResponse200) & {
+  data: ErrorResponse;
+  status: 400;
+};
+
+export type loginCreateResponseSuccess = loginCreateResponse200 & {
   headers: Headers;
 };
-export type loginCreateResponseError = (loginCreateResponse400) & {
+export type loginCreateResponseError = loginCreateResponse400 & {
   headers: Headers;
 };
 
-export type loginCreateResponse = (loginCreateResponseSuccess | loginCreateResponseError)
+export type loginCreateResponse = loginCreateResponseSuccess | loginCreateResponseError;
 
 export const getLoginCreateUrl = () => {
+  return `/api/login/`;
+};
 
-
-  
-
-  return `/api/login/`
-}
-
-export const loginCreate = async (login: Login, options?: RequestInit): Promise<loginCreateResponse> => {
-  
-  return customFetch<loginCreateResponse>(getLoginCreateUrl(),
-  {      
+export const loginCreate = async (
+  login: Login,
+  options?: RequestInit
+): Promise<loginCreateResponse> => {
+  return customFetch<loginCreateResponse>(getLoginCreateUrl(), {
     ...options,
     method: 'POST',
     headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(
-      login,)
-  }
-);}
+    body: JSON.stringify(login)
+  });
+};
 
+export const getLoginCreateMutationOptions = <
+  TError = ErrorResponse,
+  TContext = unknown
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof loginCreate>>,
+    TError,
+    { data: Login },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof loginCreate>>,
+  TError,
+  { data: Login },
+  TContext
+> => {
+  const mutationKey = ['loginCreate'];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
 
+  const mutationFn: MutationFunction<Awaited<ReturnType<typeof loginCreate>>, { data: Login }> = (
+    props
+  ) => {
+    const { data } = props ?? {};
 
+    return loginCreate(data, requestOptions);
+  };
 
-export const getLoginCreateMutationOptions = <TError = ErrorResponse,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof loginCreate>>, TError,{data: Login}, TContext>, request?: SecondParameter<typeof customFetch>}
-): UseMutationOptions<Awaited<ReturnType<typeof loginCreate>>, TError,{data: Login}, TContext> => {
+  return { mutationFn, ...mutationOptions };
+};
 
-const mutationKey = ['loginCreate'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
+export type LoginCreateMutationResult = NonNullable<Awaited<ReturnType<typeof loginCreate>>>;
+export type LoginCreateMutationBody = Login;
+export type LoginCreateMutationError = ErrorResponse;
 
-      
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof loginCreate>>, {data: Login}> = (props) => {
-          const {data} = props ?? {};
-
-          return  loginCreate(data,requestOptions)
-        }
-
-        
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type LoginCreateMutationResult = NonNullable<Awaited<ReturnType<typeof loginCreate>>>
-    export type LoginCreateMutationBody = Login
-    export type LoginCreateMutationError = ErrorResponse
-
-    /**
+/**
  * @summary Login
  */
-export const useLoginCreate = <TError = ErrorResponse,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof loginCreate>>, TError,{data: Login}, TContext>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof loginCreate>>,
-        TError,
-        {data: Login},
-        TContext
-      > => {
+export const useLoginCreate = <TError = ErrorResponse, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof loginCreate>>,
+      TError,
+      { data: Login },
+      TContext
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseMutationResult<
+  Awaited<ReturnType<typeof loginCreate>>,
+  TError,
+  { data: Login },
+  TContext
+> => {
+  const mutationOptions = getLoginCreateMutationOptions(options);
 
-      const mutationOptions = getLoginCreateMutationOptions(options);
+  return useMutation(mutationOptions, queryClient);
+};
 
-      return useMutation(mutationOptions, queryClient);
-    }
-    
 /**
  * Blacklists the refresh token so it cannot be reused.
  * @summary Logout
  */
 export type logoutCreateResponse205 = {
-  data: void
-  status: 205
-}
+  data: void;
+  status: 205;
+};
 
 export type logoutCreateResponse400 = {
-  data: ErrorResponse
-  status: 400
-}
-    
-export type logoutCreateResponseSuccess = (logoutCreateResponse205) & {
+  data: ErrorResponse;
+  status: 400;
+};
+
+export type logoutCreateResponseSuccess = logoutCreateResponse205 & {
   headers: Headers;
 };
-export type logoutCreateResponseError = (logoutCreateResponse400) & {
+export type logoutCreateResponseError = logoutCreateResponse400 & {
   headers: Headers;
 };
 
-export type logoutCreateResponse = (logoutCreateResponseSuccess | logoutCreateResponseError)
+export type logoutCreateResponse = logoutCreateResponseSuccess | logoutCreateResponseError;
 
 export const getLogoutCreateUrl = () => {
+  return `/api/logout/`;
+};
 
-
-  
-
-  return `/api/logout/`
-}
-
-export const logoutCreate = async (tokenBlacklistRequest: TokenBlacklistRequest, options?: RequestInit): Promise<logoutCreateResponse> => {
-  
-  return customFetch<logoutCreateResponse>(getLogoutCreateUrl(),
-  {      
+export const logoutCreate = async (
+  tokenBlacklistRequest: TokenBlacklistRequest,
+  options?: RequestInit
+): Promise<logoutCreateResponse> => {
+  return customFetch<logoutCreateResponse>(getLogoutCreateUrl(), {
     ...options,
     method: 'POST',
     headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(
-      tokenBlacklistRequest,)
-  }
-);}
+    body: JSON.stringify(tokenBlacklistRequest)
+  });
+};
 
+export const getLogoutCreateMutationOptions = <
+  TError = ErrorResponse,
+  TContext = unknown
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof logoutCreate>>,
+    TError,
+    { data: TokenBlacklistRequest },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof logoutCreate>>,
+  TError,
+  { data: TokenBlacklistRequest },
+  TContext
+> => {
+  const mutationKey = ['logoutCreate'];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
 
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof logoutCreate>>,
+    { data: TokenBlacklistRequest }
+  > = (props) => {
+    const { data } = props ?? {};
 
+    return logoutCreate(data, requestOptions);
+  };
 
-export const getLogoutCreateMutationOptions = <TError = ErrorResponse,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof logoutCreate>>, TError,{data: TokenBlacklistRequest}, TContext>, request?: SecondParameter<typeof customFetch>}
-): UseMutationOptions<Awaited<ReturnType<typeof logoutCreate>>, TError,{data: TokenBlacklistRequest}, TContext> => {
+  return { mutationFn, ...mutationOptions };
+};
 
-const mutationKey = ['logoutCreate'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
+export type LogoutCreateMutationResult = NonNullable<Awaited<ReturnType<typeof logoutCreate>>>;
+export type LogoutCreateMutationBody = TokenBlacklistRequest;
+export type LogoutCreateMutationError = ErrorResponse;
 
-      
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof logoutCreate>>, {data: TokenBlacklistRequest}> = (props) => {
-          const {data} = props ?? {};
-
-          return  logoutCreate(data,requestOptions)
-        }
-
-        
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type LogoutCreateMutationResult = NonNullable<Awaited<ReturnType<typeof logoutCreate>>>
-    export type LogoutCreateMutationBody = TokenBlacklistRequest
-    export type LogoutCreateMutationError = ErrorResponse
-
-    /**
+/**
  * @summary Logout
  */
-export const useLogoutCreate = <TError = ErrorResponse,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof logoutCreate>>, TError,{data: TokenBlacklistRequest}, TContext>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof logoutCreate>>,
-        TError,
-        {data: TokenBlacklistRequest},
-        TContext
-      > => {
+export const useLogoutCreate = <TError = ErrorResponse, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof logoutCreate>>,
+      TError,
+      { data: TokenBlacklistRequest },
+      TContext
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseMutationResult<
+  Awaited<ReturnType<typeof logoutCreate>>,
+  TError,
+  { data: TokenBlacklistRequest },
+  TContext
+> => {
+  const mutationOptions = getLogoutCreateMutationOptions(options);
 
-      const mutationOptions = getLogoutCreateMutationOptions(options);
+  return useMutation(mutationOptions, queryClient);
+};
 
-      return useMutation(mutationOptions, queryClient);
-    }
-    
 /**
  * @summary Get current user profile
  */
 export type meRetrieveResponse200 = {
-  data: CurrentUser
-  status: 200
-}
+  data: CurrentUser;
+  status: 200;
+};
 
 export type meRetrieveResponse401 = {
-  data: ErrorResponse
-  status: 401
-}
-    
-export type meRetrieveResponseSuccess = (meRetrieveResponse200) & {
+  data: ErrorResponse;
+  status: 401;
+};
+
+export type meRetrieveResponseSuccess = meRetrieveResponse200 & {
   headers: Headers;
 };
-export type meRetrieveResponseError = (meRetrieveResponse401) & {
+export type meRetrieveResponseError = meRetrieveResponse401 & {
   headers: Headers;
 };
 
-export type meRetrieveResponse = (meRetrieveResponseSuccess | meRetrieveResponseError)
+export type meRetrieveResponse = meRetrieveResponseSuccess | meRetrieveResponseError;
 
 export const getMeRetrieveUrl = () => {
+  return `/api/me/`;
+};
 
-
-  
-
-  return `/api/me/`
-}
-
-export const meRetrieve = async ( options?: RequestInit): Promise<meRetrieveResponse> => {
-  
-  return customFetch<meRetrieveResponse>(getMeRetrieveUrl(),
-  {      
+export const meRetrieve = async (options?: RequestInit): Promise<meRetrieveResponse> => {
+  return customFetch<meRetrieveResponse>(getMeRetrieveUrl(), {
     ...options,
     method: 'GET'
-    
-    
-  }
-);}
-
-
-
-
+  });
+};
 
 export const getMeRetrieveInfiniteQueryKey = () => {
-    return [
-    'infinite', `/api/me/`
-    ] as const;
-    }
+  return ['infinite', `/api/me/`] as const;
+};
 
 export const getMeRetrieveQueryKey = () => {
-    return [
-    `/api/me/`
-    ] as const;
-    }
+  return [`/api/me/`] as const;
+};
 
-    
-export const getMeRetrieveInfiniteQueryOptions = <TData = InfiniteData<Awaited<ReturnType<typeof meRetrieve>>>, TError = ErrorResponse>( options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof meRetrieve>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
-) => {
+export const getMeRetrieveInfiniteQueryOptions = <
+  TData = InfiniteData<Awaited<ReturnType<typeof meRetrieve>>>,
+  TError = ErrorResponse
+>(options?: {
+  query?: Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof meRetrieve>>, TError, TData>>;
+  request?: SecondParameter<typeof customFetch>;
+}) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
 
-const {query: queryOptions, request: requestOptions} = options ?? {};
+  const queryKey = queryOptions?.queryKey ?? getMeRetrieveInfiniteQueryKey();
 
-  const queryKey =  queryOptions?.queryKey ?? getMeRetrieveInfiniteQueryKey();
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof meRetrieve>>> = ({ signal }) =>
+    meRetrieve({ signal, ...requestOptions });
 
-  
+  return { queryKey, queryFn, ...queryOptions } as UseInfiniteQueryOptions<
+    Awaited<ReturnType<typeof meRetrieve>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof meRetrieve>>> = ({ signal }) => meRetrieve({ signal, ...requestOptions });
+export type MeRetrieveInfiniteQueryResult = NonNullable<Awaited<ReturnType<typeof meRetrieve>>>;
+export type MeRetrieveInfiniteQueryError = ErrorResponse;
 
-      
-
-      
-
-   return  { queryKey, queryFn, ...queryOptions} as UseInfiniteQueryOptions<Awaited<ReturnType<typeof meRetrieve>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type MeRetrieveInfiniteQueryResult = NonNullable<Awaited<ReturnType<typeof meRetrieve>>>
-export type MeRetrieveInfiniteQueryError = ErrorResponse
-
-
-export function useMeRetrieveInfinite<TData = InfiniteData<Awaited<ReturnType<typeof meRetrieve>>>, TError = ErrorResponse>(
-  options: { query:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof meRetrieve>>, TError, TData>> & Pick<
+export function useMeRetrieveInfinite<
+  TData = InfiniteData<Awaited<ReturnType<typeof meRetrieve>>>,
+  TError = ErrorResponse
+>(
+  options: {
+    query: Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof meRetrieve>>, TError, TData>> &
+      Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof meRetrieve>>,
           TError,
           Awaited<ReturnType<typeof meRetrieve>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  DefinedUseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useMeRetrieveInfinite<TData = InfiniteData<Awaited<ReturnType<typeof meRetrieve>>>, TError = ErrorResponse>(
-  options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof meRetrieve>>, TError, TData>> & Pick<
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): DefinedUseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useMeRetrieveInfinite<
+  TData = InfiniteData<Awaited<ReturnType<typeof meRetrieve>>>,
+  TError = ErrorResponse
+>(
+  options?: {
+    query?: Partial<
+      UseInfiniteQueryOptions<Awaited<ReturnType<typeof meRetrieve>>, TError, TData>
+    > &
+      Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof meRetrieve>>,
           TError,
           Awaited<ReturnType<typeof meRetrieve>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useMeRetrieveInfinite<TData = InfiniteData<Awaited<ReturnType<typeof meRetrieve>>>, TError = ErrorResponse>(
-  options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof meRetrieve>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useMeRetrieveInfinite<
+  TData = InfiniteData<Awaited<ReturnType<typeof meRetrieve>>>,
+  TError = ErrorResponse
+>(
+  options?: {
+    query?: Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof meRetrieve>>, TError, TData>>;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 /**
  * @summary Get current user profile
  */
 
-export function useMeRetrieveInfinite<TData = InfiniteData<Awaited<ReturnType<typeof meRetrieve>>>, TError = ErrorResponse>(
-  options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof meRetrieve>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient 
- ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+export function useMeRetrieveInfinite<
+  TData = InfiniteData<Awaited<ReturnType<typeof meRetrieve>>>,
+  TError = ErrorResponse
+>(
+  options?: {
+    query?: Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof meRetrieve>>, TError, TData>>;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+  const queryOptions = getMeRetrieveInfiniteQueryOptions(options);
 
-  const queryOptions = getMeRetrieveInfiniteQueryOptions(options)
+  const query = useInfiniteQuery(queryOptions, queryClient) as UseInfiniteQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
 
-  const query = useInfiniteQuery(queryOptions, queryClient) as  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-
-  query.queryKey = queryOptions.queryKey ;
+  query.queryKey = queryOptions.queryKey;
 
   return query;
 }
 
+export const getMeRetrieveQueryOptions = <
+  TData = Awaited<ReturnType<typeof meRetrieve>>,
+  TError = ErrorResponse
+>(options?: {
+  query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof meRetrieve>>, TError, TData>>;
+  request?: SecondParameter<typeof customFetch>;
+}) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
 
+  const queryKey = queryOptions?.queryKey ?? getMeRetrieveQueryKey();
 
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof meRetrieve>>> = ({ signal }) =>
+    meRetrieve({ signal, ...requestOptions });
 
-export const getMeRetrieveQueryOptions = <TData = Awaited<ReturnType<typeof meRetrieve>>, TError = ErrorResponse>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof meRetrieve>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
-) => {
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof meRetrieve>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
 
-const {query: queryOptions, request: requestOptions} = options ?? {};
+export type MeRetrieveQueryResult = NonNullable<Awaited<ReturnType<typeof meRetrieve>>>;
+export type MeRetrieveQueryError = ErrorResponse;
 
-  const queryKey =  queryOptions?.queryKey ?? getMeRetrieveQueryKey();
-
-  
-
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof meRetrieve>>> = ({ signal }) => meRetrieve({ signal, ...requestOptions });
-
-      
-
-      
-
-   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof meRetrieve>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type MeRetrieveQueryResult = NonNullable<Awaited<ReturnType<typeof meRetrieve>>>
-export type MeRetrieveQueryError = ErrorResponse
-
-
-export function useMeRetrieve<TData = Awaited<ReturnType<typeof meRetrieve>>, TError = ErrorResponse>(
-  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof meRetrieve>>, TError, TData>> & Pick<
+export function useMeRetrieve<
+  TData = Awaited<ReturnType<typeof meRetrieve>>,
+  TError = ErrorResponse
+>(
+  options: {
+    query: Partial<UseQueryOptions<Awaited<ReturnType<typeof meRetrieve>>, TError, TData>> &
+      Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof meRetrieve>>,
           TError,
           Awaited<ReturnType<typeof meRetrieve>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useMeRetrieve<TData = Awaited<ReturnType<typeof meRetrieve>>, TError = ErrorResponse>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof meRetrieve>>, TError, TData>> & Pick<
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useMeRetrieve<
+  TData = Awaited<ReturnType<typeof meRetrieve>>,
+  TError = ErrorResponse
+>(
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof meRetrieve>>, TError, TData>> &
+      Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof meRetrieve>>,
           TError,
           Awaited<ReturnType<typeof meRetrieve>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useMeRetrieve<TData = Awaited<ReturnType<typeof meRetrieve>>, TError = ErrorResponse>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof meRetrieve>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useMeRetrieve<
+  TData = Awaited<ReturnType<typeof meRetrieve>>,
+  TError = ErrorResponse
+>(
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof meRetrieve>>, TError, TData>>;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 /**
  * @summary Get current user profile
  */
 
-export function useMeRetrieve<TData = Awaited<ReturnType<typeof meRetrieve>>, TError = ErrorResponse>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof meRetrieve>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient 
- ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+export function useMeRetrieve<
+  TData = Awaited<ReturnType<typeof meRetrieve>>,
+  TError = ErrorResponse
+>(
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof meRetrieve>>, TError, TData>>;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+  const queryOptions = getMeRetrieveQueryOptions(options);
 
-  const queryOptions = getMeRetrieveQueryOptions(options)
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+  };
 
-  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-
-  query.queryKey = queryOptions.queryKey ;
+  query.queryKey = queryOptions.queryKey;
 
   return query;
 }
-
-
-
-
 
 /**
  * @summary Update current user profile
  */
 export type mePartialUpdateResponse200 = {
-  data: CurrentUser
-  status: 200
-}
+  data: CurrentUser;
+  status: 200;
+};
 
 export type mePartialUpdateResponse400 = {
-  data: ErrorResponse
-  status: 400
-}
+  data: ErrorResponse;
+  status: 400;
+};
 
 export type mePartialUpdateResponse401 = {
-  data: ErrorResponse
-  status: 401
-}
-    
-export type mePartialUpdateResponseSuccess = (mePartialUpdateResponse200) & {
+  data: ErrorResponse;
+  status: 401;
+};
+
+export type mePartialUpdateResponseSuccess = mePartialUpdateResponse200 & {
   headers: Headers;
 };
-export type mePartialUpdateResponseError = (mePartialUpdateResponse400 | mePartialUpdateResponse401) & {
+export type mePartialUpdateResponseError = (
+  | mePartialUpdateResponse400
+  | mePartialUpdateResponse401
+) & {
   headers: Headers;
 };
 
-export type mePartialUpdateResponse = (mePartialUpdateResponseSuccess | mePartialUpdateResponseError)
+export type mePartialUpdateResponse = mePartialUpdateResponseSuccess | mePartialUpdateResponseError;
 
 export const getMePartialUpdateUrl = () => {
+  return `/api/me/`;
+};
 
-
-  
-
-  return `/api/me/`
-}
-
-export const mePartialUpdate = async (patchedCurrentUserUpdate: PatchedCurrentUserUpdate, options?: RequestInit): Promise<mePartialUpdateResponse> => {
-  
-  return customFetch<mePartialUpdateResponse>(getMePartialUpdateUrl(),
-  {      
+export const mePartialUpdate = async (
+  patchedCurrentUserUpdate: PatchedCurrentUserUpdate,
+  options?: RequestInit
+): Promise<mePartialUpdateResponse> => {
+  return customFetch<mePartialUpdateResponse>(getMePartialUpdateUrl(), {
     ...options,
     method: 'PATCH',
     headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(
-      patchedCurrentUserUpdate,)
-  }
-);}
+    body: JSON.stringify(patchedCurrentUserUpdate)
+  });
+};
 
+export const getMePartialUpdateMutationOptions = <
+  TError = ErrorResponse,
+  TContext = unknown
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof mePartialUpdate>>,
+    TError,
+    { data: PatchedCurrentUserUpdate },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof mePartialUpdate>>,
+  TError,
+  { data: PatchedCurrentUserUpdate },
+  TContext
+> => {
+  const mutationKey = ['mePartialUpdate'];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
 
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof mePartialUpdate>>,
+    { data: PatchedCurrentUserUpdate }
+  > = (props) => {
+    const { data } = props ?? {};
 
+    return mePartialUpdate(data, requestOptions);
+  };
 
-export const getMePartialUpdateMutationOptions = <TError = ErrorResponse,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof mePartialUpdate>>, TError,{data: PatchedCurrentUserUpdate}, TContext>, request?: SecondParameter<typeof customFetch>}
-): UseMutationOptions<Awaited<ReturnType<typeof mePartialUpdate>>, TError,{data: PatchedCurrentUserUpdate}, TContext> => {
+  return { mutationFn, ...mutationOptions };
+};
 
-const mutationKey = ['mePartialUpdate'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
+export type MePartialUpdateMutationResult = NonNullable<
+  Awaited<ReturnType<typeof mePartialUpdate>>
+>;
+export type MePartialUpdateMutationBody = PatchedCurrentUserUpdate;
+export type MePartialUpdateMutationError = ErrorResponse;
 
-      
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof mePartialUpdate>>, {data: PatchedCurrentUserUpdate}> = (props) => {
-          const {data} = props ?? {};
-
-          return  mePartialUpdate(data,requestOptions)
-        }
-
-        
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type MePartialUpdateMutationResult = NonNullable<Awaited<ReturnType<typeof mePartialUpdate>>>
-    export type MePartialUpdateMutationBody = PatchedCurrentUserUpdate
-    export type MePartialUpdateMutationError = ErrorResponse
-
-    /**
+/**
  * @summary Update current user profile
  */
-export const useMePartialUpdate = <TError = ErrorResponse,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof mePartialUpdate>>, TError,{data: PatchedCurrentUserUpdate}, TContext>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof mePartialUpdate>>,
-        TError,
-        {data: PatchedCurrentUserUpdate},
-        TContext
-      > => {
+export const useMePartialUpdate = <TError = ErrorResponse, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof mePartialUpdate>>,
+      TError,
+      { data: PatchedCurrentUserUpdate },
+      TContext
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseMutationResult<
+  Awaited<ReturnType<typeof mePartialUpdate>>,
+  TError,
+  { data: PatchedCurrentUserUpdate },
+  TContext
+> => {
+  const mutationOptions = getMePartialUpdateMutationOptions(options);
 
-      const mutationOptions = getMePartialUpdateMutationOptions(options);
+  return useMutation(mutationOptions, queryClient);
+};
 
-      return useMutation(mutationOptions, queryClient);
-    }
-    
 /**
  * Creates a tenant trial workspace for the authenticated user. Repeated requests for an already provisioned user return a validation error.
  * @summary Provision trial tenant for current user
  */
 export type onboardingTrialTenantCreateResponse201 = {
-  data: TrialTenantOnboardingResponse
-  status: 201
-}
+  data: TrialTenantOnboardingResponse;
+  status: 201;
+};
 
 export type onboardingTrialTenantCreateResponse400 = {
-  data: TenantErrorResponse
-  status: 400
-}
+  data: TenantErrorResponse;
+  status: 400;
+};
 
 export type onboardingTrialTenantCreateResponse401 = {
-  data: TenantErrorResponse
-  status: 401
-}
-    
-export type onboardingTrialTenantCreateResponseSuccess = (onboardingTrialTenantCreateResponse201) & {
+  data: TenantErrorResponse;
+  status: 401;
+};
+
+export type onboardingTrialTenantCreateResponseSuccess = onboardingTrialTenantCreateResponse201 & {
   headers: Headers;
 };
-export type onboardingTrialTenantCreateResponseError = (onboardingTrialTenantCreateResponse400 | onboardingTrialTenantCreateResponse401) & {
+export type onboardingTrialTenantCreateResponseError = (
+  | onboardingTrialTenantCreateResponse400
+  | onboardingTrialTenantCreateResponse401
+) & {
   headers: Headers;
 };
 
-export type onboardingTrialTenantCreateResponse = (onboardingTrialTenantCreateResponseSuccess | onboardingTrialTenantCreateResponseError)
+export type onboardingTrialTenantCreateResponse =
+  | onboardingTrialTenantCreateResponseSuccess
+  | onboardingTrialTenantCreateResponseError;
 
 export const getOnboardingTrialTenantCreateUrl = () => {
+  return `/api/onboarding/trial-tenant/`;
+};
 
-
-  
-
-  return `/api/onboarding/trial-tenant/`
-}
-
-export const onboardingTrialTenantCreate = async (trialTenantOnboarding: TrialTenantOnboarding, options?: RequestInit): Promise<onboardingTrialTenantCreateResponse> => {
-  
-  return customFetch<onboardingTrialTenantCreateResponse>(getOnboardingTrialTenantCreateUrl(),
-  {      
+export const onboardingTrialTenantCreate = async (
+  trialTenantOnboarding: TrialTenantOnboarding,
+  options?: RequestInit
+): Promise<onboardingTrialTenantCreateResponse> => {
+  return customFetch<onboardingTrialTenantCreateResponse>(getOnboardingTrialTenantCreateUrl(), {
     ...options,
     method: 'POST',
     headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(
-      trialTenantOnboarding,)
-  }
-);}
+    body: JSON.stringify(trialTenantOnboarding)
+  });
+};
 
+export const getOnboardingTrialTenantCreateMutationOptions = <
+  TError = TenantErrorResponse,
+  TContext = unknown
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof onboardingTrialTenantCreate>>,
+    TError,
+    { data: TrialTenantOnboarding },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof onboardingTrialTenantCreate>>,
+  TError,
+  { data: TrialTenantOnboarding },
+  TContext
+> => {
+  const mutationKey = ['onboardingTrialTenantCreate'];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
 
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof onboardingTrialTenantCreate>>,
+    { data: TrialTenantOnboarding }
+  > = (props) => {
+    const { data } = props ?? {};
 
+    return onboardingTrialTenantCreate(data, requestOptions);
+  };
 
-export const getOnboardingTrialTenantCreateMutationOptions = <TError = TenantErrorResponse,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof onboardingTrialTenantCreate>>, TError,{data: TrialTenantOnboarding}, TContext>, request?: SecondParameter<typeof customFetch>}
-): UseMutationOptions<Awaited<ReturnType<typeof onboardingTrialTenantCreate>>, TError,{data: TrialTenantOnboarding}, TContext> => {
+  return { mutationFn, ...mutationOptions };
+};
 
-const mutationKey = ['onboardingTrialTenantCreate'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
+export type OnboardingTrialTenantCreateMutationResult = NonNullable<
+  Awaited<ReturnType<typeof onboardingTrialTenantCreate>>
+>;
+export type OnboardingTrialTenantCreateMutationBody = TrialTenantOnboarding;
+export type OnboardingTrialTenantCreateMutationError = TenantErrorResponse;
 
-      
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof onboardingTrialTenantCreate>>, {data: TrialTenantOnboarding}> = (props) => {
-          const {data} = props ?? {};
-
-          return  onboardingTrialTenantCreate(data,requestOptions)
-        }
-
-        
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type OnboardingTrialTenantCreateMutationResult = NonNullable<Awaited<ReturnType<typeof onboardingTrialTenantCreate>>>
-    export type OnboardingTrialTenantCreateMutationBody = TrialTenantOnboarding
-    export type OnboardingTrialTenantCreateMutationError = TenantErrorResponse
-
-    /**
+/**
  * @summary Provision trial tenant for current user
  */
-export const useOnboardingTrialTenantCreate = <TError = TenantErrorResponse,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof onboardingTrialTenantCreate>>, TError,{data: TrialTenantOnboarding}, TContext>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof onboardingTrialTenantCreate>>,
-        TError,
-        {data: TrialTenantOnboarding},
-        TContext
-      > => {
+export const useOnboardingTrialTenantCreate = <TError = TenantErrorResponse, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof onboardingTrialTenantCreate>>,
+      TError,
+      { data: TrialTenantOnboarding },
+      TContext
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseMutationResult<
+  Awaited<ReturnType<typeof onboardingTrialTenantCreate>>,
+  TError,
+  { data: TrialTenantOnboarding },
+  TContext
+> => {
+  const mutationOptions = getOnboardingTrialTenantCreateMutationOptions(options);
 
-      const mutationOptions = getOnboardingTrialTenantCreateMutationOptions(options);
+  return useMutation(mutationOptions, queryClient);
+};
 
-      return useMutation(mutationOptions, queryClient);
-    }
-    
 /**
  * Takes a refresh type JSON web token and returns an access type JSON web
 token if the refresh token is valid.
  * @summary Refresh token
  */
 export type refreshCreateResponse200 = {
-  data: TokenRefreshResponse
-  status: 200
-}
+  data: TokenRefreshResponse;
+  status: 200;
+};
 
 export type refreshCreateResponse401 = {
-  data: ErrorResponse
-  status: 401
-}
-    
-export type refreshCreateResponseSuccess = (refreshCreateResponse200) & {
+  data: ErrorResponse;
+  status: 401;
+};
+
+export type refreshCreateResponseSuccess = refreshCreateResponse200 & {
   headers: Headers;
 };
-export type refreshCreateResponseError = (refreshCreateResponse401) & {
+export type refreshCreateResponseError = refreshCreateResponse401 & {
   headers: Headers;
 };
 
-export type refreshCreateResponse = (refreshCreateResponseSuccess | refreshCreateResponseError)
+export type refreshCreateResponse = refreshCreateResponseSuccess | refreshCreateResponseError;
 
 export const getRefreshCreateUrl = () => {
+  return `/api/refresh/`;
+};
 
-
-  
-
-  return `/api/refresh/`
-}
-
-export const refreshCreate = async (tokenRefreshRequest: TokenRefreshRequest, options?: RequestInit): Promise<refreshCreateResponse> => {
-  
-  return customFetch<refreshCreateResponse>(getRefreshCreateUrl(),
-  {      
+export const refreshCreate = async (
+  tokenRefreshRequest: TokenRefreshRequest,
+  options?: RequestInit
+): Promise<refreshCreateResponse> => {
+  return customFetch<refreshCreateResponse>(getRefreshCreateUrl(), {
     ...options,
     method: 'POST',
     headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(
-      tokenRefreshRequest,)
-  }
-);}
+    body: JSON.stringify(tokenRefreshRequest)
+  });
+};
 
+export const getRefreshCreateMutationOptions = <
+  TError = ErrorResponse,
+  TContext = unknown
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof refreshCreate>>,
+    TError,
+    { data: TokenRefreshRequest },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof refreshCreate>>,
+  TError,
+  { data: TokenRefreshRequest },
+  TContext
+> => {
+  const mutationKey = ['refreshCreate'];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
 
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof refreshCreate>>,
+    { data: TokenRefreshRequest }
+  > = (props) => {
+    const { data } = props ?? {};
 
+    return refreshCreate(data, requestOptions);
+  };
 
-export const getRefreshCreateMutationOptions = <TError = ErrorResponse,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof refreshCreate>>, TError,{data: TokenRefreshRequest}, TContext>, request?: SecondParameter<typeof customFetch>}
-): UseMutationOptions<Awaited<ReturnType<typeof refreshCreate>>, TError,{data: TokenRefreshRequest}, TContext> => {
+  return { mutationFn, ...mutationOptions };
+};
 
-const mutationKey = ['refreshCreate'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
+export type RefreshCreateMutationResult = NonNullable<Awaited<ReturnType<typeof refreshCreate>>>;
+export type RefreshCreateMutationBody = TokenRefreshRequest;
+export type RefreshCreateMutationError = ErrorResponse;
 
-      
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof refreshCreate>>, {data: TokenRefreshRequest}> = (props) => {
-          const {data} = props ?? {};
-
-          return  refreshCreate(data,requestOptions)
-        }
-
-        
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type RefreshCreateMutationResult = NonNullable<Awaited<ReturnType<typeof refreshCreate>>>
-    export type RefreshCreateMutationBody = TokenRefreshRequest
-    export type RefreshCreateMutationError = ErrorResponse
-
-    /**
+/**
  * @summary Refresh token
  */
-export const useRefreshCreate = <TError = ErrorResponse,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof refreshCreate>>, TError,{data: TokenRefreshRequest}, TContext>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof refreshCreate>>,
-        TError,
-        {data: TokenRefreshRequest},
-        TContext
-      > => {
+export const useRefreshCreate = <TError = ErrorResponse, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof refreshCreate>>,
+      TError,
+      { data: TokenRefreshRequest },
+      TContext
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseMutationResult<
+  Awaited<ReturnType<typeof refreshCreate>>,
+  TError,
+  { data: TokenRefreshRequest },
+  TContext
+> => {
+  const mutationOptions = getRefreshCreateMutationOptions(options);
 
-      const mutationOptions = getRefreshCreateMutationOptions(options);
+  return useMutation(mutationOptions, queryClient);
+};
 
-      return useMutation(mutationOptions, queryClient);
-    }
-    
 /**
  * Creates a platform user account. Tenant membership is configured separately by admin endpoints.
  * @summary Register user
  */
 export type registerCreateResponse201 = {
-  data: Register
-  status: 201
-}
+  data: Register;
+  status: 201;
+};
 
 export type registerCreateResponse400 = {
-  data: ErrorResponse
-  status: 400
-}
-    
-export type registerCreateResponseSuccess = (registerCreateResponse201) & {
+  data: ErrorResponse;
+  status: 400;
+};
+
+export type registerCreateResponseSuccess = registerCreateResponse201 & {
   headers: Headers;
 };
-export type registerCreateResponseError = (registerCreateResponse400) & {
+export type registerCreateResponseError = registerCreateResponse400 & {
   headers: Headers;
 };
 
-export type registerCreateResponse = (registerCreateResponseSuccess | registerCreateResponseError)
+export type registerCreateResponse = registerCreateResponseSuccess | registerCreateResponseError;
 
 export const getRegisterCreateUrl = () => {
+  return `/api/register/`;
+};
 
-
-  
-
-  return `/api/register/`
-}
-
-export const registerCreate = async (register: NonReadonly<Register>, options?: RequestInit): Promise<registerCreateResponse> => {
-  
-  return customFetch<registerCreateResponse>(getRegisterCreateUrl(),
-  {      
+export const registerCreate = async (
+  register: NonReadonly<Register>,
+  options?: RequestInit
+): Promise<registerCreateResponse> => {
+  return customFetch<registerCreateResponse>(getRegisterCreateUrl(), {
     ...options,
     method: 'POST',
     headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(
-      register,)
-  }
-);}
+    body: JSON.stringify(register)
+  });
+};
 
+export const getRegisterCreateMutationOptions = <
+  TError = ErrorResponse,
+  TContext = unknown
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof registerCreate>>,
+    TError,
+    { data: NonReadonly<Register> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof registerCreate>>,
+  TError,
+  { data: NonReadonly<Register> },
+  TContext
+> => {
+  const mutationKey = ['registerCreate'];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
 
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof registerCreate>>,
+    { data: NonReadonly<Register> }
+  > = (props) => {
+    const { data } = props ?? {};
 
+    return registerCreate(data, requestOptions);
+  };
 
-export const getRegisterCreateMutationOptions = <TError = ErrorResponse,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof registerCreate>>, TError,{data: NonReadonly<Register>}, TContext>, request?: SecondParameter<typeof customFetch>}
-): UseMutationOptions<Awaited<ReturnType<typeof registerCreate>>, TError,{data: NonReadonly<Register>}, TContext> => {
+  return { mutationFn, ...mutationOptions };
+};
 
-const mutationKey = ['registerCreate'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
+export type RegisterCreateMutationResult = NonNullable<Awaited<ReturnType<typeof registerCreate>>>;
+export type RegisterCreateMutationBody = NonReadonly<Register>;
+export type RegisterCreateMutationError = ErrorResponse;
 
-      
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof registerCreate>>, {data: NonReadonly<Register>}> = (props) => {
-          const {data} = props ?? {};
-
-          return  registerCreate(data,requestOptions)
-        }
-
-        
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type RegisterCreateMutationResult = NonNullable<Awaited<ReturnType<typeof registerCreate>>>
-    export type RegisterCreateMutationBody = NonReadonly<Register>
-    export type RegisterCreateMutationError = ErrorResponse
-
-    /**
+/**
  * @summary Register user
  */
-export const useRegisterCreate = <TError = ErrorResponse,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof registerCreate>>, TError,{data: NonReadonly<Register>}, TContext>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof registerCreate>>,
-        TError,
-        {data: NonReadonly<Register>},
-        TContext
-      > => {
+export const useRegisterCreate = <TError = ErrorResponse, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof registerCreate>>,
+      TError,
+      { data: NonReadonly<Register> },
+      TContext
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseMutationResult<
+  Awaited<ReturnType<typeof registerCreate>>,
+  TError,
+  { data: NonReadonly<Register> },
+  TContext
+> => {
+  const mutationOptions = getRegisterCreateMutationOptions(options);
 
-      const mutationOptions = getRegisterCreateMutationOptions(options);
+  return useMutation(mutationOptions, queryClient);
+};
 
-      return useMutation(mutationOptions, queryClient);
-    }
-    
 /**
  * @summary List forms
  */
 export type surveysFormsListResponse200 = {
-  data: PaginatedFormList
-  status: 200
-}
-    
-export type surveysFormsListResponseSuccess = (surveysFormsListResponse200) & {
+  data: PaginatedFormList;
+  status: 200;
+};
+
+export type surveysFormsListResponseSuccess = surveysFormsListResponse200 & {
   headers: Headers;
 };
-;
 
-export type surveysFormsListResponse = (surveysFormsListResponseSuccess)
+export type surveysFormsListResponse = surveysFormsListResponseSuccess;
 
-export const getSurveysFormsListUrl = (params?: SurveysFormsListParams,) => {
+export const getSurveysFormsListUrl = (params?: SurveysFormsListParams) => {
   const normalizedParams = new URLSearchParams();
 
   Object.entries(params || {}).forEach(([key, value]) => {
-    
     if (value !== undefined) {
-      normalizedParams.append(key, value === null ? 'null' : value.toString())
+      normalizedParams.append(key, value === null ? 'null' : value.toString());
     }
   });
 
   const stringifiedParams = normalizedParams.toString();
 
-  return stringifiedParams.length > 0 ? `/api/surveys/forms/?${stringifiedParams}` : `/api/surveys/forms/`
-}
+  return stringifiedParams.length > 0
+    ? `/api/surveys/forms/?${stringifiedParams}`
+    : `/api/surveys/forms/`;
+};
 
-export const surveysFormsList = async (params?: SurveysFormsListParams, options?: RequestInit): Promise<surveysFormsListResponse> => {
-  
-  return customFetch<surveysFormsListResponse>(getSurveysFormsListUrl(params),
-  {      
+export const surveysFormsList = async (
+  params?: SurveysFormsListParams,
+  options?: RequestInit
+): Promise<surveysFormsListResponse> => {
+  return customFetch<surveysFormsListResponse>(getSurveysFormsListUrl(params), {
     ...options,
     method: 'GET'
-    
-    
+  });
+};
+
+export const getSurveysFormsListInfiniteQueryKey = (params?: SurveysFormsListParams) => {
+  return ['infinite', `/api/surveys/forms/`, ...(params ? [params] : [])] as const;
+};
+
+export const getSurveysFormsListQueryKey = (params?: SurveysFormsListParams) => {
+  return [`/api/surveys/forms/`, ...(params ? [params] : [])] as const;
+};
+
+export const getSurveysFormsListInfiniteQueryOptions = <
+  TData = InfiniteData<Awaited<ReturnType<typeof surveysFormsList>>>,
+  TError = unknown
+>(
+  params?: SurveysFormsListParams,
+  options?: {
+    query?: Partial<
+      UseInfiniteQueryOptions<Awaited<ReturnType<typeof surveysFormsList>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof customFetch>;
   }
-);}
-
-
-
-
-
-export const getSurveysFormsListInfiniteQueryKey = (params?: SurveysFormsListParams,) => {
-    return [
-    'infinite', `/api/surveys/forms/`, ...(params ? [params]: [])
-    ] as const;
-    }
-
-export const getSurveysFormsListQueryKey = (params?: SurveysFormsListParams,) => {
-    return [
-    `/api/surveys/forms/`, ...(params ? [params]: [])
-    ] as const;
-    }
-
-    
-export const getSurveysFormsListInfiniteQueryOptions = <TData = InfiniteData<Awaited<ReturnType<typeof surveysFormsList>>>, TError = unknown>(params?: SurveysFormsListParams, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof surveysFormsList>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
 ) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
 
-const {query: queryOptions, request: requestOptions} = options ?? {};
+  const queryKey = queryOptions?.queryKey ?? getSurveysFormsListInfiniteQueryKey(params);
 
-  const queryKey =  queryOptions?.queryKey ?? getSurveysFormsListInfiniteQueryKey(params);
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof surveysFormsList>>> = ({ signal }) =>
+    surveysFormsList(params, { signal, ...requestOptions });
 
-  
+  return { queryKey, queryFn, ...queryOptions } as UseInfiniteQueryOptions<
+    Awaited<ReturnType<typeof surveysFormsList>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof surveysFormsList>>> = ({ signal }) => surveysFormsList(params, { signal, ...requestOptions });
+export type SurveysFormsListInfiniteQueryResult = NonNullable<
+  Awaited<ReturnType<typeof surveysFormsList>>
+>;
+export type SurveysFormsListInfiniteQueryError = unknown;
 
-      
-
-      
-
-   return  { queryKey, queryFn, ...queryOptions} as UseInfiniteQueryOptions<Awaited<ReturnType<typeof surveysFormsList>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type SurveysFormsListInfiniteQueryResult = NonNullable<Awaited<ReturnType<typeof surveysFormsList>>>
-export type SurveysFormsListInfiniteQueryError = unknown
-
-
-export function useSurveysFormsListInfinite<TData = InfiniteData<Awaited<ReturnType<typeof surveysFormsList>>>, TError = unknown>(
- params: undefined |  SurveysFormsListParams, options: { query:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof surveysFormsList>>, TError, TData>> & Pick<
+export function useSurveysFormsListInfinite<
+  TData = InfiniteData<Awaited<ReturnType<typeof surveysFormsList>>>,
+  TError = unknown
+>(
+  params: undefined | SurveysFormsListParams,
+  options: {
+    query: Partial<
+      UseInfiniteQueryOptions<Awaited<ReturnType<typeof surveysFormsList>>, TError, TData>
+    > &
+      Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof surveysFormsList>>,
           TError,
           Awaited<ReturnType<typeof surveysFormsList>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  DefinedUseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useSurveysFormsListInfinite<TData = InfiniteData<Awaited<ReturnType<typeof surveysFormsList>>>, TError = unknown>(
- params?: SurveysFormsListParams, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof surveysFormsList>>, TError, TData>> & Pick<
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): DefinedUseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useSurveysFormsListInfinite<
+  TData = InfiniteData<Awaited<ReturnType<typeof surveysFormsList>>>,
+  TError = unknown
+>(
+  params?: SurveysFormsListParams,
+  options?: {
+    query?: Partial<
+      UseInfiniteQueryOptions<Awaited<ReturnType<typeof surveysFormsList>>, TError, TData>
+    > &
+      Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof surveysFormsList>>,
           TError,
           Awaited<ReturnType<typeof surveysFormsList>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useSurveysFormsListInfinite<TData = InfiniteData<Awaited<ReturnType<typeof surveysFormsList>>>, TError = unknown>(
- params?: SurveysFormsListParams, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof surveysFormsList>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useSurveysFormsListInfinite<
+  TData = InfiniteData<Awaited<ReturnType<typeof surveysFormsList>>>,
+  TError = unknown
+>(
+  params?: SurveysFormsListParams,
+  options?: {
+    query?: Partial<
+      UseInfiniteQueryOptions<Awaited<ReturnType<typeof surveysFormsList>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 /**
  * @summary List forms
  */
 
-export function useSurveysFormsListInfinite<TData = InfiniteData<Awaited<ReturnType<typeof surveysFormsList>>>, TError = unknown>(
- params?: SurveysFormsListParams, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof surveysFormsList>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient 
- ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+export function useSurveysFormsListInfinite<
+  TData = InfiniteData<Awaited<ReturnType<typeof surveysFormsList>>>,
+  TError = unknown
+>(
+  params?: SurveysFormsListParams,
+  options?: {
+    query?: Partial<
+      UseInfiniteQueryOptions<Awaited<ReturnType<typeof surveysFormsList>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+  const queryOptions = getSurveysFormsListInfiniteQueryOptions(params, options);
 
-  const queryOptions = getSurveysFormsListInfiniteQueryOptions(params,options)
+  const query = useInfiniteQuery(queryOptions, queryClient) as UseInfiniteQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
 
-  const query = useInfiniteQuery(queryOptions, queryClient) as  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-
-  query.queryKey = queryOptions.queryKey ;
+  query.queryKey = queryOptions.queryKey;
 
   return query;
 }
 
-
-
-
-export const getSurveysFormsListQueryOptions = <TData = Awaited<ReturnType<typeof surveysFormsList>>, TError = unknown>(params?: SurveysFormsListParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof surveysFormsList>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+export const getSurveysFormsListQueryOptions = <
+  TData = Awaited<ReturnType<typeof surveysFormsList>>,
+  TError = unknown
+>(
+  params?: SurveysFormsListParams,
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof surveysFormsList>>, TError, TData>>;
+    request?: SecondParameter<typeof customFetch>;
+  }
 ) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
 
-const {query: queryOptions, request: requestOptions} = options ?? {};
+  const queryKey = queryOptions?.queryKey ?? getSurveysFormsListQueryKey(params);
 
-  const queryKey =  queryOptions?.queryKey ?? getSurveysFormsListQueryKey(params);
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof surveysFormsList>>> = ({ signal }) =>
+    surveysFormsList(params, { signal, ...requestOptions });
 
-  
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof surveysFormsList>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof surveysFormsList>>> = ({ signal }) => surveysFormsList(params, { signal, ...requestOptions });
+export type SurveysFormsListQueryResult = NonNullable<Awaited<ReturnType<typeof surveysFormsList>>>;
+export type SurveysFormsListQueryError = unknown;
 
-      
-
-      
-
-   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof surveysFormsList>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type SurveysFormsListQueryResult = NonNullable<Awaited<ReturnType<typeof surveysFormsList>>>
-export type SurveysFormsListQueryError = unknown
-
-
-export function useSurveysFormsList<TData = Awaited<ReturnType<typeof surveysFormsList>>, TError = unknown>(
- params: undefined |  SurveysFormsListParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof surveysFormsList>>, TError, TData>> & Pick<
+export function useSurveysFormsList<
+  TData = Awaited<ReturnType<typeof surveysFormsList>>,
+  TError = unknown
+>(
+  params: undefined | SurveysFormsListParams,
+  options: {
+    query: Partial<UseQueryOptions<Awaited<ReturnType<typeof surveysFormsList>>, TError, TData>> &
+      Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof surveysFormsList>>,
           TError,
           Awaited<ReturnType<typeof surveysFormsList>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useSurveysFormsList<TData = Awaited<ReturnType<typeof surveysFormsList>>, TError = unknown>(
- params?: SurveysFormsListParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof surveysFormsList>>, TError, TData>> & Pick<
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useSurveysFormsList<
+  TData = Awaited<ReturnType<typeof surveysFormsList>>,
+  TError = unknown
+>(
+  params?: SurveysFormsListParams,
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof surveysFormsList>>, TError, TData>> &
+      Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof surveysFormsList>>,
           TError,
           Awaited<ReturnType<typeof surveysFormsList>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useSurveysFormsList<TData = Awaited<ReturnType<typeof surveysFormsList>>, TError = unknown>(
- params?: SurveysFormsListParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof surveysFormsList>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useSurveysFormsList<
+  TData = Awaited<ReturnType<typeof surveysFormsList>>,
+  TError = unknown
+>(
+  params?: SurveysFormsListParams,
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof surveysFormsList>>, TError, TData>>;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 /**
  * @summary List forms
  */
 
-export function useSurveysFormsList<TData = Awaited<ReturnType<typeof surveysFormsList>>, TError = unknown>(
- params?: SurveysFormsListParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof surveysFormsList>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient 
- ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+export function useSurveysFormsList<
+  TData = Awaited<ReturnType<typeof surveysFormsList>>,
+  TError = unknown
+>(
+  params?: SurveysFormsListParams,
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof surveysFormsList>>, TError, TData>>;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+  const queryOptions = getSurveysFormsListQueryOptions(params, options);
 
-  const queryOptions = getSurveysFormsListQueryOptions(params,options)
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+  };
 
-  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-
-  query.queryKey = queryOptions.queryKey ;
+  query.queryKey = queryOptions.queryKey;
 
   return query;
 }
-
-
-
-
 
 /**
  * @summary Create form
  */
 export type surveysFormsCreateResponse201 = {
-  data: Form
-  status: 201
-}
-    
-export type surveysFormsCreateResponseSuccess = (surveysFormsCreateResponse201) & {
+  data: Form;
+  status: 201;
+};
+
+export type surveysFormsCreateResponseSuccess = surveysFormsCreateResponse201 & {
   headers: Headers;
 };
-;
 
-export type surveysFormsCreateResponse = (surveysFormsCreateResponseSuccess)
+export type surveysFormsCreateResponse = surveysFormsCreateResponseSuccess;
 
 export const getSurveysFormsCreateUrl = () => {
+  return `/api/surveys/forms/`;
+};
 
-
-  
-
-  return `/api/surveys/forms/`
-}
-
-export const surveysFormsCreate = async (form: NonReadonly<Form>, options?: RequestInit): Promise<surveysFormsCreateResponse> => {
-  
-  return customFetch<surveysFormsCreateResponse>(getSurveysFormsCreateUrl(),
-  {      
+export const surveysFormsCreate = async (
+  form: NonReadonly<Form>,
+  options?: RequestInit
+): Promise<surveysFormsCreateResponse> => {
+  return customFetch<surveysFormsCreateResponse>(getSurveysFormsCreateUrl(), {
     ...options,
     method: 'POST',
     headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(
-      form,)
-  }
-);}
+    body: JSON.stringify(form)
+  });
+};
 
+export const getSurveysFormsCreateMutationOptions = <
+  TError = unknown,
+  TContext = unknown
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof surveysFormsCreate>>,
+    TError,
+    { data: NonReadonly<Form> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof surveysFormsCreate>>,
+  TError,
+  { data: NonReadonly<Form> },
+  TContext
+> => {
+  const mutationKey = ['surveysFormsCreate'];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
 
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof surveysFormsCreate>>,
+    { data: NonReadonly<Form> }
+  > = (props) => {
+    const { data } = props ?? {};
 
+    return surveysFormsCreate(data, requestOptions);
+  };
 
-export const getSurveysFormsCreateMutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof surveysFormsCreate>>, TError,{data: NonReadonly<Form>}, TContext>, request?: SecondParameter<typeof customFetch>}
-): UseMutationOptions<Awaited<ReturnType<typeof surveysFormsCreate>>, TError,{data: NonReadonly<Form>}, TContext> => {
+  return { mutationFn, ...mutationOptions };
+};
 
-const mutationKey = ['surveysFormsCreate'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
+export type SurveysFormsCreateMutationResult = NonNullable<
+  Awaited<ReturnType<typeof surveysFormsCreate>>
+>;
+export type SurveysFormsCreateMutationBody = NonReadonly<Form>;
+export type SurveysFormsCreateMutationError = unknown;
 
-      
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof surveysFormsCreate>>, {data: NonReadonly<Form>}> = (props) => {
-          const {data} = props ?? {};
-
-          return  surveysFormsCreate(data,requestOptions)
-        }
-
-        
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type SurveysFormsCreateMutationResult = NonNullable<Awaited<ReturnType<typeof surveysFormsCreate>>>
-    export type SurveysFormsCreateMutationBody = NonReadonly<Form>
-    export type SurveysFormsCreateMutationError = unknown
-
-    /**
+/**
  * @summary Create form
  */
-export const useSurveysFormsCreate = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof surveysFormsCreate>>, TError,{data: NonReadonly<Form>}, TContext>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof surveysFormsCreate>>,
-        TError,
-        {data: NonReadonly<Form>},
-        TContext
-      > => {
+export const useSurveysFormsCreate = <TError = unknown, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof surveysFormsCreate>>,
+      TError,
+      { data: NonReadonly<Form> },
+      TContext
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseMutationResult<
+  Awaited<ReturnType<typeof surveysFormsCreate>>,
+  TError,
+  { data: NonReadonly<Form> },
+  TContext
+> => {
+  const mutationOptions = getSurveysFormsCreateMutationOptions(options);
 
-      const mutationOptions = getSurveysFormsCreateMutationOptions(options);
+  return useMutation(mutationOptions, queryClient);
+};
 
-      return useMutation(mutationOptions, queryClient);
-    }
-    
 /**
  * @summary List questions by form
  */
 export type surveysFormsQuestionsListResponse200 = {
-  data: FormQuestion[]
-  status: 200
-}
-    
-export type surveysFormsQuestionsListResponseSuccess = (surveysFormsQuestionsListResponse200) & {
+  data: FormQuestion[];
+  status: 200;
+};
+
+export type surveysFormsQuestionsListResponseSuccess = surveysFormsQuestionsListResponse200 & {
   headers: Headers;
 };
-;
 
-export type surveysFormsQuestionsListResponse = (surveysFormsQuestionsListResponseSuccess)
+export type surveysFormsQuestionsListResponse = surveysFormsQuestionsListResponseSuccess;
 
-export const getSurveysFormsQuestionsListUrl = (formId: string,) => {
+export const getSurveysFormsQuestionsListUrl = (formId: string) => {
+  return `/api/surveys/forms/${formId}/questions/`;
+};
 
-
-  
-
-  return `/api/surveys/forms/${formId}/questions/`
-}
-
-export const surveysFormsQuestionsList = async (formId: string, options?: RequestInit): Promise<surveysFormsQuestionsListResponse> => {
-  
-  return customFetch<surveysFormsQuestionsListResponse>(getSurveysFormsQuestionsListUrl(formId),
-  {      
+export const surveysFormsQuestionsList = async (
+  formId: string,
+  options?: RequestInit
+): Promise<surveysFormsQuestionsListResponse> => {
+  return customFetch<surveysFormsQuestionsListResponse>(getSurveysFormsQuestionsListUrl(formId), {
     ...options,
     method: 'GET'
-    
-    
+  });
+};
+
+export const getSurveysFormsQuestionsListInfiniteQueryKey = (formId?: string) => {
+  return ['infinite', `/api/surveys/forms/${formId}/questions/`] as const;
+};
+
+export const getSurveysFormsQuestionsListQueryKey = (formId?: string) => {
+  return [`/api/surveys/forms/${formId}/questions/`] as const;
+};
+
+export const getSurveysFormsQuestionsListInfiniteQueryOptions = <
+  TData = InfiniteData<Awaited<ReturnType<typeof surveysFormsQuestionsList>>>,
+  TError = unknown
+>(
+  formId: string,
+  options?: {
+    query?: Partial<
+      UseInfiniteQueryOptions<Awaited<ReturnType<typeof surveysFormsQuestionsList>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof customFetch>;
   }
-);}
-
-
-
-
-
-export const getSurveysFormsQuestionsListInfiniteQueryKey = (formId?: string,) => {
-    return [
-    'infinite', `/api/surveys/forms/${formId}/questions/`
-    ] as const;
-    }
-
-export const getSurveysFormsQuestionsListQueryKey = (formId?: string,) => {
-    return [
-    `/api/surveys/forms/${formId}/questions/`
-    ] as const;
-    }
-
-    
-export const getSurveysFormsQuestionsListInfiniteQueryOptions = <TData = InfiniteData<Awaited<ReturnType<typeof surveysFormsQuestionsList>>>, TError = unknown>(formId: string, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof surveysFormsQuestionsList>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
 ) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
 
-const {query: queryOptions, request: requestOptions} = options ?? {};
+  const queryKey = queryOptions?.queryKey ?? getSurveysFormsQuestionsListInfiniteQueryKey(formId);
 
-  const queryKey =  queryOptions?.queryKey ?? getSurveysFormsQuestionsListInfiniteQueryKey(formId);
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof surveysFormsQuestionsList>>> = ({
+    signal
+  }) => surveysFormsQuestionsList(formId, { signal, ...requestOptions });
 
-  
+  return { queryKey, queryFn, enabled: !!formId, ...queryOptions } as UseInfiniteQueryOptions<
+    Awaited<ReturnType<typeof surveysFormsQuestionsList>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof surveysFormsQuestionsList>>> = ({ signal }) => surveysFormsQuestionsList(formId, { signal, ...requestOptions });
+export type SurveysFormsQuestionsListInfiniteQueryResult = NonNullable<
+  Awaited<ReturnType<typeof surveysFormsQuestionsList>>
+>;
+export type SurveysFormsQuestionsListInfiniteQueryError = unknown;
 
-      
-
-      
-
-   return  { queryKey, queryFn, enabled: !!(formId), ...queryOptions} as UseInfiniteQueryOptions<Awaited<ReturnType<typeof surveysFormsQuestionsList>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type SurveysFormsQuestionsListInfiniteQueryResult = NonNullable<Awaited<ReturnType<typeof surveysFormsQuestionsList>>>
-export type SurveysFormsQuestionsListInfiniteQueryError = unknown
-
-
-export function useSurveysFormsQuestionsListInfinite<TData = InfiniteData<Awaited<ReturnType<typeof surveysFormsQuestionsList>>>, TError = unknown>(
- formId: string, options: { query:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof surveysFormsQuestionsList>>, TError, TData>> & Pick<
+export function useSurveysFormsQuestionsListInfinite<
+  TData = InfiniteData<Awaited<ReturnType<typeof surveysFormsQuestionsList>>>,
+  TError = unknown
+>(
+  formId: string,
+  options: {
+    query: Partial<
+      UseInfiniteQueryOptions<Awaited<ReturnType<typeof surveysFormsQuestionsList>>, TError, TData>
+    > &
+      Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof surveysFormsQuestionsList>>,
           TError,
           Awaited<ReturnType<typeof surveysFormsQuestionsList>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  DefinedUseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useSurveysFormsQuestionsListInfinite<TData = InfiniteData<Awaited<ReturnType<typeof surveysFormsQuestionsList>>>, TError = unknown>(
- formId: string, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof surveysFormsQuestionsList>>, TError, TData>> & Pick<
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): DefinedUseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useSurveysFormsQuestionsListInfinite<
+  TData = InfiniteData<Awaited<ReturnType<typeof surveysFormsQuestionsList>>>,
+  TError = unknown
+>(
+  formId: string,
+  options?: {
+    query?: Partial<
+      UseInfiniteQueryOptions<Awaited<ReturnType<typeof surveysFormsQuestionsList>>, TError, TData>
+    > &
+      Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof surveysFormsQuestionsList>>,
           TError,
           Awaited<ReturnType<typeof surveysFormsQuestionsList>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useSurveysFormsQuestionsListInfinite<TData = InfiniteData<Awaited<ReturnType<typeof surveysFormsQuestionsList>>>, TError = unknown>(
- formId: string, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof surveysFormsQuestionsList>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useSurveysFormsQuestionsListInfinite<
+  TData = InfiniteData<Awaited<ReturnType<typeof surveysFormsQuestionsList>>>,
+  TError = unknown
+>(
+  formId: string,
+  options?: {
+    query?: Partial<
+      UseInfiniteQueryOptions<Awaited<ReturnType<typeof surveysFormsQuestionsList>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 /**
  * @summary List questions by form
  */
 
-export function useSurveysFormsQuestionsListInfinite<TData = InfiniteData<Awaited<ReturnType<typeof surveysFormsQuestionsList>>>, TError = unknown>(
- formId: string, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof surveysFormsQuestionsList>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient 
- ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+export function useSurveysFormsQuestionsListInfinite<
+  TData = InfiniteData<Awaited<ReturnType<typeof surveysFormsQuestionsList>>>,
+  TError = unknown
+>(
+  formId: string,
+  options?: {
+    query?: Partial<
+      UseInfiniteQueryOptions<Awaited<ReturnType<typeof surveysFormsQuestionsList>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+  const queryOptions = getSurveysFormsQuestionsListInfiniteQueryOptions(formId, options);
 
-  const queryOptions = getSurveysFormsQuestionsListInfiniteQueryOptions(formId,options)
+  const query = useInfiniteQuery(queryOptions, queryClient) as UseInfiniteQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
 
-  const query = useInfiniteQuery(queryOptions, queryClient) as  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-
-  query.queryKey = queryOptions.queryKey ;
+  query.queryKey = queryOptions.queryKey;
 
   return query;
 }
 
-
-
-
-export const getSurveysFormsQuestionsListQueryOptions = <TData = Awaited<ReturnType<typeof surveysFormsQuestionsList>>, TError = unknown>(formId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof surveysFormsQuestionsList>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+export const getSurveysFormsQuestionsListQueryOptions = <
+  TData = Awaited<ReturnType<typeof surveysFormsQuestionsList>>,
+  TError = unknown
+>(
+  formId: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof surveysFormsQuestionsList>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  }
 ) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
 
-const {query: queryOptions, request: requestOptions} = options ?? {};
+  const queryKey = queryOptions?.queryKey ?? getSurveysFormsQuestionsListQueryKey(formId);
 
-  const queryKey =  queryOptions?.queryKey ?? getSurveysFormsQuestionsListQueryKey(formId);
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof surveysFormsQuestionsList>>> = ({
+    signal
+  }) => surveysFormsQuestionsList(formId, { signal, ...requestOptions });
 
-  
+  return { queryKey, queryFn, enabled: !!formId, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof surveysFormsQuestionsList>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof surveysFormsQuestionsList>>> = ({ signal }) => surveysFormsQuestionsList(formId, { signal, ...requestOptions });
+export type SurveysFormsQuestionsListQueryResult = NonNullable<
+  Awaited<ReturnType<typeof surveysFormsQuestionsList>>
+>;
+export type SurveysFormsQuestionsListQueryError = unknown;
 
-      
-
-      
-
-   return  { queryKey, queryFn, enabled: !!(formId), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof surveysFormsQuestionsList>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type SurveysFormsQuestionsListQueryResult = NonNullable<Awaited<ReturnType<typeof surveysFormsQuestionsList>>>
-export type SurveysFormsQuestionsListQueryError = unknown
-
-
-export function useSurveysFormsQuestionsList<TData = Awaited<ReturnType<typeof surveysFormsQuestionsList>>, TError = unknown>(
- formId: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof surveysFormsQuestionsList>>, TError, TData>> & Pick<
+export function useSurveysFormsQuestionsList<
+  TData = Awaited<ReturnType<typeof surveysFormsQuestionsList>>,
+  TError = unknown
+>(
+  formId: string,
+  options: {
+    query: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof surveysFormsQuestionsList>>, TError, TData>
+    > &
+      Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof surveysFormsQuestionsList>>,
           TError,
           Awaited<ReturnType<typeof surveysFormsQuestionsList>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useSurveysFormsQuestionsList<TData = Awaited<ReturnType<typeof surveysFormsQuestionsList>>, TError = unknown>(
- formId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof surveysFormsQuestionsList>>, TError, TData>> & Pick<
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useSurveysFormsQuestionsList<
+  TData = Awaited<ReturnType<typeof surveysFormsQuestionsList>>,
+  TError = unknown
+>(
+  formId: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof surveysFormsQuestionsList>>, TError, TData>
+    > &
+      Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof surveysFormsQuestionsList>>,
           TError,
           Awaited<ReturnType<typeof surveysFormsQuestionsList>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useSurveysFormsQuestionsList<TData = Awaited<ReturnType<typeof surveysFormsQuestionsList>>, TError = unknown>(
- formId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof surveysFormsQuestionsList>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useSurveysFormsQuestionsList<
+  TData = Awaited<ReturnType<typeof surveysFormsQuestionsList>>,
+  TError = unknown
+>(
+  formId: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof surveysFormsQuestionsList>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 /**
  * @summary List questions by form
  */
 
-export function useSurveysFormsQuestionsList<TData = Awaited<ReturnType<typeof surveysFormsQuestionsList>>, TError = unknown>(
- formId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof surveysFormsQuestionsList>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient 
- ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+export function useSurveysFormsQuestionsList<
+  TData = Awaited<ReturnType<typeof surveysFormsQuestionsList>>,
+  TError = unknown
+>(
+  formId: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof surveysFormsQuestionsList>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+  const queryOptions = getSurveysFormsQuestionsListQueryOptions(formId, options);
 
-  const queryOptions = getSurveysFormsQuestionsListQueryOptions(formId,options)
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+  };
 
-  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-
-  query.queryKey = queryOptions.queryKey ;
+  query.queryKey = queryOptions.queryKey;
 
   return query;
 }
-
-
-
-
 
 /**
  * @summary Create question for form
  */
 export type surveysFormsQuestionsCreateResponse201 = {
-  data: FormQuestion
-  status: 201
-}
-    
-export type surveysFormsQuestionsCreateResponseSuccess = (surveysFormsQuestionsCreateResponse201) & {
+  data: FormQuestion;
+  status: 201;
+};
+
+export type surveysFormsQuestionsCreateResponseSuccess = surveysFormsQuestionsCreateResponse201 & {
   headers: Headers;
 };
-;
 
-export type surveysFormsQuestionsCreateResponse = (surveysFormsQuestionsCreateResponseSuccess)
+export type surveysFormsQuestionsCreateResponse = surveysFormsQuestionsCreateResponseSuccess;
 
-export const getSurveysFormsQuestionsCreateUrl = (formId: string,) => {
+export const getSurveysFormsQuestionsCreateUrl = (formId: string) => {
+  return `/api/surveys/forms/${formId}/questions/`;
+};
 
+export const surveysFormsQuestionsCreate = async (
+  formId: string,
+  formQuestion: NonReadonly<FormQuestion>,
+  options?: RequestInit
+): Promise<surveysFormsQuestionsCreateResponse> => {
+  return customFetch<surveysFormsQuestionsCreateResponse>(
+    getSurveysFormsQuestionsCreateUrl(formId),
+    {
+      ...options,
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', ...options?.headers },
+      body: JSON.stringify(formQuestion)
+    }
+  );
+};
 
-  
+export const getSurveysFormsQuestionsCreateMutationOptions = <
+  TError = unknown,
+  TContext = unknown
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof surveysFormsQuestionsCreate>>,
+    TError,
+    { formId: string; data: NonReadonly<FormQuestion> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof surveysFormsQuestionsCreate>>,
+  TError,
+  { formId: string; data: NonReadonly<FormQuestion> },
+  TContext
+> => {
+  const mutationKey = ['surveysFormsQuestionsCreate'];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
 
-  return `/api/surveys/forms/${formId}/questions/`
-}
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof surveysFormsQuestionsCreate>>,
+    { formId: string; data: NonReadonly<FormQuestion> }
+  > = (props) => {
+    const { formId, data } = props ?? {};
 
-export const surveysFormsQuestionsCreate = async (formId: string,
-    formQuestion: NonReadonly<FormQuestion>, options?: RequestInit): Promise<surveysFormsQuestionsCreateResponse> => {
-  
-  return customFetch<surveysFormsQuestionsCreateResponse>(getSurveysFormsQuestionsCreateUrl(formId),
-  {      
-    ...options,
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(
-      formQuestion,)
-  }
-);}
+    return surveysFormsQuestionsCreate(formId, data, requestOptions);
+  };
 
+  return { mutationFn, ...mutationOptions };
+};
 
+export type SurveysFormsQuestionsCreateMutationResult = NonNullable<
+  Awaited<ReturnType<typeof surveysFormsQuestionsCreate>>
+>;
+export type SurveysFormsQuestionsCreateMutationBody = NonReadonly<FormQuestion>;
+export type SurveysFormsQuestionsCreateMutationError = unknown;
 
-
-export const getSurveysFormsQuestionsCreateMutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof surveysFormsQuestionsCreate>>, TError,{formId: string;data: NonReadonly<FormQuestion>}, TContext>, request?: SecondParameter<typeof customFetch>}
-): UseMutationOptions<Awaited<ReturnType<typeof surveysFormsQuestionsCreate>>, TError,{formId: string;data: NonReadonly<FormQuestion>}, TContext> => {
-
-const mutationKey = ['surveysFormsQuestionsCreate'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
-
-      
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof surveysFormsQuestionsCreate>>, {formId: string;data: NonReadonly<FormQuestion>}> = (props) => {
-          const {formId,data} = props ?? {};
-
-          return  surveysFormsQuestionsCreate(formId,data,requestOptions)
-        }
-
-        
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type SurveysFormsQuestionsCreateMutationResult = NonNullable<Awaited<ReturnType<typeof surveysFormsQuestionsCreate>>>
-    export type SurveysFormsQuestionsCreateMutationBody = NonReadonly<FormQuestion>
-    export type SurveysFormsQuestionsCreateMutationError = unknown
-
-    /**
+/**
  * @summary Create question for form
  */
-export const useSurveysFormsQuestionsCreate = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof surveysFormsQuestionsCreate>>, TError,{formId: string;data: NonReadonly<FormQuestion>}, TContext>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof surveysFormsQuestionsCreate>>,
-        TError,
-        {formId: string;data: NonReadonly<FormQuestion>},
-        TContext
-      > => {
+export const useSurveysFormsQuestionsCreate = <TError = unknown, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof surveysFormsQuestionsCreate>>,
+      TError,
+      { formId: string; data: NonReadonly<FormQuestion> },
+      TContext
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseMutationResult<
+  Awaited<ReturnType<typeof surveysFormsQuestionsCreate>>,
+  TError,
+  { formId: string; data: NonReadonly<FormQuestion> },
+  TContext
+> => {
+  const mutationOptions = getSurveysFormsQuestionsCreateMutationOptions(options);
 
-      const mutationOptions = getSurveysFormsQuestionsCreateMutationOptions(options);
+  return useMutation(mutationOptions, queryClient);
+};
 
-      return useMutation(mutationOptions, queryClient);
-    }
-    
 /**
  * @summary Get question by id
  */
 export type surveysFormsQuestionsRetrieveResponse200 = {
-  data: FormQuestion
-  status: 200
-}
-    
-export type surveysFormsQuestionsRetrieveResponseSuccess = (surveysFormsQuestionsRetrieveResponse200) & {
-  headers: Headers;
+  data: FormQuestion;
+  status: 200;
 };
-;
 
-export type surveysFormsQuestionsRetrieveResponse = (surveysFormsQuestionsRetrieveResponseSuccess)
+export type surveysFormsQuestionsRetrieveResponseSuccess =
+  surveysFormsQuestionsRetrieveResponse200 & {
+    headers: Headers;
+  };
 
-export const getSurveysFormsQuestionsRetrieveUrl = (formId: string,
-    questionId: string,) => {
+export type surveysFormsQuestionsRetrieveResponse = surveysFormsQuestionsRetrieveResponseSuccess;
 
+export const getSurveysFormsQuestionsRetrieveUrl = (formId: string, questionId: string) => {
+  return `/api/surveys/forms/${formId}/questions/${questionId}/`;
+};
 
-  
+export const surveysFormsQuestionsRetrieve = async (
+  formId: string,
+  questionId: string,
+  options?: RequestInit
+): Promise<surveysFormsQuestionsRetrieveResponse> => {
+  return customFetch<surveysFormsQuestionsRetrieveResponse>(
+    getSurveysFormsQuestionsRetrieveUrl(formId, questionId),
+    {
+      ...options,
+      method: 'GET'
+    }
+  );
+};
 
-  return `/api/surveys/forms/${formId}/questions/${questionId}/`
-}
+export const getSurveysFormsQuestionsRetrieveInfiniteQueryKey = (
+  formId?: string,
+  questionId?: string
+) => {
+  return ['infinite', `/api/surveys/forms/${formId}/questions/${questionId}/`] as const;
+};
 
-export const surveysFormsQuestionsRetrieve = async (formId: string,
-    questionId: string, options?: RequestInit): Promise<surveysFormsQuestionsRetrieveResponse> => {
-  
-  return customFetch<surveysFormsQuestionsRetrieveResponse>(getSurveysFormsQuestionsRetrieveUrl(formId,questionId),
-  {      
-    ...options,
-    method: 'GET'
-    
-    
+export const getSurveysFormsQuestionsRetrieveQueryKey = (formId?: string, questionId?: string) => {
+  return [`/api/surveys/forms/${formId}/questions/${questionId}/`] as const;
+};
+
+export const getSurveysFormsQuestionsRetrieveInfiniteQueryOptions = <
+  TData = InfiniteData<Awaited<ReturnType<typeof surveysFormsQuestionsRetrieve>>>,
+  TError = unknown
+>(
+  formId: string,
+  questionId: string,
+  options?: {
+    query?: Partial<
+      UseInfiniteQueryOptions<
+        Awaited<ReturnType<typeof surveysFormsQuestionsRetrieve>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customFetch>;
   }
-);}
-
-
-
-
-
-export const getSurveysFormsQuestionsRetrieveInfiniteQueryKey = (formId?: string,
-    questionId?: string,) => {
-    return [
-    'infinite', `/api/surveys/forms/${formId}/questions/${questionId}/`
-    ] as const;
-    }
-
-export const getSurveysFormsQuestionsRetrieveQueryKey = (formId?: string,
-    questionId?: string,) => {
-    return [
-    `/api/surveys/forms/${formId}/questions/${questionId}/`
-    ] as const;
-    }
-
-    
-export const getSurveysFormsQuestionsRetrieveInfiniteQueryOptions = <TData = InfiniteData<Awaited<ReturnType<typeof surveysFormsQuestionsRetrieve>>>, TError = unknown>(formId: string,
-    questionId: string, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof surveysFormsQuestionsRetrieve>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
 ) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
 
-const {query: queryOptions, request: requestOptions} = options ?? {};
+  const queryKey =
+    queryOptions?.queryKey ?? getSurveysFormsQuestionsRetrieveInfiniteQueryKey(formId, questionId);
 
-  const queryKey =  queryOptions?.queryKey ?? getSurveysFormsQuestionsRetrieveInfiniteQueryKey(formId,questionId);
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof surveysFormsQuestionsRetrieve>>> = ({
+    signal
+  }) => surveysFormsQuestionsRetrieve(formId, questionId, { signal, ...requestOptions });
 
-  
+  return {
+    queryKey,
+    queryFn,
+    enabled: !!(formId && questionId),
+    ...queryOptions
+  } as UseInfiniteQueryOptions<
+    Awaited<ReturnType<typeof surveysFormsQuestionsRetrieve>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof surveysFormsQuestionsRetrieve>>> = ({ signal }) => surveysFormsQuestionsRetrieve(formId,questionId, { signal, ...requestOptions });
+export type SurveysFormsQuestionsRetrieveInfiniteQueryResult = NonNullable<
+  Awaited<ReturnType<typeof surveysFormsQuestionsRetrieve>>
+>;
+export type SurveysFormsQuestionsRetrieveInfiniteQueryError = unknown;
 
-      
-
-      
-
-   return  { queryKey, queryFn, enabled: !!(formId && questionId), ...queryOptions} as UseInfiniteQueryOptions<Awaited<ReturnType<typeof surveysFormsQuestionsRetrieve>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type SurveysFormsQuestionsRetrieveInfiniteQueryResult = NonNullable<Awaited<ReturnType<typeof surveysFormsQuestionsRetrieve>>>
-export type SurveysFormsQuestionsRetrieveInfiniteQueryError = unknown
-
-
-export function useSurveysFormsQuestionsRetrieveInfinite<TData = InfiniteData<Awaited<ReturnType<typeof surveysFormsQuestionsRetrieve>>>, TError = unknown>(
- formId: string,
-    questionId: string, options: { query:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof surveysFormsQuestionsRetrieve>>, TError, TData>> & Pick<
+export function useSurveysFormsQuestionsRetrieveInfinite<
+  TData = InfiniteData<Awaited<ReturnType<typeof surveysFormsQuestionsRetrieve>>>,
+  TError = unknown
+>(
+  formId: string,
+  questionId: string,
+  options: {
+    query: Partial<
+      UseInfiniteQueryOptions<
+        Awaited<ReturnType<typeof surveysFormsQuestionsRetrieve>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof surveysFormsQuestionsRetrieve>>,
           TError,
           Awaited<ReturnType<typeof surveysFormsQuestionsRetrieve>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  DefinedUseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useSurveysFormsQuestionsRetrieveInfinite<TData = InfiniteData<Awaited<ReturnType<typeof surveysFormsQuestionsRetrieve>>>, TError = unknown>(
- formId: string,
-    questionId: string, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof surveysFormsQuestionsRetrieve>>, TError, TData>> & Pick<
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): DefinedUseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useSurveysFormsQuestionsRetrieveInfinite<
+  TData = InfiniteData<Awaited<ReturnType<typeof surveysFormsQuestionsRetrieve>>>,
+  TError = unknown
+>(
+  formId: string,
+  questionId: string,
+  options?: {
+    query?: Partial<
+      UseInfiniteQueryOptions<
+        Awaited<ReturnType<typeof surveysFormsQuestionsRetrieve>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof surveysFormsQuestionsRetrieve>>,
           TError,
           Awaited<ReturnType<typeof surveysFormsQuestionsRetrieve>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useSurveysFormsQuestionsRetrieveInfinite<TData = InfiniteData<Awaited<ReturnType<typeof surveysFormsQuestionsRetrieve>>>, TError = unknown>(
- formId: string,
-    questionId: string, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof surveysFormsQuestionsRetrieve>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useSurveysFormsQuestionsRetrieveInfinite<
+  TData = InfiniteData<Awaited<ReturnType<typeof surveysFormsQuestionsRetrieve>>>,
+  TError = unknown
+>(
+  formId: string,
+  questionId: string,
+  options?: {
+    query?: Partial<
+      UseInfiniteQueryOptions<
+        Awaited<ReturnType<typeof surveysFormsQuestionsRetrieve>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 /**
  * @summary Get question by id
  */
 
-export function useSurveysFormsQuestionsRetrieveInfinite<TData = InfiniteData<Awaited<ReturnType<typeof surveysFormsQuestionsRetrieve>>>, TError = unknown>(
- formId: string,
-    questionId: string, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof surveysFormsQuestionsRetrieve>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient 
- ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+export function useSurveysFormsQuestionsRetrieveInfinite<
+  TData = InfiniteData<Awaited<ReturnType<typeof surveysFormsQuestionsRetrieve>>>,
+  TError = unknown
+>(
+  formId: string,
+  questionId: string,
+  options?: {
+    query?: Partial<
+      UseInfiniteQueryOptions<
+        Awaited<ReturnType<typeof surveysFormsQuestionsRetrieve>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+  const queryOptions = getSurveysFormsQuestionsRetrieveInfiniteQueryOptions(
+    formId,
+    questionId,
+    options
+  );
 
-  const queryOptions = getSurveysFormsQuestionsRetrieveInfiniteQueryOptions(formId,questionId,options)
+  const query = useInfiniteQuery(queryOptions, queryClient) as UseInfiniteQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
 
-  const query = useInfiniteQuery(queryOptions, queryClient) as  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-
-  query.queryKey = queryOptions.queryKey ;
+  query.queryKey = queryOptions.queryKey;
 
   return query;
 }
 
-
-
-
-export const getSurveysFormsQuestionsRetrieveQueryOptions = <TData = Awaited<ReturnType<typeof surveysFormsQuestionsRetrieve>>, TError = unknown>(formId: string,
-    questionId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof surveysFormsQuestionsRetrieve>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+export const getSurveysFormsQuestionsRetrieveQueryOptions = <
+  TData = Awaited<ReturnType<typeof surveysFormsQuestionsRetrieve>>,
+  TError = unknown
+>(
+  formId: string,
+  questionId: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof surveysFormsQuestionsRetrieve>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  }
 ) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
 
-const {query: queryOptions, request: requestOptions} = options ?? {};
+  const queryKey =
+    queryOptions?.queryKey ?? getSurveysFormsQuestionsRetrieveQueryKey(formId, questionId);
 
-  const queryKey =  queryOptions?.queryKey ?? getSurveysFormsQuestionsRetrieveQueryKey(formId,questionId);
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof surveysFormsQuestionsRetrieve>>> = ({
+    signal
+  }) => surveysFormsQuestionsRetrieve(formId, questionId, { signal, ...requestOptions });
 
-  
+  return {
+    queryKey,
+    queryFn,
+    enabled: !!(formId && questionId),
+    ...queryOptions
+  } as UseQueryOptions<Awaited<ReturnType<typeof surveysFormsQuestionsRetrieve>>, TError, TData> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+  };
+};
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof surveysFormsQuestionsRetrieve>>> = ({ signal }) => surveysFormsQuestionsRetrieve(formId,questionId, { signal, ...requestOptions });
+export type SurveysFormsQuestionsRetrieveQueryResult = NonNullable<
+  Awaited<ReturnType<typeof surveysFormsQuestionsRetrieve>>
+>;
+export type SurveysFormsQuestionsRetrieveQueryError = unknown;
 
-      
-
-      
-
-   return  { queryKey, queryFn, enabled: !!(formId && questionId), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof surveysFormsQuestionsRetrieve>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type SurveysFormsQuestionsRetrieveQueryResult = NonNullable<Awaited<ReturnType<typeof surveysFormsQuestionsRetrieve>>>
-export type SurveysFormsQuestionsRetrieveQueryError = unknown
-
-
-export function useSurveysFormsQuestionsRetrieve<TData = Awaited<ReturnType<typeof surveysFormsQuestionsRetrieve>>, TError = unknown>(
- formId: string,
-    questionId: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof surveysFormsQuestionsRetrieve>>, TError, TData>> & Pick<
+export function useSurveysFormsQuestionsRetrieve<
+  TData = Awaited<ReturnType<typeof surveysFormsQuestionsRetrieve>>,
+  TError = unknown
+>(
+  formId: string,
+  questionId: string,
+  options: {
+    query: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof surveysFormsQuestionsRetrieve>>, TError, TData>
+    > &
+      Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof surveysFormsQuestionsRetrieve>>,
           TError,
           Awaited<ReturnType<typeof surveysFormsQuestionsRetrieve>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useSurveysFormsQuestionsRetrieve<TData = Awaited<ReturnType<typeof surveysFormsQuestionsRetrieve>>, TError = unknown>(
- formId: string,
-    questionId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof surveysFormsQuestionsRetrieve>>, TError, TData>> & Pick<
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useSurveysFormsQuestionsRetrieve<
+  TData = Awaited<ReturnType<typeof surveysFormsQuestionsRetrieve>>,
+  TError = unknown
+>(
+  formId: string,
+  questionId: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof surveysFormsQuestionsRetrieve>>, TError, TData>
+    > &
+      Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof surveysFormsQuestionsRetrieve>>,
           TError,
           Awaited<ReturnType<typeof surveysFormsQuestionsRetrieve>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useSurveysFormsQuestionsRetrieve<TData = Awaited<ReturnType<typeof surveysFormsQuestionsRetrieve>>, TError = unknown>(
- formId: string,
-    questionId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof surveysFormsQuestionsRetrieve>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useSurveysFormsQuestionsRetrieve<
+  TData = Awaited<ReturnType<typeof surveysFormsQuestionsRetrieve>>,
+  TError = unknown
+>(
+  formId: string,
+  questionId: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof surveysFormsQuestionsRetrieve>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 /**
  * @summary Get question by id
  */
 
-export function useSurveysFormsQuestionsRetrieve<TData = Awaited<ReturnType<typeof surveysFormsQuestionsRetrieve>>, TError = unknown>(
- formId: string,
-    questionId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof surveysFormsQuestionsRetrieve>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient 
- ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+export function useSurveysFormsQuestionsRetrieve<
+  TData = Awaited<ReturnType<typeof surveysFormsQuestionsRetrieve>>,
+  TError = unknown
+>(
+  formId: string,
+  questionId: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof surveysFormsQuestionsRetrieve>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+  const queryOptions = getSurveysFormsQuestionsRetrieveQueryOptions(formId, questionId, options);
 
-  const queryOptions = getSurveysFormsQuestionsRetrieveQueryOptions(formId,questionId,options)
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+  };
 
-  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-
-  query.queryKey = queryOptions.queryKey ;
+  query.queryKey = queryOptions.queryKey;
 
   return query;
 }
-
-
-
-
 
 /**
  * @summary Patch question by id
  */
 export type surveysFormsQuestionsPartialUpdateResponse200 = {
-  data: FormQuestion
-  status: 200
-}
-    
-export type surveysFormsQuestionsPartialUpdateResponseSuccess = (surveysFormsQuestionsPartialUpdateResponse200) & {
-  headers: Headers;
+  data: FormQuestion;
+  status: 200;
 };
-;
 
-export type surveysFormsQuestionsPartialUpdateResponse = (surveysFormsQuestionsPartialUpdateResponseSuccess)
+export type surveysFormsQuestionsPartialUpdateResponseSuccess =
+  surveysFormsQuestionsPartialUpdateResponse200 & {
+    headers: Headers;
+  };
 
-export const getSurveysFormsQuestionsPartialUpdateUrl = (formId: string,
-    questionId: string,) => {
+export type surveysFormsQuestionsPartialUpdateResponse =
+  surveysFormsQuestionsPartialUpdateResponseSuccess;
 
+export const getSurveysFormsQuestionsPartialUpdateUrl = (formId: string, questionId: string) => {
+  return `/api/surveys/forms/${formId}/questions/${questionId}/`;
+};
 
-  
+export const surveysFormsQuestionsPartialUpdate = async (
+  formId: string,
+  questionId: string,
+  patchedFormQuestion: NonReadonly<PatchedFormQuestion>,
+  options?: RequestInit
+): Promise<surveysFormsQuestionsPartialUpdateResponse> => {
+  return customFetch<surveysFormsQuestionsPartialUpdateResponse>(
+    getSurveysFormsQuestionsPartialUpdateUrl(formId, questionId),
+    {
+      ...options,
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json', ...options?.headers },
+      body: JSON.stringify(patchedFormQuestion)
+    }
+  );
+};
 
-  return `/api/surveys/forms/${formId}/questions/${questionId}/`
-}
+export const getSurveysFormsQuestionsPartialUpdateMutationOptions = <
+  TError = unknown,
+  TContext = unknown
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof surveysFormsQuestionsPartialUpdate>>,
+    TError,
+    { formId: string; questionId: string; data: NonReadonly<PatchedFormQuestion> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof surveysFormsQuestionsPartialUpdate>>,
+  TError,
+  { formId: string; questionId: string; data: NonReadonly<PatchedFormQuestion> },
+  TContext
+> => {
+  const mutationKey = ['surveysFormsQuestionsPartialUpdate'];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
 
-export const surveysFormsQuestionsPartialUpdate = async (formId: string,
-    questionId: string,
-    patchedFormQuestion: NonReadonly<PatchedFormQuestion>, options?: RequestInit): Promise<surveysFormsQuestionsPartialUpdateResponse> => {
-  
-  return customFetch<surveysFormsQuestionsPartialUpdateResponse>(getSurveysFormsQuestionsPartialUpdateUrl(formId,questionId),
-  {      
-    ...options,
-    method: 'PATCH',
-    headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(
-      patchedFormQuestion,)
-  }
-);}
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof surveysFormsQuestionsPartialUpdate>>,
+    { formId: string; questionId: string; data: NonReadonly<PatchedFormQuestion> }
+  > = (props) => {
+    const { formId, questionId, data } = props ?? {};
 
+    return surveysFormsQuestionsPartialUpdate(formId, questionId, data, requestOptions);
+  };
 
+  return { mutationFn, ...mutationOptions };
+};
 
+export type SurveysFormsQuestionsPartialUpdateMutationResult = NonNullable<
+  Awaited<ReturnType<typeof surveysFormsQuestionsPartialUpdate>>
+>;
+export type SurveysFormsQuestionsPartialUpdateMutationBody = NonReadonly<PatchedFormQuestion>;
+export type SurveysFormsQuestionsPartialUpdateMutationError = unknown;
 
-export const getSurveysFormsQuestionsPartialUpdateMutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof surveysFormsQuestionsPartialUpdate>>, TError,{formId: string;questionId: string;data: NonReadonly<PatchedFormQuestion>}, TContext>, request?: SecondParameter<typeof customFetch>}
-): UseMutationOptions<Awaited<ReturnType<typeof surveysFormsQuestionsPartialUpdate>>, TError,{formId: string;questionId: string;data: NonReadonly<PatchedFormQuestion>}, TContext> => {
-
-const mutationKey = ['surveysFormsQuestionsPartialUpdate'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
-
-      
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof surveysFormsQuestionsPartialUpdate>>, {formId: string;questionId: string;data: NonReadonly<PatchedFormQuestion>}> = (props) => {
-          const {formId,questionId,data} = props ?? {};
-
-          return  surveysFormsQuestionsPartialUpdate(formId,questionId,data,requestOptions)
-        }
-
-        
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type SurveysFormsQuestionsPartialUpdateMutationResult = NonNullable<Awaited<ReturnType<typeof surveysFormsQuestionsPartialUpdate>>>
-    export type SurveysFormsQuestionsPartialUpdateMutationBody = NonReadonly<PatchedFormQuestion>
-    export type SurveysFormsQuestionsPartialUpdateMutationError = unknown
-
-    /**
+/**
  * @summary Patch question by id
  */
-export const useSurveysFormsQuestionsPartialUpdate = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof surveysFormsQuestionsPartialUpdate>>, TError,{formId: string;questionId: string;data: NonReadonly<PatchedFormQuestion>}, TContext>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof surveysFormsQuestionsPartialUpdate>>,
-        TError,
-        {formId: string;questionId: string;data: NonReadonly<PatchedFormQuestion>},
-        TContext
-      > => {
+export const useSurveysFormsQuestionsPartialUpdate = <TError = unknown, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof surveysFormsQuestionsPartialUpdate>>,
+      TError,
+      { formId: string; questionId: string; data: NonReadonly<PatchedFormQuestion> },
+      TContext
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseMutationResult<
+  Awaited<ReturnType<typeof surveysFormsQuestionsPartialUpdate>>,
+  TError,
+  { formId: string; questionId: string; data: NonReadonly<PatchedFormQuestion> },
+  TContext
+> => {
+  const mutationOptions = getSurveysFormsQuestionsPartialUpdateMutationOptions(options);
 
-      const mutationOptions = getSurveysFormsQuestionsPartialUpdateMutationOptions(options);
+  return useMutation(mutationOptions, queryClient);
+};
 
-      return useMutation(mutationOptions, queryClient);
-    }
-    
 /**
  * @summary Delete question by id
  */
 export type surveysFormsQuestionsDestroyResponse204 = {
-  data: void
-  status: 204
-}
-    
-export type surveysFormsQuestionsDestroyResponseSuccess = (surveysFormsQuestionsDestroyResponse204) & {
-  headers: Headers;
+  data: void;
+  status: 204;
 };
-;
 
-export type surveysFormsQuestionsDestroyResponse = (surveysFormsQuestionsDestroyResponseSuccess)
+export type surveysFormsQuestionsDestroyResponseSuccess =
+  surveysFormsQuestionsDestroyResponse204 & {
+    headers: Headers;
+  };
 
-export const getSurveysFormsQuestionsDestroyUrl = (formId: string,
-    questionId: string,) => {
+export type surveysFormsQuestionsDestroyResponse = surveysFormsQuestionsDestroyResponseSuccess;
 
+export const getSurveysFormsQuestionsDestroyUrl = (formId: string, questionId: string) => {
+  return `/api/surveys/forms/${formId}/questions/${questionId}/`;
+};
 
-  
+export const surveysFormsQuestionsDestroy = async (
+  formId: string,
+  questionId: string,
+  options?: RequestInit
+): Promise<surveysFormsQuestionsDestroyResponse> => {
+  return customFetch<surveysFormsQuestionsDestroyResponse>(
+    getSurveysFormsQuestionsDestroyUrl(formId, questionId),
+    {
+      ...options,
+      method: 'DELETE'
+    }
+  );
+};
 
-  return `/api/surveys/forms/${formId}/questions/${questionId}/`
-}
+export const getSurveysFormsQuestionsDestroyMutationOptions = <
+  TError = unknown,
+  TContext = unknown
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof surveysFormsQuestionsDestroy>>,
+    TError,
+    { formId: string; questionId: string },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof surveysFormsQuestionsDestroy>>,
+  TError,
+  { formId: string; questionId: string },
+  TContext
+> => {
+  const mutationKey = ['surveysFormsQuestionsDestroy'];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
 
-export const surveysFormsQuestionsDestroy = async (formId: string,
-    questionId: string, options?: RequestInit): Promise<surveysFormsQuestionsDestroyResponse> => {
-  
-  return customFetch<surveysFormsQuestionsDestroyResponse>(getSurveysFormsQuestionsDestroyUrl(formId,questionId),
-  {      
-    ...options,
-    method: 'DELETE'
-    
-    
-  }
-);}
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof surveysFormsQuestionsDestroy>>,
+    { formId: string; questionId: string }
+  > = (props) => {
+    const { formId, questionId } = props ?? {};
 
+    return surveysFormsQuestionsDestroy(formId, questionId, requestOptions);
+  };
 
+  return { mutationFn, ...mutationOptions };
+};
 
+export type SurveysFormsQuestionsDestroyMutationResult = NonNullable<
+  Awaited<ReturnType<typeof surveysFormsQuestionsDestroy>>
+>;
 
-export const getSurveysFormsQuestionsDestroyMutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof surveysFormsQuestionsDestroy>>, TError,{formId: string;questionId: string}, TContext>, request?: SecondParameter<typeof customFetch>}
-): UseMutationOptions<Awaited<ReturnType<typeof surveysFormsQuestionsDestroy>>, TError,{formId: string;questionId: string}, TContext> => {
+export type SurveysFormsQuestionsDestroyMutationError = unknown;
 
-const mutationKey = ['surveysFormsQuestionsDestroy'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
-
-      
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof surveysFormsQuestionsDestroy>>, {formId: string;questionId: string}> = (props) => {
-          const {formId,questionId} = props ?? {};
-
-          return  surveysFormsQuestionsDestroy(formId,questionId,requestOptions)
-        }
-
-        
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type SurveysFormsQuestionsDestroyMutationResult = NonNullable<Awaited<ReturnType<typeof surveysFormsQuestionsDestroy>>>
-    
-    export type SurveysFormsQuestionsDestroyMutationError = unknown
-
-    /**
+/**
  * @summary Delete question by id
  */
-export const useSurveysFormsQuestionsDestroy = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof surveysFormsQuestionsDestroy>>, TError,{formId: string;questionId: string}, TContext>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof surveysFormsQuestionsDestroy>>,
-        TError,
-        {formId: string;questionId: string},
-        TContext
-      > => {
+export const useSurveysFormsQuestionsDestroy = <TError = unknown, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof surveysFormsQuestionsDestroy>>,
+      TError,
+      { formId: string; questionId: string },
+      TContext
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseMutationResult<
+  Awaited<ReturnType<typeof surveysFormsQuestionsDestroy>>,
+  TError,
+  { formId: string; questionId: string },
+  TContext
+> => {
+  const mutationOptions = getSurveysFormsQuestionsDestroyMutationOptions(options);
 
-      const mutationOptions = getSurveysFormsQuestionsDestroyMutationOptions(options);
+  return useMutation(mutationOptions, queryClient);
+};
 
-      return useMutation(mutationOptions, queryClient);
-    }
-    
 /**
  * @summary List options by question
  */
 export type surveysFormsQuestionsOptionsListResponse200 = {
-  data: FormQuestionOption[]
-  status: 200
-}
-    
-export type surveysFormsQuestionsOptionsListResponseSuccess = (surveysFormsQuestionsOptionsListResponse200) & {
-  headers: Headers;
+  data: FormQuestionOption[];
+  status: 200;
 };
-;
 
-export type surveysFormsQuestionsOptionsListResponse = (surveysFormsQuestionsOptionsListResponseSuccess)
+export type surveysFormsQuestionsOptionsListResponseSuccess =
+  surveysFormsQuestionsOptionsListResponse200 & {
+    headers: Headers;
+  };
 
-export const getSurveysFormsQuestionsOptionsListUrl = (formId: string,
-    questionId: string,) => {
+export type surveysFormsQuestionsOptionsListResponse =
+  surveysFormsQuestionsOptionsListResponseSuccess;
 
+export const getSurveysFormsQuestionsOptionsListUrl = (formId: string, questionId: string) => {
+  return `/api/surveys/forms/${formId}/questions/${questionId}/options/`;
+};
 
-  
+export const surveysFormsQuestionsOptionsList = async (
+  formId: string,
+  questionId: string,
+  options?: RequestInit
+): Promise<surveysFormsQuestionsOptionsListResponse> => {
+  return customFetch<surveysFormsQuestionsOptionsListResponse>(
+    getSurveysFormsQuestionsOptionsListUrl(formId, questionId),
+    {
+      ...options,
+      method: 'GET'
+    }
+  );
+};
 
-  return `/api/surveys/forms/${formId}/questions/${questionId}/options/`
-}
+export const getSurveysFormsQuestionsOptionsListInfiniteQueryKey = (
+  formId?: string,
+  questionId?: string
+) => {
+  return ['infinite', `/api/surveys/forms/${formId}/questions/${questionId}/options/`] as const;
+};
 
-export const surveysFormsQuestionsOptionsList = async (formId: string,
-    questionId: string, options?: RequestInit): Promise<surveysFormsQuestionsOptionsListResponse> => {
-  
-  return customFetch<surveysFormsQuestionsOptionsListResponse>(getSurveysFormsQuestionsOptionsListUrl(formId,questionId),
-  {      
-    ...options,
-    method: 'GET'
-    
-    
+export const getSurveysFormsQuestionsOptionsListQueryKey = (
+  formId?: string,
+  questionId?: string
+) => {
+  return [`/api/surveys/forms/${formId}/questions/${questionId}/options/`] as const;
+};
+
+export const getSurveysFormsQuestionsOptionsListInfiniteQueryOptions = <
+  TData = InfiniteData<Awaited<ReturnType<typeof surveysFormsQuestionsOptionsList>>>,
+  TError = unknown
+>(
+  formId: string,
+  questionId: string,
+  options?: {
+    query?: Partial<
+      UseInfiniteQueryOptions<
+        Awaited<ReturnType<typeof surveysFormsQuestionsOptionsList>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customFetch>;
   }
-);}
-
-
-
-
-
-export const getSurveysFormsQuestionsOptionsListInfiniteQueryKey = (formId?: string,
-    questionId?: string,) => {
-    return [
-    'infinite', `/api/surveys/forms/${formId}/questions/${questionId}/options/`
-    ] as const;
-    }
-
-export const getSurveysFormsQuestionsOptionsListQueryKey = (formId?: string,
-    questionId?: string,) => {
-    return [
-    `/api/surveys/forms/${formId}/questions/${questionId}/options/`
-    ] as const;
-    }
-
-    
-export const getSurveysFormsQuestionsOptionsListInfiniteQueryOptions = <TData = InfiniteData<Awaited<ReturnType<typeof surveysFormsQuestionsOptionsList>>>, TError = unknown>(formId: string,
-    questionId: string, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof surveysFormsQuestionsOptionsList>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
 ) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
 
-const {query: queryOptions, request: requestOptions} = options ?? {};
+  const queryKey =
+    queryOptions?.queryKey ??
+    getSurveysFormsQuestionsOptionsListInfiniteQueryKey(formId, questionId);
 
-  const queryKey =  queryOptions?.queryKey ?? getSurveysFormsQuestionsOptionsListInfiniteQueryKey(formId,questionId);
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof surveysFormsQuestionsOptionsList>>> = ({
+    signal
+  }) => surveysFormsQuestionsOptionsList(formId, questionId, { signal, ...requestOptions });
 
-  
+  return {
+    queryKey,
+    queryFn,
+    enabled: !!(formId && questionId),
+    ...queryOptions
+  } as UseInfiniteQueryOptions<
+    Awaited<ReturnType<typeof surveysFormsQuestionsOptionsList>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof surveysFormsQuestionsOptionsList>>> = ({ signal }) => surveysFormsQuestionsOptionsList(formId,questionId, { signal, ...requestOptions });
+export type SurveysFormsQuestionsOptionsListInfiniteQueryResult = NonNullable<
+  Awaited<ReturnType<typeof surveysFormsQuestionsOptionsList>>
+>;
+export type SurveysFormsQuestionsOptionsListInfiniteQueryError = unknown;
 
-      
-
-      
-
-   return  { queryKey, queryFn, enabled: !!(formId && questionId), ...queryOptions} as UseInfiniteQueryOptions<Awaited<ReturnType<typeof surveysFormsQuestionsOptionsList>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type SurveysFormsQuestionsOptionsListInfiniteQueryResult = NonNullable<Awaited<ReturnType<typeof surveysFormsQuestionsOptionsList>>>
-export type SurveysFormsQuestionsOptionsListInfiniteQueryError = unknown
-
-
-export function useSurveysFormsQuestionsOptionsListInfinite<TData = InfiniteData<Awaited<ReturnType<typeof surveysFormsQuestionsOptionsList>>>, TError = unknown>(
- formId: string,
-    questionId: string, options: { query:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof surveysFormsQuestionsOptionsList>>, TError, TData>> & Pick<
+export function useSurveysFormsQuestionsOptionsListInfinite<
+  TData = InfiniteData<Awaited<ReturnType<typeof surveysFormsQuestionsOptionsList>>>,
+  TError = unknown
+>(
+  formId: string,
+  questionId: string,
+  options: {
+    query: Partial<
+      UseInfiniteQueryOptions<
+        Awaited<ReturnType<typeof surveysFormsQuestionsOptionsList>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof surveysFormsQuestionsOptionsList>>,
           TError,
           Awaited<ReturnType<typeof surveysFormsQuestionsOptionsList>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  DefinedUseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useSurveysFormsQuestionsOptionsListInfinite<TData = InfiniteData<Awaited<ReturnType<typeof surveysFormsQuestionsOptionsList>>>, TError = unknown>(
- formId: string,
-    questionId: string, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof surveysFormsQuestionsOptionsList>>, TError, TData>> & Pick<
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): DefinedUseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useSurveysFormsQuestionsOptionsListInfinite<
+  TData = InfiniteData<Awaited<ReturnType<typeof surveysFormsQuestionsOptionsList>>>,
+  TError = unknown
+>(
+  formId: string,
+  questionId: string,
+  options?: {
+    query?: Partial<
+      UseInfiniteQueryOptions<
+        Awaited<ReturnType<typeof surveysFormsQuestionsOptionsList>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof surveysFormsQuestionsOptionsList>>,
           TError,
           Awaited<ReturnType<typeof surveysFormsQuestionsOptionsList>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useSurveysFormsQuestionsOptionsListInfinite<TData = InfiniteData<Awaited<ReturnType<typeof surveysFormsQuestionsOptionsList>>>, TError = unknown>(
- formId: string,
-    questionId: string, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof surveysFormsQuestionsOptionsList>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useSurveysFormsQuestionsOptionsListInfinite<
+  TData = InfiniteData<Awaited<ReturnType<typeof surveysFormsQuestionsOptionsList>>>,
+  TError = unknown
+>(
+  formId: string,
+  questionId: string,
+  options?: {
+    query?: Partial<
+      UseInfiniteQueryOptions<
+        Awaited<ReturnType<typeof surveysFormsQuestionsOptionsList>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 /**
  * @summary List options by question
  */
 
-export function useSurveysFormsQuestionsOptionsListInfinite<TData = InfiniteData<Awaited<ReturnType<typeof surveysFormsQuestionsOptionsList>>>, TError = unknown>(
- formId: string,
-    questionId: string, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof surveysFormsQuestionsOptionsList>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient 
- ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+export function useSurveysFormsQuestionsOptionsListInfinite<
+  TData = InfiniteData<Awaited<ReturnType<typeof surveysFormsQuestionsOptionsList>>>,
+  TError = unknown
+>(
+  formId: string,
+  questionId: string,
+  options?: {
+    query?: Partial<
+      UseInfiniteQueryOptions<
+        Awaited<ReturnType<typeof surveysFormsQuestionsOptionsList>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+  const queryOptions = getSurveysFormsQuestionsOptionsListInfiniteQueryOptions(
+    formId,
+    questionId,
+    options
+  );
 
-  const queryOptions = getSurveysFormsQuestionsOptionsListInfiniteQueryOptions(formId,questionId,options)
+  const query = useInfiniteQuery(queryOptions, queryClient) as UseInfiniteQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
 
-  const query = useInfiniteQuery(queryOptions, queryClient) as  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-
-  query.queryKey = queryOptions.queryKey ;
+  query.queryKey = queryOptions.queryKey;
 
   return query;
 }
 
-
-
-
-export const getSurveysFormsQuestionsOptionsListQueryOptions = <TData = Awaited<ReturnType<typeof surveysFormsQuestionsOptionsList>>, TError = unknown>(formId: string,
-    questionId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof surveysFormsQuestionsOptionsList>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+export const getSurveysFormsQuestionsOptionsListQueryOptions = <
+  TData = Awaited<ReturnType<typeof surveysFormsQuestionsOptionsList>>,
+  TError = unknown
+>(
+  formId: string,
+  questionId: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof surveysFormsQuestionsOptionsList>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  }
 ) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
 
-const {query: queryOptions, request: requestOptions} = options ?? {};
+  const queryKey =
+    queryOptions?.queryKey ?? getSurveysFormsQuestionsOptionsListQueryKey(formId, questionId);
 
-  const queryKey =  queryOptions?.queryKey ?? getSurveysFormsQuestionsOptionsListQueryKey(formId,questionId);
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof surveysFormsQuestionsOptionsList>>> = ({
+    signal
+  }) => surveysFormsQuestionsOptionsList(formId, questionId, { signal, ...requestOptions });
 
-  
+  return {
+    queryKey,
+    queryFn,
+    enabled: !!(formId && questionId),
+    ...queryOptions
+  } as UseQueryOptions<
+    Awaited<ReturnType<typeof surveysFormsQuestionsOptionsList>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof surveysFormsQuestionsOptionsList>>> = ({ signal }) => surveysFormsQuestionsOptionsList(formId,questionId, { signal, ...requestOptions });
+export type SurveysFormsQuestionsOptionsListQueryResult = NonNullable<
+  Awaited<ReturnType<typeof surveysFormsQuestionsOptionsList>>
+>;
+export type SurveysFormsQuestionsOptionsListQueryError = unknown;
 
-      
-
-      
-
-   return  { queryKey, queryFn, enabled: !!(formId && questionId), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof surveysFormsQuestionsOptionsList>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type SurveysFormsQuestionsOptionsListQueryResult = NonNullable<Awaited<ReturnType<typeof surveysFormsQuestionsOptionsList>>>
-export type SurveysFormsQuestionsOptionsListQueryError = unknown
-
-
-export function useSurveysFormsQuestionsOptionsList<TData = Awaited<ReturnType<typeof surveysFormsQuestionsOptionsList>>, TError = unknown>(
- formId: string,
-    questionId: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof surveysFormsQuestionsOptionsList>>, TError, TData>> & Pick<
+export function useSurveysFormsQuestionsOptionsList<
+  TData = Awaited<ReturnType<typeof surveysFormsQuestionsOptionsList>>,
+  TError = unknown
+>(
+  formId: string,
+  questionId: string,
+  options: {
+    query: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof surveysFormsQuestionsOptionsList>>, TError, TData>
+    > &
+      Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof surveysFormsQuestionsOptionsList>>,
           TError,
           Awaited<ReturnType<typeof surveysFormsQuestionsOptionsList>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useSurveysFormsQuestionsOptionsList<TData = Awaited<ReturnType<typeof surveysFormsQuestionsOptionsList>>, TError = unknown>(
- formId: string,
-    questionId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof surveysFormsQuestionsOptionsList>>, TError, TData>> & Pick<
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useSurveysFormsQuestionsOptionsList<
+  TData = Awaited<ReturnType<typeof surveysFormsQuestionsOptionsList>>,
+  TError = unknown
+>(
+  formId: string,
+  questionId: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof surveysFormsQuestionsOptionsList>>, TError, TData>
+    > &
+      Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof surveysFormsQuestionsOptionsList>>,
           TError,
           Awaited<ReturnType<typeof surveysFormsQuestionsOptionsList>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useSurveysFormsQuestionsOptionsList<TData = Awaited<ReturnType<typeof surveysFormsQuestionsOptionsList>>, TError = unknown>(
- formId: string,
-    questionId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof surveysFormsQuestionsOptionsList>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useSurveysFormsQuestionsOptionsList<
+  TData = Awaited<ReturnType<typeof surveysFormsQuestionsOptionsList>>,
+  TError = unknown
+>(
+  formId: string,
+  questionId: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof surveysFormsQuestionsOptionsList>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 /**
  * @summary List options by question
  */
 
-export function useSurveysFormsQuestionsOptionsList<TData = Awaited<ReturnType<typeof surveysFormsQuestionsOptionsList>>, TError = unknown>(
- formId: string,
-    questionId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof surveysFormsQuestionsOptionsList>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient 
- ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+export function useSurveysFormsQuestionsOptionsList<
+  TData = Awaited<ReturnType<typeof surveysFormsQuestionsOptionsList>>,
+  TError = unknown
+>(
+  formId: string,
+  questionId: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof surveysFormsQuestionsOptionsList>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+  const queryOptions = getSurveysFormsQuestionsOptionsListQueryOptions(formId, questionId, options);
 
-  const queryOptions = getSurveysFormsQuestionsOptionsListQueryOptions(formId,questionId,options)
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+  };
 
-  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-
-  query.queryKey = queryOptions.queryKey ;
+  query.queryKey = queryOptions.queryKey;
 
   return query;
 }
-
-
-
-
 
 /**
  * @summary Create option for question
  */
 export type surveysFormsQuestionsOptionsCreateResponse201 = {
-  data: FormQuestionOption
-  status: 201
-}
-    
-export type surveysFormsQuestionsOptionsCreateResponseSuccess = (surveysFormsQuestionsOptionsCreateResponse201) & {
-  headers: Headers;
+  data: FormQuestionOption;
+  status: 201;
 };
-;
 
-export type surveysFormsQuestionsOptionsCreateResponse = (surveysFormsQuestionsOptionsCreateResponseSuccess)
+export type surveysFormsQuestionsOptionsCreateResponseSuccess =
+  surveysFormsQuestionsOptionsCreateResponse201 & {
+    headers: Headers;
+  };
 
-export const getSurveysFormsQuestionsOptionsCreateUrl = (formId: string,
-    questionId: string,) => {
+export type surveysFormsQuestionsOptionsCreateResponse =
+  surveysFormsQuestionsOptionsCreateResponseSuccess;
 
+export const getSurveysFormsQuestionsOptionsCreateUrl = (formId: string, questionId: string) => {
+  return `/api/surveys/forms/${formId}/questions/${questionId}/options/`;
+};
 
-  
+export const surveysFormsQuestionsOptionsCreate = async (
+  formId: string,
+  questionId: string,
+  formQuestionOption: NonReadonly<FormQuestionOption>,
+  options?: RequestInit
+): Promise<surveysFormsQuestionsOptionsCreateResponse> => {
+  return customFetch<surveysFormsQuestionsOptionsCreateResponse>(
+    getSurveysFormsQuestionsOptionsCreateUrl(formId, questionId),
+    {
+      ...options,
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', ...options?.headers },
+      body: JSON.stringify(formQuestionOption)
+    }
+  );
+};
 
-  return `/api/surveys/forms/${formId}/questions/${questionId}/options/`
-}
+export const getSurveysFormsQuestionsOptionsCreateMutationOptions = <
+  TError = unknown,
+  TContext = unknown
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof surveysFormsQuestionsOptionsCreate>>,
+    TError,
+    { formId: string; questionId: string; data: NonReadonly<FormQuestionOption> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof surveysFormsQuestionsOptionsCreate>>,
+  TError,
+  { formId: string; questionId: string; data: NonReadonly<FormQuestionOption> },
+  TContext
+> => {
+  const mutationKey = ['surveysFormsQuestionsOptionsCreate'];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
 
-export const surveysFormsQuestionsOptionsCreate = async (formId: string,
-    questionId: string,
-    formQuestionOption: NonReadonly<FormQuestionOption>, options?: RequestInit): Promise<surveysFormsQuestionsOptionsCreateResponse> => {
-  
-  return customFetch<surveysFormsQuestionsOptionsCreateResponse>(getSurveysFormsQuestionsOptionsCreateUrl(formId,questionId),
-  {      
-    ...options,
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(
-      formQuestionOption,)
-  }
-);}
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof surveysFormsQuestionsOptionsCreate>>,
+    { formId: string; questionId: string; data: NonReadonly<FormQuestionOption> }
+  > = (props) => {
+    const { formId, questionId, data } = props ?? {};
 
+    return surveysFormsQuestionsOptionsCreate(formId, questionId, data, requestOptions);
+  };
 
+  return { mutationFn, ...mutationOptions };
+};
 
+export type SurveysFormsQuestionsOptionsCreateMutationResult = NonNullable<
+  Awaited<ReturnType<typeof surveysFormsQuestionsOptionsCreate>>
+>;
+export type SurveysFormsQuestionsOptionsCreateMutationBody = NonReadonly<FormQuestionOption>;
+export type SurveysFormsQuestionsOptionsCreateMutationError = unknown;
 
-export const getSurveysFormsQuestionsOptionsCreateMutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof surveysFormsQuestionsOptionsCreate>>, TError,{formId: string;questionId: string;data: NonReadonly<FormQuestionOption>}, TContext>, request?: SecondParameter<typeof customFetch>}
-): UseMutationOptions<Awaited<ReturnType<typeof surveysFormsQuestionsOptionsCreate>>, TError,{formId: string;questionId: string;data: NonReadonly<FormQuestionOption>}, TContext> => {
-
-const mutationKey = ['surveysFormsQuestionsOptionsCreate'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
-
-      
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof surveysFormsQuestionsOptionsCreate>>, {formId: string;questionId: string;data: NonReadonly<FormQuestionOption>}> = (props) => {
-          const {formId,questionId,data} = props ?? {};
-
-          return  surveysFormsQuestionsOptionsCreate(formId,questionId,data,requestOptions)
-        }
-
-        
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type SurveysFormsQuestionsOptionsCreateMutationResult = NonNullable<Awaited<ReturnType<typeof surveysFormsQuestionsOptionsCreate>>>
-    export type SurveysFormsQuestionsOptionsCreateMutationBody = NonReadonly<FormQuestionOption>
-    export type SurveysFormsQuestionsOptionsCreateMutationError = unknown
-
-    /**
+/**
  * @summary Create option for question
  */
-export const useSurveysFormsQuestionsOptionsCreate = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof surveysFormsQuestionsOptionsCreate>>, TError,{formId: string;questionId: string;data: NonReadonly<FormQuestionOption>}, TContext>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof surveysFormsQuestionsOptionsCreate>>,
-        TError,
-        {formId: string;questionId: string;data: NonReadonly<FormQuestionOption>},
-        TContext
-      > => {
+export const useSurveysFormsQuestionsOptionsCreate = <TError = unknown, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof surveysFormsQuestionsOptionsCreate>>,
+      TError,
+      { formId: string; questionId: string; data: NonReadonly<FormQuestionOption> },
+      TContext
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseMutationResult<
+  Awaited<ReturnType<typeof surveysFormsQuestionsOptionsCreate>>,
+  TError,
+  { formId: string; questionId: string; data: NonReadonly<FormQuestionOption> },
+  TContext
+> => {
+  const mutationOptions = getSurveysFormsQuestionsOptionsCreateMutationOptions(options);
 
-      const mutationOptions = getSurveysFormsQuestionsOptionsCreateMutationOptions(options);
+  return useMutation(mutationOptions, queryClient);
+};
 
-      return useMutation(mutationOptions, queryClient);
-    }
-    
 /**
  * @summary Get question option by id
  */
 export type surveysFormsQuestionsOptionsRetrieveResponse200 = {
-  data: FormQuestionOption
-  status: 200
-}
-    
-export type surveysFormsQuestionsOptionsRetrieveResponseSuccess = (surveysFormsQuestionsOptionsRetrieveResponse200) & {
-  headers: Headers;
+  data: FormQuestionOption;
+  status: 200;
 };
-;
 
-export type surveysFormsQuestionsOptionsRetrieveResponse = (surveysFormsQuestionsOptionsRetrieveResponseSuccess)
+export type surveysFormsQuestionsOptionsRetrieveResponseSuccess =
+  surveysFormsQuestionsOptionsRetrieveResponse200 & {
+    headers: Headers;
+  };
 
-export const getSurveysFormsQuestionsOptionsRetrieveUrl = (formId: string,
-    questionId: string,
-    optionId: string,) => {
+export type surveysFormsQuestionsOptionsRetrieveResponse =
+  surveysFormsQuestionsOptionsRetrieveResponseSuccess;
 
+export const getSurveysFormsQuestionsOptionsRetrieveUrl = (
+  formId: string,
+  questionId: string,
+  optionId: string
+) => {
+  return `/api/surveys/forms/${formId}/questions/${questionId}/options/${optionId}/`;
+};
 
-  
-
-  return `/api/surveys/forms/${formId}/questions/${questionId}/options/${optionId}/`
-}
-
-export const surveysFormsQuestionsOptionsRetrieve = async (formId: string,
-    questionId: string,
-    optionId: string, options?: RequestInit): Promise<surveysFormsQuestionsOptionsRetrieveResponse> => {
-  
-  return customFetch<surveysFormsQuestionsOptionsRetrieveResponse>(getSurveysFormsQuestionsOptionsRetrieveUrl(formId,questionId,optionId),
-  {      
-    ...options,
-    method: 'GET'
-    
-    
-  }
-);}
-
-
-
-
-
-export const getSurveysFormsQuestionsOptionsRetrieveInfiniteQueryKey = (formId?: string,
-    questionId?: string,
-    optionId?: string,) => {
-    return [
-    'infinite', `/api/surveys/forms/${formId}/questions/${questionId}/options/${optionId}/`
-    ] as const;
+export const surveysFormsQuestionsOptionsRetrieve = async (
+  formId: string,
+  questionId: string,
+  optionId: string,
+  options?: RequestInit
+): Promise<surveysFormsQuestionsOptionsRetrieveResponse> => {
+  return customFetch<surveysFormsQuestionsOptionsRetrieveResponse>(
+    getSurveysFormsQuestionsOptionsRetrieveUrl(formId, questionId, optionId),
+    {
+      ...options,
+      method: 'GET'
     }
+  );
+};
 
-export const getSurveysFormsQuestionsOptionsRetrieveQueryKey = (formId?: string,
-    questionId?: string,
-    optionId?: string,) => {
-    return [
+export const getSurveysFormsQuestionsOptionsRetrieveInfiniteQueryKey = (
+  formId?: string,
+  questionId?: string,
+  optionId?: string
+) => {
+  return [
+    'infinite',
     `/api/surveys/forms/${formId}/questions/${questionId}/options/${optionId}/`
-    ] as const;
-    }
+  ] as const;
+};
 
-    
-export const getSurveysFormsQuestionsOptionsRetrieveInfiniteQueryOptions = <TData = InfiniteData<Awaited<ReturnType<typeof surveysFormsQuestionsOptionsRetrieve>>>, TError = unknown>(formId: string,
-    questionId: string,
-    optionId: string, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof surveysFormsQuestionsOptionsRetrieve>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+export const getSurveysFormsQuestionsOptionsRetrieveQueryKey = (
+  formId?: string,
+  questionId?: string,
+  optionId?: string
 ) => {
+  return [`/api/surveys/forms/${formId}/questions/${questionId}/options/${optionId}/`] as const;
+};
 
-const {query: queryOptions, request: requestOptions} = options ?? {};
+export const getSurveysFormsQuestionsOptionsRetrieveInfiniteQueryOptions = <
+  TData = InfiniteData<Awaited<ReturnType<typeof surveysFormsQuestionsOptionsRetrieve>>>,
+  TError = unknown
+>(
+  formId: string,
+  questionId: string,
+  optionId: string,
+  options?: {
+    query?: Partial<
+      UseInfiniteQueryOptions<
+        Awaited<ReturnType<typeof surveysFormsQuestionsOptionsRetrieve>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  }
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
 
-  const queryKey =  queryOptions?.queryKey ?? getSurveysFormsQuestionsOptionsRetrieveInfiniteQueryKey(formId,questionId,optionId);
+  const queryKey =
+    queryOptions?.queryKey ??
+    getSurveysFormsQuestionsOptionsRetrieveInfiniteQueryKey(formId, questionId, optionId);
 
-  
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof surveysFormsQuestionsOptionsRetrieve>>
+  > = ({ signal }) =>
+    surveysFormsQuestionsOptionsRetrieve(formId, questionId, optionId, {
+      signal,
+      ...requestOptions
+    });
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof surveysFormsQuestionsOptionsRetrieve>>> = ({ signal }) => surveysFormsQuestionsOptionsRetrieve(formId,questionId,optionId, { signal, ...requestOptions });
+  return {
+    queryKey,
+    queryFn,
+    enabled: !!(formId && questionId && optionId),
+    ...queryOptions
+  } as UseInfiniteQueryOptions<
+    Awaited<ReturnType<typeof surveysFormsQuestionsOptionsRetrieve>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
 
-      
+export type SurveysFormsQuestionsOptionsRetrieveInfiniteQueryResult = NonNullable<
+  Awaited<ReturnType<typeof surveysFormsQuestionsOptionsRetrieve>>
+>;
+export type SurveysFormsQuestionsOptionsRetrieveInfiniteQueryError = unknown;
 
-      
-
-   return  { queryKey, queryFn, enabled: !!(formId && questionId && optionId), ...queryOptions} as UseInfiniteQueryOptions<Awaited<ReturnType<typeof surveysFormsQuestionsOptionsRetrieve>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type SurveysFormsQuestionsOptionsRetrieveInfiniteQueryResult = NonNullable<Awaited<ReturnType<typeof surveysFormsQuestionsOptionsRetrieve>>>
-export type SurveysFormsQuestionsOptionsRetrieveInfiniteQueryError = unknown
-
-
-export function useSurveysFormsQuestionsOptionsRetrieveInfinite<TData = InfiniteData<Awaited<ReturnType<typeof surveysFormsQuestionsOptionsRetrieve>>>, TError = unknown>(
- formId: string,
-    questionId: string,
-    optionId: string, options: { query:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof surveysFormsQuestionsOptionsRetrieve>>, TError, TData>> & Pick<
+export function useSurveysFormsQuestionsOptionsRetrieveInfinite<
+  TData = InfiniteData<Awaited<ReturnType<typeof surveysFormsQuestionsOptionsRetrieve>>>,
+  TError = unknown
+>(
+  formId: string,
+  questionId: string,
+  optionId: string,
+  options: {
+    query: Partial<
+      UseInfiniteQueryOptions<
+        Awaited<ReturnType<typeof surveysFormsQuestionsOptionsRetrieve>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof surveysFormsQuestionsOptionsRetrieve>>,
           TError,
           Awaited<ReturnType<typeof surveysFormsQuestionsOptionsRetrieve>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  DefinedUseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useSurveysFormsQuestionsOptionsRetrieveInfinite<TData = InfiniteData<Awaited<ReturnType<typeof surveysFormsQuestionsOptionsRetrieve>>>, TError = unknown>(
- formId: string,
-    questionId: string,
-    optionId: string, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof surveysFormsQuestionsOptionsRetrieve>>, TError, TData>> & Pick<
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): DefinedUseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useSurveysFormsQuestionsOptionsRetrieveInfinite<
+  TData = InfiniteData<Awaited<ReturnType<typeof surveysFormsQuestionsOptionsRetrieve>>>,
+  TError = unknown
+>(
+  formId: string,
+  questionId: string,
+  optionId: string,
+  options?: {
+    query?: Partial<
+      UseInfiniteQueryOptions<
+        Awaited<ReturnType<typeof surveysFormsQuestionsOptionsRetrieve>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof surveysFormsQuestionsOptionsRetrieve>>,
           TError,
           Awaited<ReturnType<typeof surveysFormsQuestionsOptionsRetrieve>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useSurveysFormsQuestionsOptionsRetrieveInfinite<TData = InfiniteData<Awaited<ReturnType<typeof surveysFormsQuestionsOptionsRetrieve>>>, TError = unknown>(
- formId: string,
-    questionId: string,
-    optionId: string, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof surveysFormsQuestionsOptionsRetrieve>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useSurveysFormsQuestionsOptionsRetrieveInfinite<
+  TData = InfiniteData<Awaited<ReturnType<typeof surveysFormsQuestionsOptionsRetrieve>>>,
+  TError = unknown
+>(
+  formId: string,
+  questionId: string,
+  optionId: string,
+  options?: {
+    query?: Partial<
+      UseInfiniteQueryOptions<
+        Awaited<ReturnType<typeof surveysFormsQuestionsOptionsRetrieve>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 /**
  * @summary Get question option by id
  */
 
-export function useSurveysFormsQuestionsOptionsRetrieveInfinite<TData = InfiniteData<Awaited<ReturnType<typeof surveysFormsQuestionsOptionsRetrieve>>>, TError = unknown>(
- formId: string,
-    questionId: string,
-    optionId: string, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof surveysFormsQuestionsOptionsRetrieve>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient 
- ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+export function useSurveysFormsQuestionsOptionsRetrieveInfinite<
+  TData = InfiniteData<Awaited<ReturnType<typeof surveysFormsQuestionsOptionsRetrieve>>>,
+  TError = unknown
+>(
+  formId: string,
+  questionId: string,
+  optionId: string,
+  options?: {
+    query?: Partial<
+      UseInfiniteQueryOptions<
+        Awaited<ReturnType<typeof surveysFormsQuestionsOptionsRetrieve>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+  const queryOptions = getSurveysFormsQuestionsOptionsRetrieveInfiniteQueryOptions(
+    formId,
+    questionId,
+    optionId,
+    options
+  );
 
-  const queryOptions = getSurveysFormsQuestionsOptionsRetrieveInfiniteQueryOptions(formId,questionId,optionId,options)
+  const query = useInfiniteQuery(queryOptions, queryClient) as UseInfiniteQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
 
-  const query = useInfiniteQuery(queryOptions, queryClient) as  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-
-  query.queryKey = queryOptions.queryKey ;
+  query.queryKey = queryOptions.queryKey;
 
   return query;
 }
 
-
-
-
-export const getSurveysFormsQuestionsOptionsRetrieveQueryOptions = <TData = Awaited<ReturnType<typeof surveysFormsQuestionsOptionsRetrieve>>, TError = unknown>(formId: string,
-    questionId: string,
-    optionId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof surveysFormsQuestionsOptionsRetrieve>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+export const getSurveysFormsQuestionsOptionsRetrieveQueryOptions = <
+  TData = Awaited<ReturnType<typeof surveysFormsQuestionsOptionsRetrieve>>,
+  TError = unknown
+>(
+  formId: string,
+  questionId: string,
+  optionId: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof surveysFormsQuestionsOptionsRetrieve>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  }
 ) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
 
-const {query: queryOptions, request: requestOptions} = options ?? {};
+  const queryKey =
+    queryOptions?.queryKey ??
+    getSurveysFormsQuestionsOptionsRetrieveQueryKey(formId, questionId, optionId);
 
-  const queryKey =  queryOptions?.queryKey ?? getSurveysFormsQuestionsOptionsRetrieveQueryKey(formId,questionId,optionId);
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof surveysFormsQuestionsOptionsRetrieve>>
+  > = ({ signal }) =>
+    surveysFormsQuestionsOptionsRetrieve(formId, questionId, optionId, {
+      signal,
+      ...requestOptions
+    });
 
-  
+  return {
+    queryKey,
+    queryFn,
+    enabled: !!(formId && questionId && optionId),
+    ...queryOptions
+  } as UseQueryOptions<
+    Awaited<ReturnType<typeof surveysFormsQuestionsOptionsRetrieve>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof surveysFormsQuestionsOptionsRetrieve>>> = ({ signal }) => surveysFormsQuestionsOptionsRetrieve(formId,questionId,optionId, { signal, ...requestOptions });
+export type SurveysFormsQuestionsOptionsRetrieveQueryResult = NonNullable<
+  Awaited<ReturnType<typeof surveysFormsQuestionsOptionsRetrieve>>
+>;
+export type SurveysFormsQuestionsOptionsRetrieveQueryError = unknown;
 
-      
-
-      
-
-   return  { queryKey, queryFn, enabled: !!(formId && questionId && optionId), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof surveysFormsQuestionsOptionsRetrieve>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type SurveysFormsQuestionsOptionsRetrieveQueryResult = NonNullable<Awaited<ReturnType<typeof surveysFormsQuestionsOptionsRetrieve>>>
-export type SurveysFormsQuestionsOptionsRetrieveQueryError = unknown
-
-
-export function useSurveysFormsQuestionsOptionsRetrieve<TData = Awaited<ReturnType<typeof surveysFormsQuestionsOptionsRetrieve>>, TError = unknown>(
- formId: string,
-    questionId: string,
-    optionId: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof surveysFormsQuestionsOptionsRetrieve>>, TError, TData>> & Pick<
+export function useSurveysFormsQuestionsOptionsRetrieve<
+  TData = Awaited<ReturnType<typeof surveysFormsQuestionsOptionsRetrieve>>,
+  TError = unknown
+>(
+  formId: string,
+  questionId: string,
+  optionId: string,
+  options: {
+    query: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof surveysFormsQuestionsOptionsRetrieve>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof surveysFormsQuestionsOptionsRetrieve>>,
           TError,
           Awaited<ReturnType<typeof surveysFormsQuestionsOptionsRetrieve>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useSurveysFormsQuestionsOptionsRetrieve<TData = Awaited<ReturnType<typeof surveysFormsQuestionsOptionsRetrieve>>, TError = unknown>(
- formId: string,
-    questionId: string,
-    optionId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof surveysFormsQuestionsOptionsRetrieve>>, TError, TData>> & Pick<
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useSurveysFormsQuestionsOptionsRetrieve<
+  TData = Awaited<ReturnType<typeof surveysFormsQuestionsOptionsRetrieve>>,
+  TError = unknown
+>(
+  formId: string,
+  questionId: string,
+  optionId: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof surveysFormsQuestionsOptionsRetrieve>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof surveysFormsQuestionsOptionsRetrieve>>,
           TError,
           Awaited<ReturnType<typeof surveysFormsQuestionsOptionsRetrieve>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useSurveysFormsQuestionsOptionsRetrieve<TData = Awaited<ReturnType<typeof surveysFormsQuestionsOptionsRetrieve>>, TError = unknown>(
- formId: string,
-    questionId: string,
-    optionId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof surveysFormsQuestionsOptionsRetrieve>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useSurveysFormsQuestionsOptionsRetrieve<
+  TData = Awaited<ReturnType<typeof surveysFormsQuestionsOptionsRetrieve>>,
+  TError = unknown
+>(
+  formId: string,
+  questionId: string,
+  optionId: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof surveysFormsQuestionsOptionsRetrieve>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 /**
  * @summary Get question option by id
  */
 
-export function useSurveysFormsQuestionsOptionsRetrieve<TData = Awaited<ReturnType<typeof surveysFormsQuestionsOptionsRetrieve>>, TError = unknown>(
- formId: string,
-    questionId: string,
-    optionId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof surveysFormsQuestionsOptionsRetrieve>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient 
- ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+export function useSurveysFormsQuestionsOptionsRetrieve<
+  TData = Awaited<ReturnType<typeof surveysFormsQuestionsOptionsRetrieve>>,
+  TError = unknown
+>(
+  formId: string,
+  questionId: string,
+  optionId: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof surveysFormsQuestionsOptionsRetrieve>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+  const queryOptions = getSurveysFormsQuestionsOptionsRetrieveQueryOptions(
+    formId,
+    questionId,
+    optionId,
+    options
+  );
 
-  const queryOptions = getSurveysFormsQuestionsOptionsRetrieveQueryOptions(formId,questionId,optionId,options)
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+  };
 
-  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-
-  query.queryKey = queryOptions.queryKey ;
+  query.queryKey = queryOptions.queryKey;
 
   return query;
 }
-
-
-
-
 
 /**
  * @summary Patch question option by id
  */
 export type surveysFormsQuestionsOptionsPartialUpdateResponse200 = {
-  data: FormQuestionOption
-  status: 200
-}
-    
-export type surveysFormsQuestionsOptionsPartialUpdateResponseSuccess = (surveysFormsQuestionsOptionsPartialUpdateResponse200) & {
-  headers: Headers;
+  data: FormQuestionOption;
+  status: 200;
 };
-;
 
-export type surveysFormsQuestionsOptionsPartialUpdateResponse = (surveysFormsQuestionsOptionsPartialUpdateResponseSuccess)
+export type surveysFormsQuestionsOptionsPartialUpdateResponseSuccess =
+  surveysFormsQuestionsOptionsPartialUpdateResponse200 & {
+    headers: Headers;
+  };
 
-export const getSurveysFormsQuestionsOptionsPartialUpdateUrl = (formId: string,
-    questionId: string,
-    optionId: string,) => {
+export type surveysFormsQuestionsOptionsPartialUpdateResponse =
+  surveysFormsQuestionsOptionsPartialUpdateResponseSuccess;
 
+export const getSurveysFormsQuestionsOptionsPartialUpdateUrl = (
+  formId: string,
+  questionId: string,
+  optionId: string
+) => {
+  return `/api/surveys/forms/${formId}/questions/${questionId}/options/${optionId}/`;
+};
 
-  
+export const surveysFormsQuestionsOptionsPartialUpdate = async (
+  formId: string,
+  questionId: string,
+  optionId: string,
+  patchedFormQuestionOption: NonReadonly<PatchedFormQuestionOption>,
+  options?: RequestInit
+): Promise<surveysFormsQuestionsOptionsPartialUpdateResponse> => {
+  return customFetch<surveysFormsQuestionsOptionsPartialUpdateResponse>(
+    getSurveysFormsQuestionsOptionsPartialUpdateUrl(formId, questionId, optionId),
+    {
+      ...options,
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json', ...options?.headers },
+      body: JSON.stringify(patchedFormQuestionOption)
+    }
+  );
+};
 
-  return `/api/surveys/forms/${formId}/questions/${questionId}/options/${optionId}/`
-}
+export const getSurveysFormsQuestionsOptionsPartialUpdateMutationOptions = <
+  TError = unknown,
+  TContext = unknown
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof surveysFormsQuestionsOptionsPartialUpdate>>,
+    TError,
+    {
+      formId: string;
+      questionId: string;
+      optionId: string;
+      data: NonReadonly<PatchedFormQuestionOption>;
+    },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof surveysFormsQuestionsOptionsPartialUpdate>>,
+  TError,
+  {
+    formId: string;
+    questionId: string;
+    optionId: string;
+    data: NonReadonly<PatchedFormQuestionOption>;
+  },
+  TContext
+> => {
+  const mutationKey = ['surveysFormsQuestionsOptionsPartialUpdate'];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
 
-export const surveysFormsQuestionsOptionsPartialUpdate = async (formId: string,
-    questionId: string,
-    optionId: string,
-    patchedFormQuestionOption: NonReadonly<PatchedFormQuestionOption>, options?: RequestInit): Promise<surveysFormsQuestionsOptionsPartialUpdateResponse> => {
-  
-  return customFetch<surveysFormsQuestionsOptionsPartialUpdateResponse>(getSurveysFormsQuestionsOptionsPartialUpdateUrl(formId,questionId,optionId),
-  {      
-    ...options,
-    method: 'PATCH',
-    headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(
-      patchedFormQuestionOption,)
-  }
-);}
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof surveysFormsQuestionsOptionsPartialUpdate>>,
+    {
+      formId: string;
+      questionId: string;
+      optionId: string;
+      data: NonReadonly<PatchedFormQuestionOption>;
+    }
+  > = (props) => {
+    const { formId, questionId, optionId, data } = props ?? {};
 
+    return surveysFormsQuestionsOptionsPartialUpdate(
+      formId,
+      questionId,
+      optionId,
+      data,
+      requestOptions
+    );
+  };
 
+  return { mutationFn, ...mutationOptions };
+};
 
+export type SurveysFormsQuestionsOptionsPartialUpdateMutationResult = NonNullable<
+  Awaited<ReturnType<typeof surveysFormsQuestionsOptionsPartialUpdate>>
+>;
+export type SurveysFormsQuestionsOptionsPartialUpdateMutationBody =
+  NonReadonly<PatchedFormQuestionOption>;
+export type SurveysFormsQuestionsOptionsPartialUpdateMutationError = unknown;
 
-export const getSurveysFormsQuestionsOptionsPartialUpdateMutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof surveysFormsQuestionsOptionsPartialUpdate>>, TError,{formId: string;questionId: string;optionId: string;data: NonReadonly<PatchedFormQuestionOption>}, TContext>, request?: SecondParameter<typeof customFetch>}
-): UseMutationOptions<Awaited<ReturnType<typeof surveysFormsQuestionsOptionsPartialUpdate>>, TError,{formId: string;questionId: string;optionId: string;data: NonReadonly<PatchedFormQuestionOption>}, TContext> => {
-
-const mutationKey = ['surveysFormsQuestionsOptionsPartialUpdate'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
-
-      
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof surveysFormsQuestionsOptionsPartialUpdate>>, {formId: string;questionId: string;optionId: string;data: NonReadonly<PatchedFormQuestionOption>}> = (props) => {
-          const {formId,questionId,optionId,data} = props ?? {};
-
-          return  surveysFormsQuestionsOptionsPartialUpdate(formId,questionId,optionId,data,requestOptions)
-        }
-
-        
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type SurveysFormsQuestionsOptionsPartialUpdateMutationResult = NonNullable<Awaited<ReturnType<typeof surveysFormsQuestionsOptionsPartialUpdate>>>
-    export type SurveysFormsQuestionsOptionsPartialUpdateMutationBody = NonReadonly<PatchedFormQuestionOption>
-    export type SurveysFormsQuestionsOptionsPartialUpdateMutationError = unknown
-
-    /**
+/**
  * @summary Patch question option by id
  */
-export const useSurveysFormsQuestionsOptionsPartialUpdate = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof surveysFormsQuestionsOptionsPartialUpdate>>, TError,{formId: string;questionId: string;optionId: string;data: NonReadonly<PatchedFormQuestionOption>}, TContext>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof surveysFormsQuestionsOptionsPartialUpdate>>,
-        TError,
-        {formId: string;questionId: string;optionId: string;data: NonReadonly<PatchedFormQuestionOption>},
-        TContext
-      > => {
+export const useSurveysFormsQuestionsOptionsPartialUpdate = <TError = unknown, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof surveysFormsQuestionsOptionsPartialUpdate>>,
+      TError,
+      {
+        formId: string;
+        questionId: string;
+        optionId: string;
+        data: NonReadonly<PatchedFormQuestionOption>;
+      },
+      TContext
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseMutationResult<
+  Awaited<ReturnType<typeof surveysFormsQuestionsOptionsPartialUpdate>>,
+  TError,
+  {
+    formId: string;
+    questionId: string;
+    optionId: string;
+    data: NonReadonly<PatchedFormQuestionOption>;
+  },
+  TContext
+> => {
+  const mutationOptions = getSurveysFormsQuestionsOptionsPartialUpdateMutationOptions(options);
 
-      const mutationOptions = getSurveysFormsQuestionsOptionsPartialUpdateMutationOptions(options);
+  return useMutation(mutationOptions, queryClient);
+};
 
-      return useMutation(mutationOptions, queryClient);
-    }
-    
 /**
  * @summary Delete question option by id
  */
 export type surveysFormsQuestionsOptionsDestroyResponse204 = {
-  data: void
-  status: 204
-}
-    
-export type surveysFormsQuestionsOptionsDestroyResponseSuccess = (surveysFormsQuestionsOptionsDestroyResponse204) & {
-  headers: Headers;
+  data: void;
+  status: 204;
 };
-;
 
-export type surveysFormsQuestionsOptionsDestroyResponse = (surveysFormsQuestionsOptionsDestroyResponseSuccess)
+export type surveysFormsQuestionsOptionsDestroyResponseSuccess =
+  surveysFormsQuestionsOptionsDestroyResponse204 & {
+    headers: Headers;
+  };
 
-export const getSurveysFormsQuestionsOptionsDestroyUrl = (formId: string,
-    questionId: string,
-    optionId: string,) => {
+export type surveysFormsQuestionsOptionsDestroyResponse =
+  surveysFormsQuestionsOptionsDestroyResponseSuccess;
 
+export const getSurveysFormsQuestionsOptionsDestroyUrl = (
+  formId: string,
+  questionId: string,
+  optionId: string
+) => {
+  return `/api/surveys/forms/${formId}/questions/${questionId}/options/${optionId}/`;
+};
 
-  
+export const surveysFormsQuestionsOptionsDestroy = async (
+  formId: string,
+  questionId: string,
+  optionId: string,
+  options?: RequestInit
+): Promise<surveysFormsQuestionsOptionsDestroyResponse> => {
+  return customFetch<surveysFormsQuestionsOptionsDestroyResponse>(
+    getSurveysFormsQuestionsOptionsDestroyUrl(formId, questionId, optionId),
+    {
+      ...options,
+      method: 'DELETE'
+    }
+  );
+};
 
-  return `/api/surveys/forms/${formId}/questions/${questionId}/options/${optionId}/`
-}
+export const getSurveysFormsQuestionsOptionsDestroyMutationOptions = <
+  TError = unknown,
+  TContext = unknown
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof surveysFormsQuestionsOptionsDestroy>>,
+    TError,
+    { formId: string; questionId: string; optionId: string },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof surveysFormsQuestionsOptionsDestroy>>,
+  TError,
+  { formId: string; questionId: string; optionId: string },
+  TContext
+> => {
+  const mutationKey = ['surveysFormsQuestionsOptionsDestroy'];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
 
-export const surveysFormsQuestionsOptionsDestroy = async (formId: string,
-    questionId: string,
-    optionId: string, options?: RequestInit): Promise<surveysFormsQuestionsOptionsDestroyResponse> => {
-  
-  return customFetch<surveysFormsQuestionsOptionsDestroyResponse>(getSurveysFormsQuestionsOptionsDestroyUrl(formId,questionId,optionId),
-  {      
-    ...options,
-    method: 'DELETE'
-    
-    
-  }
-);}
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof surveysFormsQuestionsOptionsDestroy>>,
+    { formId: string; questionId: string; optionId: string }
+  > = (props) => {
+    const { formId, questionId, optionId } = props ?? {};
 
+    return surveysFormsQuestionsOptionsDestroy(formId, questionId, optionId, requestOptions);
+  };
 
+  return { mutationFn, ...mutationOptions };
+};
 
+export type SurveysFormsQuestionsOptionsDestroyMutationResult = NonNullable<
+  Awaited<ReturnType<typeof surveysFormsQuestionsOptionsDestroy>>
+>;
 
-export const getSurveysFormsQuestionsOptionsDestroyMutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof surveysFormsQuestionsOptionsDestroy>>, TError,{formId: string;questionId: string;optionId: string}, TContext>, request?: SecondParameter<typeof customFetch>}
-): UseMutationOptions<Awaited<ReturnType<typeof surveysFormsQuestionsOptionsDestroy>>, TError,{formId: string;questionId: string;optionId: string}, TContext> => {
+export type SurveysFormsQuestionsOptionsDestroyMutationError = unknown;
 
-const mutationKey = ['surveysFormsQuestionsOptionsDestroy'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
-
-      
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof surveysFormsQuestionsOptionsDestroy>>, {formId: string;questionId: string;optionId: string}> = (props) => {
-          const {formId,questionId,optionId} = props ?? {};
-
-          return  surveysFormsQuestionsOptionsDestroy(formId,questionId,optionId,requestOptions)
-        }
-
-        
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type SurveysFormsQuestionsOptionsDestroyMutationResult = NonNullable<Awaited<ReturnType<typeof surveysFormsQuestionsOptionsDestroy>>>
-    
-    export type SurveysFormsQuestionsOptionsDestroyMutationError = unknown
-
-    /**
+/**
  * @summary Delete question option by id
  */
-export const useSurveysFormsQuestionsOptionsDestroy = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof surveysFormsQuestionsOptionsDestroy>>, TError,{formId: string;questionId: string;optionId: string}, TContext>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof surveysFormsQuestionsOptionsDestroy>>,
-        TError,
-        {formId: string;questionId: string;optionId: string},
-        TContext
-      > => {
+export const useSurveysFormsQuestionsOptionsDestroy = <TError = unknown, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof surveysFormsQuestionsOptionsDestroy>>,
+      TError,
+      { formId: string; questionId: string; optionId: string },
+      TContext
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseMutationResult<
+  Awaited<ReturnType<typeof surveysFormsQuestionsOptionsDestroy>>,
+  TError,
+  { formId: string; questionId: string; optionId: string },
+  TContext
+> => {
+  const mutationOptions = getSurveysFormsQuestionsOptionsDestroyMutationOptions(options);
 
-      const mutationOptions = getSurveysFormsQuestionsOptionsDestroyMutationOptions(options);
+  return useMutation(mutationOptions, queryClient);
+};
 
-      return useMutation(mutationOptions, queryClient);
-    }
-    
 /**
  * @summary Get form by id
  */
 export type surveysFormsRetrieveResponse200 = {
-  data: Form
-  status: 200
-}
-    
-export type surveysFormsRetrieveResponseSuccess = (surveysFormsRetrieveResponse200) & {
+  data: Form;
+  status: 200;
+};
+
+export type surveysFormsRetrieveResponseSuccess = surveysFormsRetrieveResponse200 & {
   headers: Headers;
 };
-;
 
-export type surveysFormsRetrieveResponse = (surveysFormsRetrieveResponseSuccess)
+export type surveysFormsRetrieveResponse = surveysFormsRetrieveResponseSuccess;
 
-export const getSurveysFormsRetrieveUrl = (id: string,) => {
+export const getSurveysFormsRetrieveUrl = (id: string) => {
+  return `/api/surveys/forms/${id}/`;
+};
 
-
-  
-
-  return `/api/surveys/forms/${id}/`
-}
-
-export const surveysFormsRetrieve = async (id: string, options?: RequestInit): Promise<surveysFormsRetrieveResponse> => {
-  
-  return customFetch<surveysFormsRetrieveResponse>(getSurveysFormsRetrieveUrl(id),
-  {      
+export const surveysFormsRetrieve = async (
+  id: string,
+  options?: RequestInit
+): Promise<surveysFormsRetrieveResponse> => {
+  return customFetch<surveysFormsRetrieveResponse>(getSurveysFormsRetrieveUrl(id), {
     ...options,
     method: 'GET'
-    
-    
+  });
+};
+
+export const getSurveysFormsRetrieveInfiniteQueryKey = (id?: string) => {
+  return ['infinite', `/api/surveys/forms/${id}/`] as const;
+};
+
+export const getSurveysFormsRetrieveQueryKey = (id?: string) => {
+  return [`/api/surveys/forms/${id}/`] as const;
+};
+
+export const getSurveysFormsRetrieveInfiniteQueryOptions = <
+  TData = InfiniteData<Awaited<ReturnType<typeof surveysFormsRetrieve>>>,
+  TError = unknown
+>(
+  id: string,
+  options?: {
+    query?: Partial<
+      UseInfiniteQueryOptions<Awaited<ReturnType<typeof surveysFormsRetrieve>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof customFetch>;
   }
-);}
-
-
-
-
-
-export const getSurveysFormsRetrieveInfiniteQueryKey = (id?: string,) => {
-    return [
-    'infinite', `/api/surveys/forms/${id}/`
-    ] as const;
-    }
-
-export const getSurveysFormsRetrieveQueryKey = (id?: string,) => {
-    return [
-    `/api/surveys/forms/${id}/`
-    ] as const;
-    }
-
-    
-export const getSurveysFormsRetrieveInfiniteQueryOptions = <TData = InfiniteData<Awaited<ReturnType<typeof surveysFormsRetrieve>>>, TError = unknown>(id: string, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof surveysFormsRetrieve>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
 ) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
 
-const {query: queryOptions, request: requestOptions} = options ?? {};
+  const queryKey = queryOptions?.queryKey ?? getSurveysFormsRetrieveInfiniteQueryKey(id);
 
-  const queryKey =  queryOptions?.queryKey ?? getSurveysFormsRetrieveInfiniteQueryKey(id);
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof surveysFormsRetrieve>>> = ({ signal }) =>
+    surveysFormsRetrieve(id, { signal, ...requestOptions });
 
-  
+  return { queryKey, queryFn, enabled: !!id, ...queryOptions } as UseInfiniteQueryOptions<
+    Awaited<ReturnType<typeof surveysFormsRetrieve>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof surveysFormsRetrieve>>> = ({ signal }) => surveysFormsRetrieve(id, { signal, ...requestOptions });
+export type SurveysFormsRetrieveInfiniteQueryResult = NonNullable<
+  Awaited<ReturnType<typeof surveysFormsRetrieve>>
+>;
+export type SurveysFormsRetrieveInfiniteQueryError = unknown;
 
-      
-
-      
-
-   return  { queryKey, queryFn, enabled: !!(id), ...queryOptions} as UseInfiniteQueryOptions<Awaited<ReturnType<typeof surveysFormsRetrieve>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type SurveysFormsRetrieveInfiniteQueryResult = NonNullable<Awaited<ReturnType<typeof surveysFormsRetrieve>>>
-export type SurveysFormsRetrieveInfiniteQueryError = unknown
-
-
-export function useSurveysFormsRetrieveInfinite<TData = InfiniteData<Awaited<ReturnType<typeof surveysFormsRetrieve>>>, TError = unknown>(
- id: string, options: { query:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof surveysFormsRetrieve>>, TError, TData>> & Pick<
+export function useSurveysFormsRetrieveInfinite<
+  TData = InfiniteData<Awaited<ReturnType<typeof surveysFormsRetrieve>>>,
+  TError = unknown
+>(
+  id: string,
+  options: {
+    query: Partial<
+      UseInfiniteQueryOptions<Awaited<ReturnType<typeof surveysFormsRetrieve>>, TError, TData>
+    > &
+      Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof surveysFormsRetrieve>>,
           TError,
           Awaited<ReturnType<typeof surveysFormsRetrieve>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  DefinedUseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useSurveysFormsRetrieveInfinite<TData = InfiniteData<Awaited<ReturnType<typeof surveysFormsRetrieve>>>, TError = unknown>(
- id: string, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof surveysFormsRetrieve>>, TError, TData>> & Pick<
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): DefinedUseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useSurveysFormsRetrieveInfinite<
+  TData = InfiniteData<Awaited<ReturnType<typeof surveysFormsRetrieve>>>,
+  TError = unknown
+>(
+  id: string,
+  options?: {
+    query?: Partial<
+      UseInfiniteQueryOptions<Awaited<ReturnType<typeof surveysFormsRetrieve>>, TError, TData>
+    > &
+      Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof surveysFormsRetrieve>>,
           TError,
           Awaited<ReturnType<typeof surveysFormsRetrieve>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useSurveysFormsRetrieveInfinite<TData = InfiniteData<Awaited<ReturnType<typeof surveysFormsRetrieve>>>, TError = unknown>(
- id: string, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof surveysFormsRetrieve>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useSurveysFormsRetrieveInfinite<
+  TData = InfiniteData<Awaited<ReturnType<typeof surveysFormsRetrieve>>>,
+  TError = unknown
+>(
+  id: string,
+  options?: {
+    query?: Partial<
+      UseInfiniteQueryOptions<Awaited<ReturnType<typeof surveysFormsRetrieve>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 /**
  * @summary Get form by id
  */
 
-export function useSurveysFormsRetrieveInfinite<TData = InfiniteData<Awaited<ReturnType<typeof surveysFormsRetrieve>>>, TError = unknown>(
- id: string, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof surveysFormsRetrieve>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient 
- ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+export function useSurveysFormsRetrieveInfinite<
+  TData = InfiniteData<Awaited<ReturnType<typeof surveysFormsRetrieve>>>,
+  TError = unknown
+>(
+  id: string,
+  options?: {
+    query?: Partial<
+      UseInfiniteQueryOptions<Awaited<ReturnType<typeof surveysFormsRetrieve>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+  const queryOptions = getSurveysFormsRetrieveInfiniteQueryOptions(id, options);
 
-  const queryOptions = getSurveysFormsRetrieveInfiniteQueryOptions(id,options)
+  const query = useInfiniteQuery(queryOptions, queryClient) as UseInfiniteQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
 
-  const query = useInfiniteQuery(queryOptions, queryClient) as  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-
-  query.queryKey = queryOptions.queryKey ;
+  query.queryKey = queryOptions.queryKey;
 
   return query;
 }
 
-
-
-
-export const getSurveysFormsRetrieveQueryOptions = <TData = Awaited<ReturnType<typeof surveysFormsRetrieve>>, TError = unknown>(id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof surveysFormsRetrieve>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+export const getSurveysFormsRetrieveQueryOptions = <
+  TData = Awaited<ReturnType<typeof surveysFormsRetrieve>>,
+  TError = unknown
+>(
+  id: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof surveysFormsRetrieve>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  }
 ) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
 
-const {query: queryOptions, request: requestOptions} = options ?? {};
+  const queryKey = queryOptions?.queryKey ?? getSurveysFormsRetrieveQueryKey(id);
 
-  const queryKey =  queryOptions?.queryKey ?? getSurveysFormsRetrieveQueryKey(id);
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof surveysFormsRetrieve>>> = ({ signal }) =>
+    surveysFormsRetrieve(id, { signal, ...requestOptions });
 
-  
+  return { queryKey, queryFn, enabled: !!id, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof surveysFormsRetrieve>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof surveysFormsRetrieve>>> = ({ signal }) => surveysFormsRetrieve(id, { signal, ...requestOptions });
+export type SurveysFormsRetrieveQueryResult = NonNullable<
+  Awaited<ReturnType<typeof surveysFormsRetrieve>>
+>;
+export type SurveysFormsRetrieveQueryError = unknown;
 
-      
-
-      
-
-   return  { queryKey, queryFn, enabled: !!(id), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof surveysFormsRetrieve>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type SurveysFormsRetrieveQueryResult = NonNullable<Awaited<ReturnType<typeof surveysFormsRetrieve>>>
-export type SurveysFormsRetrieveQueryError = unknown
-
-
-export function useSurveysFormsRetrieve<TData = Awaited<ReturnType<typeof surveysFormsRetrieve>>, TError = unknown>(
- id: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof surveysFormsRetrieve>>, TError, TData>> & Pick<
+export function useSurveysFormsRetrieve<
+  TData = Awaited<ReturnType<typeof surveysFormsRetrieve>>,
+  TError = unknown
+>(
+  id: string,
+  options: {
+    query: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof surveysFormsRetrieve>>, TError, TData>
+    > &
+      Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof surveysFormsRetrieve>>,
           TError,
           Awaited<ReturnType<typeof surveysFormsRetrieve>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useSurveysFormsRetrieve<TData = Awaited<ReturnType<typeof surveysFormsRetrieve>>, TError = unknown>(
- id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof surveysFormsRetrieve>>, TError, TData>> & Pick<
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useSurveysFormsRetrieve<
+  TData = Awaited<ReturnType<typeof surveysFormsRetrieve>>,
+  TError = unknown
+>(
+  id: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof surveysFormsRetrieve>>, TError, TData>
+    > &
+      Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof surveysFormsRetrieve>>,
           TError,
           Awaited<ReturnType<typeof surveysFormsRetrieve>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useSurveysFormsRetrieve<TData = Awaited<ReturnType<typeof surveysFormsRetrieve>>, TError = unknown>(
- id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof surveysFormsRetrieve>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useSurveysFormsRetrieve<
+  TData = Awaited<ReturnType<typeof surveysFormsRetrieve>>,
+  TError = unknown
+>(
+  id: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof surveysFormsRetrieve>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 /**
  * @summary Get form by id
  */
 
-export function useSurveysFormsRetrieve<TData = Awaited<ReturnType<typeof surveysFormsRetrieve>>, TError = unknown>(
- id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof surveysFormsRetrieve>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient 
- ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+export function useSurveysFormsRetrieve<
+  TData = Awaited<ReturnType<typeof surveysFormsRetrieve>>,
+  TError = unknown
+>(
+  id: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof surveysFormsRetrieve>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+  const queryOptions = getSurveysFormsRetrieveQueryOptions(id, options);
 
-  const queryOptions = getSurveysFormsRetrieveQueryOptions(id,options)
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+  };
 
-  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-
-  query.queryKey = queryOptions.queryKey ;
+  query.queryKey = queryOptions.queryKey;
 
   return query;
 }
-
-
-
-
 
 /**
  * @summary Patch form by id
  */
 export type surveysFormsPartialUpdateResponse200 = {
-  data: Form
-  status: 200
-}
-    
-export type surveysFormsPartialUpdateResponseSuccess = (surveysFormsPartialUpdateResponse200) & {
+  data: Form;
+  status: 200;
+};
+
+export type surveysFormsPartialUpdateResponseSuccess = surveysFormsPartialUpdateResponse200 & {
   headers: Headers;
 };
-;
 
-export type surveysFormsPartialUpdateResponse = (surveysFormsPartialUpdateResponseSuccess)
+export type surveysFormsPartialUpdateResponse = surveysFormsPartialUpdateResponseSuccess;
 
-export const getSurveysFormsPartialUpdateUrl = (id: string,) => {
+export const getSurveysFormsPartialUpdateUrl = (id: string) => {
+  return `/api/surveys/forms/${id}/`;
+};
 
-
-  
-
-  return `/api/surveys/forms/${id}/`
-}
-
-export const surveysFormsPartialUpdate = async (id: string,
-    patchedForm: NonReadonly<PatchedForm>, options?: RequestInit): Promise<surveysFormsPartialUpdateResponse> => {
-  
-  return customFetch<surveysFormsPartialUpdateResponse>(getSurveysFormsPartialUpdateUrl(id),
-  {      
+export const surveysFormsPartialUpdate = async (
+  id: string,
+  patchedForm: NonReadonly<PatchedForm>,
+  options?: RequestInit
+): Promise<surveysFormsPartialUpdateResponse> => {
+  return customFetch<surveysFormsPartialUpdateResponse>(getSurveysFormsPartialUpdateUrl(id), {
     ...options,
     method: 'PATCH',
     headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(
-      patchedForm,)
-  }
-);}
+    body: JSON.stringify(patchedForm)
+  });
+};
 
+export const getSurveysFormsPartialUpdateMutationOptions = <
+  TError = unknown,
+  TContext = unknown
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof surveysFormsPartialUpdate>>,
+    TError,
+    { id: string; data: NonReadonly<PatchedForm> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof surveysFormsPartialUpdate>>,
+  TError,
+  { id: string; data: NonReadonly<PatchedForm> },
+  TContext
+> => {
+  const mutationKey = ['surveysFormsPartialUpdate'];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
 
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof surveysFormsPartialUpdate>>,
+    { id: string; data: NonReadonly<PatchedForm> }
+  > = (props) => {
+    const { id, data } = props ?? {};
 
+    return surveysFormsPartialUpdate(id, data, requestOptions);
+  };
 
-export const getSurveysFormsPartialUpdateMutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof surveysFormsPartialUpdate>>, TError,{id: string;data: NonReadonly<PatchedForm>}, TContext>, request?: SecondParameter<typeof customFetch>}
-): UseMutationOptions<Awaited<ReturnType<typeof surveysFormsPartialUpdate>>, TError,{id: string;data: NonReadonly<PatchedForm>}, TContext> => {
+  return { mutationFn, ...mutationOptions };
+};
 
-const mutationKey = ['surveysFormsPartialUpdate'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
+export type SurveysFormsPartialUpdateMutationResult = NonNullable<
+  Awaited<ReturnType<typeof surveysFormsPartialUpdate>>
+>;
+export type SurveysFormsPartialUpdateMutationBody = NonReadonly<PatchedForm>;
+export type SurveysFormsPartialUpdateMutationError = unknown;
 
-      
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof surveysFormsPartialUpdate>>, {id: string;data: NonReadonly<PatchedForm>}> = (props) => {
-          const {id,data} = props ?? {};
-
-          return  surveysFormsPartialUpdate(id,data,requestOptions)
-        }
-
-        
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type SurveysFormsPartialUpdateMutationResult = NonNullable<Awaited<ReturnType<typeof surveysFormsPartialUpdate>>>
-    export type SurveysFormsPartialUpdateMutationBody = NonReadonly<PatchedForm>
-    export type SurveysFormsPartialUpdateMutationError = unknown
-
-    /**
+/**
  * @summary Patch form by id
  */
-export const useSurveysFormsPartialUpdate = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof surveysFormsPartialUpdate>>, TError,{id: string;data: NonReadonly<PatchedForm>}, TContext>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof surveysFormsPartialUpdate>>,
-        TError,
-        {id: string;data: NonReadonly<PatchedForm>},
-        TContext
-      > => {
+export const useSurveysFormsPartialUpdate = <TError = unknown, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof surveysFormsPartialUpdate>>,
+      TError,
+      { id: string; data: NonReadonly<PatchedForm> },
+      TContext
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseMutationResult<
+  Awaited<ReturnType<typeof surveysFormsPartialUpdate>>,
+  TError,
+  { id: string; data: NonReadonly<PatchedForm> },
+  TContext
+> => {
+  const mutationOptions = getSurveysFormsPartialUpdateMutationOptions(options);
 
-      const mutationOptions = getSurveysFormsPartialUpdateMutationOptions(options);
+  return useMutation(mutationOptions, queryClient);
+};
 
-      return useMutation(mutationOptions, queryClient);
-    }
-    
 /**
  * @summary Delete form by id
  */
 export type surveysFormsDestroyResponse204 = {
-  data: void
-  status: 204
-}
-    
-export type surveysFormsDestroyResponseSuccess = (surveysFormsDestroyResponse204) & {
+  data: void;
+  status: 204;
+};
+
+export type surveysFormsDestroyResponseSuccess = surveysFormsDestroyResponse204 & {
   headers: Headers;
 };
-;
 
-export type surveysFormsDestroyResponse = (surveysFormsDestroyResponseSuccess)
+export type surveysFormsDestroyResponse = surveysFormsDestroyResponseSuccess;
 
-export const getSurveysFormsDestroyUrl = (id: string,) => {
+export const getSurveysFormsDestroyUrl = (id: string) => {
+  return `/api/surveys/forms/${id}/`;
+};
 
-
-  
-
-  return `/api/surveys/forms/${id}/`
-}
-
-export const surveysFormsDestroy = async (id: string, options?: RequestInit): Promise<surveysFormsDestroyResponse> => {
-  
-  return customFetch<surveysFormsDestroyResponse>(getSurveysFormsDestroyUrl(id),
-  {      
+export const surveysFormsDestroy = async (
+  id: string,
+  options?: RequestInit
+): Promise<surveysFormsDestroyResponse> => {
+  return customFetch<surveysFormsDestroyResponse>(getSurveysFormsDestroyUrl(id), {
     ...options,
     method: 'DELETE'
-    
-    
-  }
-);}
+  });
+};
 
+export const getSurveysFormsDestroyMutationOptions = <
+  TError = unknown,
+  TContext = unknown
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof surveysFormsDestroy>>,
+    TError,
+    { id: string },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof surveysFormsDestroy>>,
+  TError,
+  { id: string },
+  TContext
+> => {
+  const mutationKey = ['surveysFormsDestroy'];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
 
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof surveysFormsDestroy>>,
+    { id: string }
+  > = (props) => {
+    const { id } = props ?? {};
 
+    return surveysFormsDestroy(id, requestOptions);
+  };
 
-export const getSurveysFormsDestroyMutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof surveysFormsDestroy>>, TError,{id: string}, TContext>, request?: SecondParameter<typeof customFetch>}
-): UseMutationOptions<Awaited<ReturnType<typeof surveysFormsDestroy>>, TError,{id: string}, TContext> => {
+  return { mutationFn, ...mutationOptions };
+};
 
-const mutationKey = ['surveysFormsDestroy'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
+export type SurveysFormsDestroyMutationResult = NonNullable<
+  Awaited<ReturnType<typeof surveysFormsDestroy>>
+>;
 
-      
+export type SurveysFormsDestroyMutationError = unknown;
 
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof surveysFormsDestroy>>, {id: string}> = (props) => {
-          const {id} = props ?? {};
-
-          return  surveysFormsDestroy(id,requestOptions)
-        }
-
-        
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type SurveysFormsDestroyMutationResult = NonNullable<Awaited<ReturnType<typeof surveysFormsDestroy>>>
-    
-    export type SurveysFormsDestroyMutationError = unknown
-
-    /**
+/**
  * @summary Delete form by id
  */
-export const useSurveysFormsDestroy = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof surveysFormsDestroy>>, TError,{id: string}, TContext>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof surveysFormsDestroy>>,
-        TError,
-        {id: string},
-        TContext
-      > => {
+export const useSurveysFormsDestroy = <TError = unknown, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof surveysFormsDestroy>>,
+      TError,
+      { id: string },
+      TContext
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseMutationResult<
+  Awaited<ReturnType<typeof surveysFormsDestroy>>,
+  TError,
+  { id: string },
+  TContext
+> => {
+  const mutationOptions = getSurveysFormsDestroyMutationOptions(options);
 
-      const mutationOptions = getSurveysFormsDestroyMutationOptions(options);
+  return useMutation(mutationOptions, queryClient);
+};
 
-      return useMutation(mutationOptions, queryClient);
-    }
-    
 /**
  * @summary Archive form
  */
 export type surveysFormsArchiveCreateResponse200 = {
-  data: Form
-  status: 200
-}
-    
-export type surveysFormsArchiveCreateResponseSuccess = (surveysFormsArchiveCreateResponse200) & {
+  data: Form;
+  status: 200;
+};
+
+export type surveysFormsArchiveCreateResponseSuccess = surveysFormsArchiveCreateResponse200 & {
   headers: Headers;
 };
-;
 
-export type surveysFormsArchiveCreateResponse = (surveysFormsArchiveCreateResponseSuccess)
+export type surveysFormsArchiveCreateResponse = surveysFormsArchiveCreateResponseSuccess;
 
-export const getSurveysFormsArchiveCreateUrl = (id: string,) => {
+export const getSurveysFormsArchiveCreateUrl = (id: string) => {
+  return `/api/surveys/forms/${id}/archive/`;
+};
 
-
-  
-
-  return `/api/surveys/forms/${id}/archive/`
-}
-
-export const surveysFormsArchiveCreate = async (id: string,
-    form: NonReadonly<Form>, options?: RequestInit): Promise<surveysFormsArchiveCreateResponse> => {
-  
-  return customFetch<surveysFormsArchiveCreateResponse>(getSurveysFormsArchiveCreateUrl(id),
-  {      
+export const surveysFormsArchiveCreate = async (
+  id: string,
+  form: NonReadonly<Form>,
+  options?: RequestInit
+): Promise<surveysFormsArchiveCreateResponse> => {
+  return customFetch<surveysFormsArchiveCreateResponse>(getSurveysFormsArchiveCreateUrl(id), {
     ...options,
     method: 'POST',
     headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(
-      form,)
-  }
-);}
+    body: JSON.stringify(form)
+  });
+};
 
+export const getSurveysFormsArchiveCreateMutationOptions = <
+  TError = unknown,
+  TContext = unknown
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof surveysFormsArchiveCreate>>,
+    TError,
+    { id: string; data: NonReadonly<Form> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof surveysFormsArchiveCreate>>,
+  TError,
+  { id: string; data: NonReadonly<Form> },
+  TContext
+> => {
+  const mutationKey = ['surveysFormsArchiveCreate'];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
 
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof surveysFormsArchiveCreate>>,
+    { id: string; data: NonReadonly<Form> }
+  > = (props) => {
+    const { id, data } = props ?? {};
 
+    return surveysFormsArchiveCreate(id, data, requestOptions);
+  };
 
-export const getSurveysFormsArchiveCreateMutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof surveysFormsArchiveCreate>>, TError,{id: string;data: NonReadonly<Form>}, TContext>, request?: SecondParameter<typeof customFetch>}
-): UseMutationOptions<Awaited<ReturnType<typeof surveysFormsArchiveCreate>>, TError,{id: string;data: NonReadonly<Form>}, TContext> => {
+  return { mutationFn, ...mutationOptions };
+};
 
-const mutationKey = ['surveysFormsArchiveCreate'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
+export type SurveysFormsArchiveCreateMutationResult = NonNullable<
+  Awaited<ReturnType<typeof surveysFormsArchiveCreate>>
+>;
+export type SurveysFormsArchiveCreateMutationBody = NonReadonly<Form>;
+export type SurveysFormsArchiveCreateMutationError = unknown;
 
-      
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof surveysFormsArchiveCreate>>, {id: string;data: NonReadonly<Form>}> = (props) => {
-          const {id,data} = props ?? {};
-
-          return  surveysFormsArchiveCreate(id,data,requestOptions)
-        }
-
-        
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type SurveysFormsArchiveCreateMutationResult = NonNullable<Awaited<ReturnType<typeof surveysFormsArchiveCreate>>>
-    export type SurveysFormsArchiveCreateMutationBody = NonReadonly<Form>
-    export type SurveysFormsArchiveCreateMutationError = unknown
-
-    /**
+/**
  * @summary Archive form
  */
-export const useSurveysFormsArchiveCreate = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof surveysFormsArchiveCreate>>, TError,{id: string;data: NonReadonly<Form>}, TContext>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof surveysFormsArchiveCreate>>,
-        TError,
-        {id: string;data: NonReadonly<Form>},
-        TContext
-      > => {
+export const useSurveysFormsArchiveCreate = <TError = unknown, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof surveysFormsArchiveCreate>>,
+      TError,
+      { id: string; data: NonReadonly<Form> },
+      TContext
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseMutationResult<
+  Awaited<ReturnType<typeof surveysFormsArchiveCreate>>,
+  TError,
+  { id: string; data: NonReadonly<Form> },
+  TContext
+> => {
+  const mutationOptions = getSurveysFormsArchiveCreateMutationOptions(options);
 
-      const mutationOptions = getSurveysFormsArchiveCreateMutationOptions(options);
+  return useMutation(mutationOptions, queryClient);
+};
 
-      return useMutation(mutationOptions, queryClient);
-    }
-    
 /**
  * @summary Publish form
  */
 export type surveysFormsPublishCreateResponse200 = {
-  data: Form
-  status: 200
-}
-    
-export type surveysFormsPublishCreateResponseSuccess = (surveysFormsPublishCreateResponse200) & {
+  data: Form;
+  status: 200;
+};
+
+export type surveysFormsPublishCreateResponseSuccess = surveysFormsPublishCreateResponse200 & {
   headers: Headers;
 };
-;
 
-export type surveysFormsPublishCreateResponse = (surveysFormsPublishCreateResponseSuccess)
+export type surveysFormsPublishCreateResponse = surveysFormsPublishCreateResponseSuccess;
 
-export const getSurveysFormsPublishCreateUrl = (id: string,) => {
+export const getSurveysFormsPublishCreateUrl = (id: string) => {
+  return `/api/surveys/forms/${id}/publish/`;
+};
 
-
-  
-
-  return `/api/surveys/forms/${id}/publish/`
-}
-
-export const surveysFormsPublishCreate = async (id: string,
-    form: NonReadonly<Form>, options?: RequestInit): Promise<surveysFormsPublishCreateResponse> => {
-  
-  return customFetch<surveysFormsPublishCreateResponse>(getSurveysFormsPublishCreateUrl(id),
-  {      
+export const surveysFormsPublishCreate = async (
+  id: string,
+  form: NonReadonly<Form>,
+  options?: RequestInit
+): Promise<surveysFormsPublishCreateResponse> => {
+  return customFetch<surveysFormsPublishCreateResponse>(getSurveysFormsPublishCreateUrl(id), {
     ...options,
     method: 'POST',
     headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(
-      form,)
-  }
-);}
+    body: JSON.stringify(form)
+  });
+};
 
+export const getSurveysFormsPublishCreateMutationOptions = <
+  TError = unknown,
+  TContext = unknown
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof surveysFormsPublishCreate>>,
+    TError,
+    { id: string; data: NonReadonly<Form> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof surveysFormsPublishCreate>>,
+  TError,
+  { id: string; data: NonReadonly<Form> },
+  TContext
+> => {
+  const mutationKey = ['surveysFormsPublishCreate'];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
 
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof surveysFormsPublishCreate>>,
+    { id: string; data: NonReadonly<Form> }
+  > = (props) => {
+    const { id, data } = props ?? {};
 
+    return surveysFormsPublishCreate(id, data, requestOptions);
+  };
 
-export const getSurveysFormsPublishCreateMutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof surveysFormsPublishCreate>>, TError,{id: string;data: NonReadonly<Form>}, TContext>, request?: SecondParameter<typeof customFetch>}
-): UseMutationOptions<Awaited<ReturnType<typeof surveysFormsPublishCreate>>, TError,{id: string;data: NonReadonly<Form>}, TContext> => {
+  return { mutationFn, ...mutationOptions };
+};
 
-const mutationKey = ['surveysFormsPublishCreate'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
+export type SurveysFormsPublishCreateMutationResult = NonNullable<
+  Awaited<ReturnType<typeof surveysFormsPublishCreate>>
+>;
+export type SurveysFormsPublishCreateMutationBody = NonReadonly<Form>;
+export type SurveysFormsPublishCreateMutationError = unknown;
 
-      
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof surveysFormsPublishCreate>>, {id: string;data: NonReadonly<Form>}> = (props) => {
-          const {id,data} = props ?? {};
-
-          return  surveysFormsPublishCreate(id,data,requestOptions)
-        }
-
-        
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type SurveysFormsPublishCreateMutationResult = NonNullable<Awaited<ReturnType<typeof surveysFormsPublishCreate>>>
-    export type SurveysFormsPublishCreateMutationBody = NonReadonly<Form>
-    export type SurveysFormsPublishCreateMutationError = unknown
-
-    /**
+/**
  * @summary Publish form
  */
-export const useSurveysFormsPublishCreate = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof surveysFormsPublishCreate>>, TError,{id: string;data: NonReadonly<Form>}, TContext>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof surveysFormsPublishCreate>>,
-        TError,
-        {id: string;data: NonReadonly<Form>},
-        TContext
-      > => {
+export const useSurveysFormsPublishCreate = <TError = unknown, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof surveysFormsPublishCreate>>,
+      TError,
+      { id: string; data: NonReadonly<Form> },
+      TContext
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseMutationResult<
+  Awaited<ReturnType<typeof surveysFormsPublishCreate>>,
+  TError,
+  { id: string; data: NonReadonly<Form> },
+  TContext
+> => {
+  const mutationOptions = getSurveysFormsPublishCreateMutationOptions(options);
 
-      const mutationOptions = getSurveysFormsPublishCreateMutationOptions(options);
+  return useMutation(mutationOptions, queryClient);
+};
 
-      return useMutation(mutationOptions, queryClient);
-    }
-    
 /**
  * @summary Reorder form questions
  */
 export type surveysFormsQuestionsReorderCreateResponse200 = {
-  data: FormQuestionReorder
-  status: 200
-}
-    
-export type surveysFormsQuestionsReorderCreateResponseSuccess = (surveysFormsQuestionsReorderCreateResponse200) & {
-  headers: Headers;
+  data: FormQuestionReorder;
+  status: 200;
 };
-;
 
-export type surveysFormsQuestionsReorderCreateResponse = (surveysFormsQuestionsReorderCreateResponseSuccess)
+export type surveysFormsQuestionsReorderCreateResponseSuccess =
+  surveysFormsQuestionsReorderCreateResponse200 & {
+    headers: Headers;
+  };
 
-export const getSurveysFormsQuestionsReorderCreateUrl = (id: string,) => {
+export type surveysFormsQuestionsReorderCreateResponse =
+  surveysFormsQuestionsReorderCreateResponseSuccess;
 
+export const getSurveysFormsQuestionsReorderCreateUrl = (id: string) => {
+  return `/api/surveys/forms/${id}/questions/reorder/`;
+};
 
-  
+export const surveysFormsQuestionsReorderCreate = async (
+  id: string,
+  formQuestionReorder: FormQuestionReorder,
+  options?: RequestInit
+): Promise<surveysFormsQuestionsReorderCreateResponse> => {
+  return customFetch<surveysFormsQuestionsReorderCreateResponse>(
+    getSurveysFormsQuestionsReorderCreateUrl(id),
+    {
+      ...options,
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', ...options?.headers },
+      body: JSON.stringify(formQuestionReorder)
+    }
+  );
+};
 
-  return `/api/surveys/forms/${id}/questions/reorder/`
-}
+export const getSurveysFormsQuestionsReorderCreateMutationOptions = <
+  TError = unknown,
+  TContext = unknown
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof surveysFormsQuestionsReorderCreate>>,
+    TError,
+    { id: string; data: FormQuestionReorder },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof surveysFormsQuestionsReorderCreate>>,
+  TError,
+  { id: string; data: FormQuestionReorder },
+  TContext
+> => {
+  const mutationKey = ['surveysFormsQuestionsReorderCreate'];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
 
-export const surveysFormsQuestionsReorderCreate = async (id: string,
-    formQuestionReorder: FormQuestionReorder, options?: RequestInit): Promise<surveysFormsQuestionsReorderCreateResponse> => {
-  
-  return customFetch<surveysFormsQuestionsReorderCreateResponse>(getSurveysFormsQuestionsReorderCreateUrl(id),
-  {      
-    ...options,
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(
-      formQuestionReorder,)
-  }
-);}
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof surveysFormsQuestionsReorderCreate>>,
+    { id: string; data: FormQuestionReorder }
+  > = (props) => {
+    const { id, data } = props ?? {};
 
+    return surveysFormsQuestionsReorderCreate(id, data, requestOptions);
+  };
 
+  return { mutationFn, ...mutationOptions };
+};
 
+export type SurveysFormsQuestionsReorderCreateMutationResult = NonNullable<
+  Awaited<ReturnType<typeof surveysFormsQuestionsReorderCreate>>
+>;
+export type SurveysFormsQuestionsReorderCreateMutationBody = FormQuestionReorder;
+export type SurveysFormsQuestionsReorderCreateMutationError = unknown;
 
-export const getSurveysFormsQuestionsReorderCreateMutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof surveysFormsQuestionsReorderCreate>>, TError,{id: string;data: FormQuestionReorder}, TContext>, request?: SecondParameter<typeof customFetch>}
-): UseMutationOptions<Awaited<ReturnType<typeof surveysFormsQuestionsReorderCreate>>, TError,{id: string;data: FormQuestionReorder}, TContext> => {
-
-const mutationKey = ['surveysFormsQuestionsReorderCreate'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
-
-      
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof surveysFormsQuestionsReorderCreate>>, {id: string;data: FormQuestionReorder}> = (props) => {
-          const {id,data} = props ?? {};
-
-          return  surveysFormsQuestionsReorderCreate(id,data,requestOptions)
-        }
-
-        
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type SurveysFormsQuestionsReorderCreateMutationResult = NonNullable<Awaited<ReturnType<typeof surveysFormsQuestionsReorderCreate>>>
-    export type SurveysFormsQuestionsReorderCreateMutationBody = FormQuestionReorder
-    export type SurveysFormsQuestionsReorderCreateMutationError = unknown
-
-    /**
+/**
  * @summary Reorder form questions
  */
-export const useSurveysFormsQuestionsReorderCreate = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof surveysFormsQuestionsReorderCreate>>, TError,{id: string;data: FormQuestionReorder}, TContext>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof surveysFormsQuestionsReorderCreate>>,
-        TError,
-        {id: string;data: FormQuestionReorder},
-        TContext
-      > => {
+export const useSurveysFormsQuestionsReorderCreate = <TError = unknown, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof surveysFormsQuestionsReorderCreate>>,
+      TError,
+      { id: string; data: FormQuestionReorder },
+      TContext
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseMutationResult<
+  Awaited<ReturnType<typeof surveysFormsQuestionsReorderCreate>>,
+  TError,
+  { id: string; data: FormQuestionReorder },
+  TContext
+> => {
+  const mutationOptions = getSurveysFormsQuestionsReorderCreateMutationOptions(options);
 
-      const mutationOptions = getSurveysFormsQuestionsReorderCreateMutationOptions(options);
+  return useMutation(mutationOptions, queryClient);
+};
 
-      return useMutation(mutationOptions, queryClient);
+/**
+ * Returns all global seed templates available for cloning.
+ * @summary List form templates
+ */
+export type surveysFormsTemplatesListResponse200 = {
+  data: Form[];
+  status: 200;
+};
+
+export type surveysFormsTemplatesListResponseSuccess = surveysFormsTemplatesListResponse200 & {
+  headers: Headers;
+};
+
+export type surveysFormsTemplatesListResponse = surveysFormsTemplatesListResponseSuccess;
+
+export const getSurveysFormsTemplatesListUrl = () => {
+  return `/api/surveys/forms/templates/`;
+};
+
+export const surveysFormsTemplatesList = async (
+  options?: RequestInit
+): Promise<surveysFormsTemplatesListResponse> => {
+  return customFetch<surveysFormsTemplatesListResponse>(getSurveysFormsTemplatesListUrl(), {
+    ...options,
+    method: 'GET'
+  });
+};
+
+export const getSurveysFormsTemplatesListInfiniteQueryKey = () => {
+  return ['infinite', `/api/surveys/forms/templates/`] as const;
+};
+
+export const getSurveysFormsTemplatesListQueryKey = () => {
+  return [`/api/surveys/forms/templates/`] as const;
+};
+
+export const getSurveysFormsTemplatesListInfiniteQueryOptions = <
+  TData = InfiniteData<Awaited<ReturnType<typeof surveysFormsTemplatesList>>>,
+  TError = unknown
+>(options?: {
+  query?: Partial<
+    UseInfiniteQueryOptions<Awaited<ReturnType<typeof surveysFormsTemplatesList>>, TError, TData>
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getSurveysFormsTemplatesListInfiniteQueryKey();
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof surveysFormsTemplatesList>>> = ({
+    signal
+  }) => surveysFormsTemplatesList({ signal, ...requestOptions });
+
+  return { queryKey, queryFn, ...queryOptions } as UseInfiniteQueryOptions<
+    Awaited<ReturnType<typeof surveysFormsTemplatesList>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type SurveysFormsTemplatesListInfiniteQueryResult = NonNullable<
+  Awaited<ReturnType<typeof surveysFormsTemplatesList>>
+>;
+export type SurveysFormsTemplatesListInfiniteQueryError = unknown;
+
+export function useSurveysFormsTemplatesListInfinite<
+  TData = InfiniteData<Awaited<ReturnType<typeof surveysFormsTemplatesList>>>,
+  TError = unknown
+>(
+  options: {
+    query: Partial<
+      UseInfiniteQueryOptions<Awaited<ReturnType<typeof surveysFormsTemplatesList>>, TError, TData>
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof surveysFormsTemplatesList>>,
+          TError,
+          Awaited<ReturnType<typeof surveysFormsTemplatesList>>
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): DefinedUseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useSurveysFormsTemplatesListInfinite<
+  TData = InfiniteData<Awaited<ReturnType<typeof surveysFormsTemplatesList>>>,
+  TError = unknown
+>(
+  options?: {
+    query?: Partial<
+      UseInfiniteQueryOptions<Awaited<ReturnType<typeof surveysFormsTemplatesList>>, TError, TData>
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof surveysFormsTemplatesList>>,
+          TError,
+          Awaited<ReturnType<typeof surveysFormsTemplatesList>>
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useSurveysFormsTemplatesListInfinite<
+  TData = InfiniteData<Awaited<ReturnType<typeof surveysFormsTemplatesList>>>,
+  TError = unknown
+>(
+  options?: {
+    query?: Partial<
+      UseInfiniteQueryOptions<Awaited<ReturnType<typeof surveysFormsTemplatesList>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+/**
+ * @summary List form templates
+ */
+
+export function useSurveysFormsTemplatesListInfinite<
+  TData = InfiniteData<Awaited<ReturnType<typeof surveysFormsTemplatesList>>>,
+  TError = unknown
+>(
+  options?: {
+    query?: Partial<
+      UseInfiniteQueryOptions<Awaited<ReturnType<typeof surveysFormsTemplatesList>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+  const queryOptions = getSurveysFormsTemplatesListInfiniteQueryOptions(options);
+
+  const query = useInfiniteQuery(queryOptions, queryClient) as UseInfiniteQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  query.queryKey = queryOptions.queryKey;
+
+  return query;
+}
+
+export const getSurveysFormsTemplatesListQueryOptions = <
+  TData = Awaited<ReturnType<typeof surveysFormsTemplatesList>>,
+  TError = unknown
+>(options?: {
+  query?: Partial<
+    UseQueryOptions<Awaited<ReturnType<typeof surveysFormsTemplatesList>>, TError, TData>
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getSurveysFormsTemplatesListQueryKey();
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof surveysFormsTemplatesList>>> = ({
+    signal
+  }) => surveysFormsTemplatesList({ signal, ...requestOptions });
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof surveysFormsTemplatesList>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type SurveysFormsTemplatesListQueryResult = NonNullable<
+  Awaited<ReturnType<typeof surveysFormsTemplatesList>>
+>;
+export type SurveysFormsTemplatesListQueryError = unknown;
+
+export function useSurveysFormsTemplatesList<
+  TData = Awaited<ReturnType<typeof surveysFormsTemplatesList>>,
+  TError = unknown
+>(
+  options: {
+    query: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof surveysFormsTemplatesList>>, TError, TData>
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof surveysFormsTemplatesList>>,
+          TError,
+          Awaited<ReturnType<typeof surveysFormsTemplatesList>>
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useSurveysFormsTemplatesList<
+  TData = Awaited<ReturnType<typeof surveysFormsTemplatesList>>,
+  TError = unknown
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof surveysFormsTemplatesList>>, TError, TData>
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof surveysFormsTemplatesList>>,
+          TError,
+          Awaited<ReturnType<typeof surveysFormsTemplatesList>>
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useSurveysFormsTemplatesList<
+  TData = Awaited<ReturnType<typeof surveysFormsTemplatesList>>,
+  TError = unknown
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof surveysFormsTemplatesList>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+/**
+ * @summary List form templates
+ */
+
+export function useSurveysFormsTemplatesList<
+  TData = Awaited<ReturnType<typeof surveysFormsTemplatesList>>,
+  TError = unknown
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof surveysFormsTemplatesList>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+  const queryOptions = getSurveysFormsTemplatesListQueryOptions(options);
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+  };
+
+  query.queryKey = queryOptions.queryKey;
+
+  return query;
+}
+
+/**
+ * Creates a full copy of the template (form + all questions + indicators) in the current tenant. The clone starts as DRAFT and can be edited freely.
+ * @summary Clone form template to tenant
+ */
+export type surveysFormsTemplatesCloneCreateResponse200 = {
+  data: Form;
+  status: 200;
+};
+
+export type surveysFormsTemplatesCloneCreateResponseSuccess =
+  surveysFormsTemplatesCloneCreateResponse200 & {
+    headers: Headers;
+  };
+
+export type surveysFormsTemplatesCloneCreateResponse =
+  surveysFormsTemplatesCloneCreateResponseSuccess;
+
+export const getSurveysFormsTemplatesCloneCreateUrl = (id: string) => {
+  return `/api/surveys/forms/templates/${id}/clone/`;
+};
+
+export const surveysFormsTemplatesCloneCreate = async (
+  id: string,
+  form: NonReadonly<Form>,
+  options?: RequestInit
+): Promise<surveysFormsTemplatesCloneCreateResponse> => {
+  return customFetch<surveysFormsTemplatesCloneCreateResponse>(
+    getSurveysFormsTemplatesCloneCreateUrl(id),
+    {
+      ...options,
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', ...options?.headers },
+      body: JSON.stringify(form)
     }
-    
+  );
+};
+
+export const getSurveysFormsTemplatesCloneCreateMutationOptions = <
+  TError = unknown,
+  TContext = unknown
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof surveysFormsTemplatesCloneCreate>>,
+    TError,
+    { id: string; data: NonReadonly<Form> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof surveysFormsTemplatesCloneCreate>>,
+  TError,
+  { id: string; data: NonReadonly<Form> },
+  TContext
+> => {
+  const mutationKey = ['surveysFormsTemplatesCloneCreate'];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof surveysFormsTemplatesCloneCreate>>,
+    { id: string; data: NonReadonly<Form> }
+  > = (props) => {
+    const { id, data } = props ?? {};
+
+    return surveysFormsTemplatesCloneCreate(id, data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type SurveysFormsTemplatesCloneCreateMutationResult = NonNullable<
+  Awaited<ReturnType<typeof surveysFormsTemplatesCloneCreate>>
+>;
+export type SurveysFormsTemplatesCloneCreateMutationBody = NonReadonly<Form>;
+export type SurveysFormsTemplatesCloneCreateMutationError = unknown;
+
+/**
+ * @summary Clone form template to tenant
+ */
+export const useSurveysFormsTemplatesCloneCreate = <TError = unknown, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof surveysFormsTemplatesCloneCreate>>,
+      TError,
+      { id: string; data: NonReadonly<Form> },
+      TContext
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseMutationResult<
+  Awaited<ReturnType<typeof surveysFormsTemplatesCloneCreate>>,
+  TError,
+  { id: string; data: NonReadonly<Form> },
+  TContext
+> => {
+  const mutationOptions = getSurveysFormsTemplatesCloneCreateMutationOptions(options);
+
+  return useMutation(mutationOptions, queryClient);
+};
+
 /**
  * @summary List survey frameworks
  */
 export type surveysFrameworksListResponse200 = {
-  data: SurveyFramework[]
-  status: 200
-}
-    
-export type surveysFrameworksListResponseSuccess = (surveysFrameworksListResponse200) & {
+  data: SurveyFramework[];
+  status: 200;
+};
+
+export type surveysFrameworksListResponseSuccess = surveysFrameworksListResponse200 & {
   headers: Headers;
 };
-;
 
-export type surveysFrameworksListResponse = (surveysFrameworksListResponseSuccess)
+export type surveysFrameworksListResponse = surveysFrameworksListResponseSuccess;
 
-export const getSurveysFrameworksListUrl = (params?: SurveysFrameworksListParams,) => {
+export const getSurveysFrameworksListUrl = (params?: SurveysFrameworksListParams) => {
   const normalizedParams = new URLSearchParams();
 
   Object.entries(params || {}).forEach(([key, value]) => {
-    
     if (value !== undefined) {
-      normalizedParams.append(key, value === null ? 'null' : value.toString())
+      normalizedParams.append(key, value === null ? 'null' : value.toString());
     }
   });
 
   const stringifiedParams = normalizedParams.toString();
 
-  return stringifiedParams.length > 0 ? `/api/surveys/frameworks/?${stringifiedParams}` : `/api/surveys/frameworks/`
-}
+  return stringifiedParams.length > 0
+    ? `/api/surveys/frameworks/?${stringifiedParams}`
+    : `/api/surveys/frameworks/`;
+};
 
-export const surveysFrameworksList = async (params?: SurveysFrameworksListParams, options?: RequestInit): Promise<surveysFrameworksListResponse> => {
-  
-  return customFetch<surveysFrameworksListResponse>(getSurveysFrameworksListUrl(params),
-  {      
+export const surveysFrameworksList = async (
+  params?: SurveysFrameworksListParams,
+  options?: RequestInit
+): Promise<surveysFrameworksListResponse> => {
+  return customFetch<surveysFrameworksListResponse>(getSurveysFrameworksListUrl(params), {
     ...options,
     method: 'GET'
-    
-    
+  });
+};
+
+export const getSurveysFrameworksListInfiniteQueryKey = (params?: SurveysFrameworksListParams) => {
+  return ['infinite', `/api/surveys/frameworks/`, ...(params ? [params] : [])] as const;
+};
+
+export const getSurveysFrameworksListQueryKey = (params?: SurveysFrameworksListParams) => {
+  return [`/api/surveys/frameworks/`, ...(params ? [params] : [])] as const;
+};
+
+export const getSurveysFrameworksListInfiniteQueryOptions = <
+  TData = InfiniteData<Awaited<ReturnType<typeof surveysFrameworksList>>>,
+  TError = unknown
+>(
+  params?: SurveysFrameworksListParams,
+  options?: {
+    query?: Partial<
+      UseInfiniteQueryOptions<Awaited<ReturnType<typeof surveysFrameworksList>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof customFetch>;
   }
-);}
-
-
-
-
-
-export const getSurveysFrameworksListInfiniteQueryKey = (params?: SurveysFrameworksListParams,) => {
-    return [
-    'infinite', `/api/surveys/frameworks/`, ...(params ? [params]: [])
-    ] as const;
-    }
-
-export const getSurveysFrameworksListQueryKey = (params?: SurveysFrameworksListParams,) => {
-    return [
-    `/api/surveys/frameworks/`, ...(params ? [params]: [])
-    ] as const;
-    }
-
-    
-export const getSurveysFrameworksListInfiniteQueryOptions = <TData = InfiniteData<Awaited<ReturnType<typeof surveysFrameworksList>>>, TError = unknown>(params?: SurveysFrameworksListParams, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof surveysFrameworksList>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
 ) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
 
-const {query: queryOptions, request: requestOptions} = options ?? {};
+  const queryKey = queryOptions?.queryKey ?? getSurveysFrameworksListInfiniteQueryKey(params);
 
-  const queryKey =  queryOptions?.queryKey ?? getSurveysFrameworksListInfiniteQueryKey(params);
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof surveysFrameworksList>>> = ({ signal }) =>
+    surveysFrameworksList(params, { signal, ...requestOptions });
 
-  
+  return { queryKey, queryFn, ...queryOptions } as UseInfiniteQueryOptions<
+    Awaited<ReturnType<typeof surveysFrameworksList>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof surveysFrameworksList>>> = ({ signal }) => surveysFrameworksList(params, { signal, ...requestOptions });
+export type SurveysFrameworksListInfiniteQueryResult = NonNullable<
+  Awaited<ReturnType<typeof surveysFrameworksList>>
+>;
+export type SurveysFrameworksListInfiniteQueryError = unknown;
 
-      
-
-      
-
-   return  { queryKey, queryFn, ...queryOptions} as UseInfiniteQueryOptions<Awaited<ReturnType<typeof surveysFrameworksList>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type SurveysFrameworksListInfiniteQueryResult = NonNullable<Awaited<ReturnType<typeof surveysFrameworksList>>>
-export type SurveysFrameworksListInfiniteQueryError = unknown
-
-
-export function useSurveysFrameworksListInfinite<TData = InfiniteData<Awaited<ReturnType<typeof surveysFrameworksList>>>, TError = unknown>(
- params: undefined |  SurveysFrameworksListParams, options: { query:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof surveysFrameworksList>>, TError, TData>> & Pick<
+export function useSurveysFrameworksListInfinite<
+  TData = InfiniteData<Awaited<ReturnType<typeof surveysFrameworksList>>>,
+  TError = unknown
+>(
+  params: undefined | SurveysFrameworksListParams,
+  options: {
+    query: Partial<
+      UseInfiniteQueryOptions<Awaited<ReturnType<typeof surveysFrameworksList>>, TError, TData>
+    > &
+      Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof surveysFrameworksList>>,
           TError,
           Awaited<ReturnType<typeof surveysFrameworksList>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  DefinedUseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useSurveysFrameworksListInfinite<TData = InfiniteData<Awaited<ReturnType<typeof surveysFrameworksList>>>, TError = unknown>(
- params?: SurveysFrameworksListParams, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof surveysFrameworksList>>, TError, TData>> & Pick<
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): DefinedUseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useSurveysFrameworksListInfinite<
+  TData = InfiniteData<Awaited<ReturnType<typeof surveysFrameworksList>>>,
+  TError = unknown
+>(
+  params?: SurveysFrameworksListParams,
+  options?: {
+    query?: Partial<
+      UseInfiniteQueryOptions<Awaited<ReturnType<typeof surveysFrameworksList>>, TError, TData>
+    > &
+      Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof surveysFrameworksList>>,
           TError,
           Awaited<ReturnType<typeof surveysFrameworksList>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useSurveysFrameworksListInfinite<TData = InfiniteData<Awaited<ReturnType<typeof surveysFrameworksList>>>, TError = unknown>(
- params?: SurveysFrameworksListParams, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof surveysFrameworksList>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useSurveysFrameworksListInfinite<
+  TData = InfiniteData<Awaited<ReturnType<typeof surveysFrameworksList>>>,
+  TError = unknown
+>(
+  params?: SurveysFrameworksListParams,
+  options?: {
+    query?: Partial<
+      UseInfiniteQueryOptions<Awaited<ReturnType<typeof surveysFrameworksList>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 /**
  * @summary List survey frameworks
  */
 
-export function useSurveysFrameworksListInfinite<TData = InfiniteData<Awaited<ReturnType<typeof surveysFrameworksList>>>, TError = unknown>(
- params?: SurveysFrameworksListParams, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof surveysFrameworksList>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient 
- ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+export function useSurveysFrameworksListInfinite<
+  TData = InfiniteData<Awaited<ReturnType<typeof surveysFrameworksList>>>,
+  TError = unknown
+>(
+  params?: SurveysFrameworksListParams,
+  options?: {
+    query?: Partial<
+      UseInfiniteQueryOptions<Awaited<ReturnType<typeof surveysFrameworksList>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+  const queryOptions = getSurveysFrameworksListInfiniteQueryOptions(params, options);
 
-  const queryOptions = getSurveysFrameworksListInfiniteQueryOptions(params,options)
+  const query = useInfiniteQuery(queryOptions, queryClient) as UseInfiniteQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
 
-  const query = useInfiniteQuery(queryOptions, queryClient) as  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-
-  query.queryKey = queryOptions.queryKey ;
+  query.queryKey = queryOptions.queryKey;
 
   return query;
 }
 
-
-
-
-export const getSurveysFrameworksListQueryOptions = <TData = Awaited<ReturnType<typeof surveysFrameworksList>>, TError = unknown>(params?: SurveysFrameworksListParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof surveysFrameworksList>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+export const getSurveysFrameworksListQueryOptions = <
+  TData = Awaited<ReturnType<typeof surveysFrameworksList>>,
+  TError = unknown
+>(
+  params?: SurveysFrameworksListParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof surveysFrameworksList>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  }
 ) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
 
-const {query: queryOptions, request: requestOptions} = options ?? {};
+  const queryKey = queryOptions?.queryKey ?? getSurveysFrameworksListQueryKey(params);
 
-  const queryKey =  queryOptions?.queryKey ?? getSurveysFrameworksListQueryKey(params);
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof surveysFrameworksList>>> = ({ signal }) =>
+    surveysFrameworksList(params, { signal, ...requestOptions });
 
-  
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof surveysFrameworksList>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof surveysFrameworksList>>> = ({ signal }) => surveysFrameworksList(params, { signal, ...requestOptions });
+export type SurveysFrameworksListQueryResult = NonNullable<
+  Awaited<ReturnType<typeof surveysFrameworksList>>
+>;
+export type SurveysFrameworksListQueryError = unknown;
 
-      
-
-      
-
-   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof surveysFrameworksList>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type SurveysFrameworksListQueryResult = NonNullable<Awaited<ReturnType<typeof surveysFrameworksList>>>
-export type SurveysFrameworksListQueryError = unknown
-
-
-export function useSurveysFrameworksList<TData = Awaited<ReturnType<typeof surveysFrameworksList>>, TError = unknown>(
- params: undefined |  SurveysFrameworksListParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof surveysFrameworksList>>, TError, TData>> & Pick<
+export function useSurveysFrameworksList<
+  TData = Awaited<ReturnType<typeof surveysFrameworksList>>,
+  TError = unknown
+>(
+  params: undefined | SurveysFrameworksListParams,
+  options: {
+    query: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof surveysFrameworksList>>, TError, TData>
+    > &
+      Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof surveysFrameworksList>>,
           TError,
           Awaited<ReturnType<typeof surveysFrameworksList>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useSurveysFrameworksList<TData = Awaited<ReturnType<typeof surveysFrameworksList>>, TError = unknown>(
- params?: SurveysFrameworksListParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof surveysFrameworksList>>, TError, TData>> & Pick<
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useSurveysFrameworksList<
+  TData = Awaited<ReturnType<typeof surveysFrameworksList>>,
+  TError = unknown
+>(
+  params?: SurveysFrameworksListParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof surveysFrameworksList>>, TError, TData>
+    > &
+      Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof surveysFrameworksList>>,
           TError,
           Awaited<ReturnType<typeof surveysFrameworksList>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useSurveysFrameworksList<TData = Awaited<ReturnType<typeof surveysFrameworksList>>, TError = unknown>(
- params?: SurveysFrameworksListParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof surveysFrameworksList>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useSurveysFrameworksList<
+  TData = Awaited<ReturnType<typeof surveysFrameworksList>>,
+  TError = unknown
+>(
+  params?: SurveysFrameworksListParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof surveysFrameworksList>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 /**
  * @summary List survey frameworks
  */
 
-export function useSurveysFrameworksList<TData = Awaited<ReturnType<typeof surveysFrameworksList>>, TError = unknown>(
- params?: SurveysFrameworksListParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof surveysFrameworksList>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient 
- ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+export function useSurveysFrameworksList<
+  TData = Awaited<ReturnType<typeof surveysFrameworksList>>,
+  TError = unknown
+>(
+  params?: SurveysFrameworksListParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof surveysFrameworksList>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+  const queryOptions = getSurveysFrameworksListQueryOptions(params, options);
 
-  const queryOptions = getSurveysFrameworksListQueryOptions(params,options)
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+  };
 
-  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-
-  query.queryKey = queryOptions.queryKey ;
+  query.queryKey = queryOptions.queryKey;
 
   return query;
 }
-
-
-
-
 
 /**
  * @summary Create survey framework
  */
 export type surveysFrameworksCreateResponse201 = {
-  data: SurveyFramework
-  status: 201
-}
-    
-export type surveysFrameworksCreateResponseSuccess = (surveysFrameworksCreateResponse201) & {
+  data: SurveyFramework;
+  status: 201;
+};
+
+export type surveysFrameworksCreateResponseSuccess = surveysFrameworksCreateResponse201 & {
   headers: Headers;
 };
-;
 
-export type surveysFrameworksCreateResponse = (surveysFrameworksCreateResponseSuccess)
+export type surveysFrameworksCreateResponse = surveysFrameworksCreateResponseSuccess;
 
 export const getSurveysFrameworksCreateUrl = () => {
+  return `/api/surveys/frameworks/`;
+};
 
-
-  
-
-  return `/api/surveys/frameworks/`
-}
-
-export const surveysFrameworksCreate = async (surveyFramework: NonReadonly<SurveyFramework>, options?: RequestInit): Promise<surveysFrameworksCreateResponse> => {
-  
-  return customFetch<surveysFrameworksCreateResponse>(getSurveysFrameworksCreateUrl(),
-  {      
+export const surveysFrameworksCreate = async (
+  surveyFramework: NonReadonly<SurveyFramework>,
+  options?: RequestInit
+): Promise<surveysFrameworksCreateResponse> => {
+  return customFetch<surveysFrameworksCreateResponse>(getSurveysFrameworksCreateUrl(), {
     ...options,
     method: 'POST',
     headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(
-      surveyFramework,)
-  }
-);}
+    body: JSON.stringify(surveyFramework)
+  });
+};
 
+export const getSurveysFrameworksCreateMutationOptions = <
+  TError = unknown,
+  TContext = unknown
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof surveysFrameworksCreate>>,
+    TError,
+    { data: NonReadonly<SurveyFramework> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof surveysFrameworksCreate>>,
+  TError,
+  { data: NonReadonly<SurveyFramework> },
+  TContext
+> => {
+  const mutationKey = ['surveysFrameworksCreate'];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
 
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof surveysFrameworksCreate>>,
+    { data: NonReadonly<SurveyFramework> }
+  > = (props) => {
+    const { data } = props ?? {};
 
+    return surveysFrameworksCreate(data, requestOptions);
+  };
 
-export const getSurveysFrameworksCreateMutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof surveysFrameworksCreate>>, TError,{data: NonReadonly<SurveyFramework>}, TContext>, request?: SecondParameter<typeof customFetch>}
-): UseMutationOptions<Awaited<ReturnType<typeof surveysFrameworksCreate>>, TError,{data: NonReadonly<SurveyFramework>}, TContext> => {
+  return { mutationFn, ...mutationOptions };
+};
 
-const mutationKey = ['surveysFrameworksCreate'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
+export type SurveysFrameworksCreateMutationResult = NonNullable<
+  Awaited<ReturnType<typeof surveysFrameworksCreate>>
+>;
+export type SurveysFrameworksCreateMutationBody = NonReadonly<SurveyFramework>;
+export type SurveysFrameworksCreateMutationError = unknown;
 
-      
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof surveysFrameworksCreate>>, {data: NonReadonly<SurveyFramework>}> = (props) => {
-          const {data} = props ?? {};
-
-          return  surveysFrameworksCreate(data,requestOptions)
-        }
-
-        
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type SurveysFrameworksCreateMutationResult = NonNullable<Awaited<ReturnType<typeof surveysFrameworksCreate>>>
-    export type SurveysFrameworksCreateMutationBody = NonReadonly<SurveyFramework>
-    export type SurveysFrameworksCreateMutationError = unknown
-
-    /**
+/**
  * @summary Create survey framework
  */
-export const useSurveysFrameworksCreate = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof surveysFrameworksCreate>>, TError,{data: NonReadonly<SurveyFramework>}, TContext>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof surveysFrameworksCreate>>,
-        TError,
-        {data: NonReadonly<SurveyFramework>},
-        TContext
-      > => {
+export const useSurveysFrameworksCreate = <TError = unknown, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof surveysFrameworksCreate>>,
+      TError,
+      { data: NonReadonly<SurveyFramework> },
+      TContext
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseMutationResult<
+  Awaited<ReturnType<typeof surveysFrameworksCreate>>,
+  TError,
+  { data: NonReadonly<SurveyFramework> },
+  TContext
+> => {
+  const mutationOptions = getSurveysFrameworksCreateMutationOptions(options);
 
-      const mutationOptions = getSurveysFrameworksCreateMutationOptions(options);
+  return useMutation(mutationOptions, queryClient);
+};
 
-      return useMutation(mutationOptions, queryClient);
-    }
-    
 /**
  * @summary Get survey framework by id
  */
 export type surveysFrameworksRetrieveResponse200 = {
-  data: SurveyFramework
-  status: 200
-}
-    
-export type surveysFrameworksRetrieveResponseSuccess = (surveysFrameworksRetrieveResponse200) & {
+  data: SurveyFramework;
+  status: 200;
+};
+
+export type surveysFrameworksRetrieveResponseSuccess = surveysFrameworksRetrieveResponse200 & {
   headers: Headers;
 };
-;
 
-export type surveysFrameworksRetrieveResponse = (surveysFrameworksRetrieveResponseSuccess)
+export type surveysFrameworksRetrieveResponse = surveysFrameworksRetrieveResponseSuccess;
 
-export const getSurveysFrameworksRetrieveUrl = (id: string,) => {
+export const getSurveysFrameworksRetrieveUrl = (id: string) => {
+  return `/api/surveys/frameworks/${id}/`;
+};
 
-
-  
-
-  return `/api/surveys/frameworks/${id}/`
-}
-
-export const surveysFrameworksRetrieve = async (id: string, options?: RequestInit): Promise<surveysFrameworksRetrieveResponse> => {
-  
-  return customFetch<surveysFrameworksRetrieveResponse>(getSurveysFrameworksRetrieveUrl(id),
-  {      
+export const surveysFrameworksRetrieve = async (
+  id: string,
+  options?: RequestInit
+): Promise<surveysFrameworksRetrieveResponse> => {
+  return customFetch<surveysFrameworksRetrieveResponse>(getSurveysFrameworksRetrieveUrl(id), {
     ...options,
     method: 'GET'
-    
-    
+  });
+};
+
+export const getSurveysFrameworksRetrieveInfiniteQueryKey = (id?: string) => {
+  return ['infinite', `/api/surveys/frameworks/${id}/`] as const;
+};
+
+export const getSurveysFrameworksRetrieveQueryKey = (id?: string) => {
+  return [`/api/surveys/frameworks/${id}/`] as const;
+};
+
+export const getSurveysFrameworksRetrieveInfiniteQueryOptions = <
+  TData = InfiniteData<Awaited<ReturnType<typeof surveysFrameworksRetrieve>>>,
+  TError = unknown
+>(
+  id: string,
+  options?: {
+    query?: Partial<
+      UseInfiniteQueryOptions<Awaited<ReturnType<typeof surveysFrameworksRetrieve>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof customFetch>;
   }
-);}
-
-
-
-
-
-export const getSurveysFrameworksRetrieveInfiniteQueryKey = (id?: string,) => {
-    return [
-    'infinite', `/api/surveys/frameworks/${id}/`
-    ] as const;
-    }
-
-export const getSurveysFrameworksRetrieveQueryKey = (id?: string,) => {
-    return [
-    `/api/surveys/frameworks/${id}/`
-    ] as const;
-    }
-
-    
-export const getSurveysFrameworksRetrieveInfiniteQueryOptions = <TData = InfiniteData<Awaited<ReturnType<typeof surveysFrameworksRetrieve>>>, TError = unknown>(id: string, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof surveysFrameworksRetrieve>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
 ) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
 
-const {query: queryOptions, request: requestOptions} = options ?? {};
+  const queryKey = queryOptions?.queryKey ?? getSurveysFrameworksRetrieveInfiniteQueryKey(id);
 
-  const queryKey =  queryOptions?.queryKey ?? getSurveysFrameworksRetrieveInfiniteQueryKey(id);
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof surveysFrameworksRetrieve>>> = ({
+    signal
+  }) => surveysFrameworksRetrieve(id, { signal, ...requestOptions });
 
-  
+  return { queryKey, queryFn, enabled: !!id, ...queryOptions } as UseInfiniteQueryOptions<
+    Awaited<ReturnType<typeof surveysFrameworksRetrieve>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof surveysFrameworksRetrieve>>> = ({ signal }) => surveysFrameworksRetrieve(id, { signal, ...requestOptions });
+export type SurveysFrameworksRetrieveInfiniteQueryResult = NonNullable<
+  Awaited<ReturnType<typeof surveysFrameworksRetrieve>>
+>;
+export type SurveysFrameworksRetrieveInfiniteQueryError = unknown;
 
-      
-
-      
-
-   return  { queryKey, queryFn, enabled: !!(id), ...queryOptions} as UseInfiniteQueryOptions<Awaited<ReturnType<typeof surveysFrameworksRetrieve>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type SurveysFrameworksRetrieveInfiniteQueryResult = NonNullable<Awaited<ReturnType<typeof surveysFrameworksRetrieve>>>
-export type SurveysFrameworksRetrieveInfiniteQueryError = unknown
-
-
-export function useSurveysFrameworksRetrieveInfinite<TData = InfiniteData<Awaited<ReturnType<typeof surveysFrameworksRetrieve>>>, TError = unknown>(
- id: string, options: { query:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof surveysFrameworksRetrieve>>, TError, TData>> & Pick<
+export function useSurveysFrameworksRetrieveInfinite<
+  TData = InfiniteData<Awaited<ReturnType<typeof surveysFrameworksRetrieve>>>,
+  TError = unknown
+>(
+  id: string,
+  options: {
+    query: Partial<
+      UseInfiniteQueryOptions<Awaited<ReturnType<typeof surveysFrameworksRetrieve>>, TError, TData>
+    > &
+      Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof surveysFrameworksRetrieve>>,
           TError,
           Awaited<ReturnType<typeof surveysFrameworksRetrieve>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  DefinedUseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useSurveysFrameworksRetrieveInfinite<TData = InfiniteData<Awaited<ReturnType<typeof surveysFrameworksRetrieve>>>, TError = unknown>(
- id: string, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof surveysFrameworksRetrieve>>, TError, TData>> & Pick<
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): DefinedUseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useSurveysFrameworksRetrieveInfinite<
+  TData = InfiniteData<Awaited<ReturnType<typeof surveysFrameworksRetrieve>>>,
+  TError = unknown
+>(
+  id: string,
+  options?: {
+    query?: Partial<
+      UseInfiniteQueryOptions<Awaited<ReturnType<typeof surveysFrameworksRetrieve>>, TError, TData>
+    > &
+      Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof surveysFrameworksRetrieve>>,
           TError,
           Awaited<ReturnType<typeof surveysFrameworksRetrieve>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useSurveysFrameworksRetrieveInfinite<TData = InfiniteData<Awaited<ReturnType<typeof surveysFrameworksRetrieve>>>, TError = unknown>(
- id: string, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof surveysFrameworksRetrieve>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useSurveysFrameworksRetrieveInfinite<
+  TData = InfiniteData<Awaited<ReturnType<typeof surveysFrameworksRetrieve>>>,
+  TError = unknown
+>(
+  id: string,
+  options?: {
+    query?: Partial<
+      UseInfiniteQueryOptions<Awaited<ReturnType<typeof surveysFrameworksRetrieve>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 /**
  * @summary Get survey framework by id
  */
 
-export function useSurveysFrameworksRetrieveInfinite<TData = InfiniteData<Awaited<ReturnType<typeof surveysFrameworksRetrieve>>>, TError = unknown>(
- id: string, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof surveysFrameworksRetrieve>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient 
- ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+export function useSurveysFrameworksRetrieveInfinite<
+  TData = InfiniteData<Awaited<ReturnType<typeof surveysFrameworksRetrieve>>>,
+  TError = unknown
+>(
+  id: string,
+  options?: {
+    query?: Partial<
+      UseInfiniteQueryOptions<Awaited<ReturnType<typeof surveysFrameworksRetrieve>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+  const queryOptions = getSurveysFrameworksRetrieveInfiniteQueryOptions(id, options);
 
-  const queryOptions = getSurveysFrameworksRetrieveInfiniteQueryOptions(id,options)
+  const query = useInfiniteQuery(queryOptions, queryClient) as UseInfiniteQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
 
-  const query = useInfiniteQuery(queryOptions, queryClient) as  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-
-  query.queryKey = queryOptions.queryKey ;
+  query.queryKey = queryOptions.queryKey;
 
   return query;
 }
 
-
-
-
-export const getSurveysFrameworksRetrieveQueryOptions = <TData = Awaited<ReturnType<typeof surveysFrameworksRetrieve>>, TError = unknown>(id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof surveysFrameworksRetrieve>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+export const getSurveysFrameworksRetrieveQueryOptions = <
+  TData = Awaited<ReturnType<typeof surveysFrameworksRetrieve>>,
+  TError = unknown
+>(
+  id: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof surveysFrameworksRetrieve>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  }
 ) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
 
-const {query: queryOptions, request: requestOptions} = options ?? {};
+  const queryKey = queryOptions?.queryKey ?? getSurveysFrameworksRetrieveQueryKey(id);
 
-  const queryKey =  queryOptions?.queryKey ?? getSurveysFrameworksRetrieveQueryKey(id);
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof surveysFrameworksRetrieve>>> = ({
+    signal
+  }) => surveysFrameworksRetrieve(id, { signal, ...requestOptions });
 
-  
+  return { queryKey, queryFn, enabled: !!id, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof surveysFrameworksRetrieve>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof surveysFrameworksRetrieve>>> = ({ signal }) => surveysFrameworksRetrieve(id, { signal, ...requestOptions });
+export type SurveysFrameworksRetrieveQueryResult = NonNullable<
+  Awaited<ReturnType<typeof surveysFrameworksRetrieve>>
+>;
+export type SurveysFrameworksRetrieveQueryError = unknown;
 
-      
-
-      
-
-   return  { queryKey, queryFn, enabled: !!(id), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof surveysFrameworksRetrieve>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type SurveysFrameworksRetrieveQueryResult = NonNullable<Awaited<ReturnType<typeof surveysFrameworksRetrieve>>>
-export type SurveysFrameworksRetrieveQueryError = unknown
-
-
-export function useSurveysFrameworksRetrieve<TData = Awaited<ReturnType<typeof surveysFrameworksRetrieve>>, TError = unknown>(
- id: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof surveysFrameworksRetrieve>>, TError, TData>> & Pick<
+export function useSurveysFrameworksRetrieve<
+  TData = Awaited<ReturnType<typeof surveysFrameworksRetrieve>>,
+  TError = unknown
+>(
+  id: string,
+  options: {
+    query: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof surveysFrameworksRetrieve>>, TError, TData>
+    > &
+      Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof surveysFrameworksRetrieve>>,
           TError,
           Awaited<ReturnType<typeof surveysFrameworksRetrieve>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useSurveysFrameworksRetrieve<TData = Awaited<ReturnType<typeof surveysFrameworksRetrieve>>, TError = unknown>(
- id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof surveysFrameworksRetrieve>>, TError, TData>> & Pick<
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useSurveysFrameworksRetrieve<
+  TData = Awaited<ReturnType<typeof surveysFrameworksRetrieve>>,
+  TError = unknown
+>(
+  id: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof surveysFrameworksRetrieve>>, TError, TData>
+    > &
+      Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof surveysFrameworksRetrieve>>,
           TError,
           Awaited<ReturnType<typeof surveysFrameworksRetrieve>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useSurveysFrameworksRetrieve<TData = Awaited<ReturnType<typeof surveysFrameworksRetrieve>>, TError = unknown>(
- id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof surveysFrameworksRetrieve>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useSurveysFrameworksRetrieve<
+  TData = Awaited<ReturnType<typeof surveysFrameworksRetrieve>>,
+  TError = unknown
+>(
+  id: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof surveysFrameworksRetrieve>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 /**
  * @summary Get survey framework by id
  */
 
-export function useSurveysFrameworksRetrieve<TData = Awaited<ReturnType<typeof surveysFrameworksRetrieve>>, TError = unknown>(
- id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof surveysFrameworksRetrieve>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient 
- ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+export function useSurveysFrameworksRetrieve<
+  TData = Awaited<ReturnType<typeof surveysFrameworksRetrieve>>,
+  TError = unknown
+>(
+  id: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof surveysFrameworksRetrieve>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+  const queryOptions = getSurveysFrameworksRetrieveQueryOptions(id, options);
 
-  const queryOptions = getSurveysFrameworksRetrieveQueryOptions(id,options)
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+  };
 
-  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-
-  query.queryKey = queryOptions.queryKey ;
+  query.queryKey = queryOptions.queryKey;
 
   return query;
 }
-
-
-
-
 
 /**
  * @summary Patch survey framework by id
  */
 export type surveysFrameworksPartialUpdateResponse200 = {
-  data: SurveyFramework
-  status: 200
-}
-    
-export type surveysFrameworksPartialUpdateResponseSuccess = (surveysFrameworksPartialUpdateResponse200) & {
-  headers: Headers;
+  data: SurveyFramework;
+  status: 200;
 };
-;
 
-export type surveysFrameworksPartialUpdateResponse = (surveysFrameworksPartialUpdateResponseSuccess)
+export type surveysFrameworksPartialUpdateResponseSuccess =
+  surveysFrameworksPartialUpdateResponse200 & {
+    headers: Headers;
+  };
 
-export const getSurveysFrameworksPartialUpdateUrl = (id: string,) => {
+export type surveysFrameworksPartialUpdateResponse = surveysFrameworksPartialUpdateResponseSuccess;
 
+export const getSurveysFrameworksPartialUpdateUrl = (id: string) => {
+  return `/api/surveys/frameworks/${id}/`;
+};
 
-  
+export const surveysFrameworksPartialUpdate = async (
+  id: string,
+  patchedSurveyFramework: NonReadonly<PatchedSurveyFramework>,
+  options?: RequestInit
+): Promise<surveysFrameworksPartialUpdateResponse> => {
+  return customFetch<surveysFrameworksPartialUpdateResponse>(
+    getSurveysFrameworksPartialUpdateUrl(id),
+    {
+      ...options,
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json', ...options?.headers },
+      body: JSON.stringify(patchedSurveyFramework)
+    }
+  );
+};
 
-  return `/api/surveys/frameworks/${id}/`
-}
+export const getSurveysFrameworksPartialUpdateMutationOptions = <
+  TError = unknown,
+  TContext = unknown
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof surveysFrameworksPartialUpdate>>,
+    TError,
+    { id: string; data: NonReadonly<PatchedSurveyFramework> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof surveysFrameworksPartialUpdate>>,
+  TError,
+  { id: string; data: NonReadonly<PatchedSurveyFramework> },
+  TContext
+> => {
+  const mutationKey = ['surveysFrameworksPartialUpdate'];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
 
-export const surveysFrameworksPartialUpdate = async (id: string,
-    patchedSurveyFramework: NonReadonly<PatchedSurveyFramework>, options?: RequestInit): Promise<surveysFrameworksPartialUpdateResponse> => {
-  
-  return customFetch<surveysFrameworksPartialUpdateResponse>(getSurveysFrameworksPartialUpdateUrl(id),
-  {      
-    ...options,
-    method: 'PATCH',
-    headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(
-      patchedSurveyFramework,)
-  }
-);}
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof surveysFrameworksPartialUpdate>>,
+    { id: string; data: NonReadonly<PatchedSurveyFramework> }
+  > = (props) => {
+    const { id, data } = props ?? {};
 
+    return surveysFrameworksPartialUpdate(id, data, requestOptions);
+  };
 
+  return { mutationFn, ...mutationOptions };
+};
 
+export type SurveysFrameworksPartialUpdateMutationResult = NonNullable<
+  Awaited<ReturnType<typeof surveysFrameworksPartialUpdate>>
+>;
+export type SurveysFrameworksPartialUpdateMutationBody = NonReadonly<PatchedSurveyFramework>;
+export type SurveysFrameworksPartialUpdateMutationError = unknown;
 
-export const getSurveysFrameworksPartialUpdateMutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof surveysFrameworksPartialUpdate>>, TError,{id: string;data: NonReadonly<PatchedSurveyFramework>}, TContext>, request?: SecondParameter<typeof customFetch>}
-): UseMutationOptions<Awaited<ReturnType<typeof surveysFrameworksPartialUpdate>>, TError,{id: string;data: NonReadonly<PatchedSurveyFramework>}, TContext> => {
-
-const mutationKey = ['surveysFrameworksPartialUpdate'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
-
-      
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof surveysFrameworksPartialUpdate>>, {id: string;data: NonReadonly<PatchedSurveyFramework>}> = (props) => {
-          const {id,data} = props ?? {};
-
-          return  surveysFrameworksPartialUpdate(id,data,requestOptions)
-        }
-
-        
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type SurveysFrameworksPartialUpdateMutationResult = NonNullable<Awaited<ReturnType<typeof surveysFrameworksPartialUpdate>>>
-    export type SurveysFrameworksPartialUpdateMutationBody = NonReadonly<PatchedSurveyFramework>
-    export type SurveysFrameworksPartialUpdateMutationError = unknown
-
-    /**
+/**
  * @summary Patch survey framework by id
  */
-export const useSurveysFrameworksPartialUpdate = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof surveysFrameworksPartialUpdate>>, TError,{id: string;data: NonReadonly<PatchedSurveyFramework>}, TContext>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof surveysFrameworksPartialUpdate>>,
-        TError,
-        {id: string;data: NonReadonly<PatchedSurveyFramework>},
-        TContext
-      > => {
+export const useSurveysFrameworksPartialUpdate = <TError = unknown, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof surveysFrameworksPartialUpdate>>,
+      TError,
+      { id: string; data: NonReadonly<PatchedSurveyFramework> },
+      TContext
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseMutationResult<
+  Awaited<ReturnType<typeof surveysFrameworksPartialUpdate>>,
+  TError,
+  { id: string; data: NonReadonly<PatchedSurveyFramework> },
+  TContext
+> => {
+  const mutationOptions = getSurveysFrameworksPartialUpdateMutationOptions(options);
 
-      const mutationOptions = getSurveysFrameworksPartialUpdateMutationOptions(options);
+  return useMutation(mutationOptions, queryClient);
+};
 
-      return useMutation(mutationOptions, queryClient);
-    }
-    
 /**
  * Superadmin lists all tenants. Tenant admin lists only tenants where they are admin/owner.
  * @summary List tenants
  */
 export type tenantsListResponse200 = {
-  data: Tenant[]
-  status: 200
-}
+  data: Tenant[];
+  status: 200;
+};
 
 export type tenantsListResponse401 = {
-  data: TenantErrorResponse
-  status: 401
-}
-    
-export type tenantsListResponseSuccess = (tenantsListResponse200) & {
+  data: TenantErrorResponse;
+  status: 401;
+};
+
+export type tenantsListResponseSuccess = tenantsListResponse200 & {
   headers: Headers;
 };
-export type tenantsListResponseError = (tenantsListResponse401) & {
+export type tenantsListResponseError = tenantsListResponse401 & {
   headers: Headers;
 };
 
-export type tenantsListResponse = (tenantsListResponseSuccess | tenantsListResponseError)
+export type tenantsListResponse = tenantsListResponseSuccess | tenantsListResponseError;
 
 export const getTenantsListUrl = () => {
+  return `/api/tenants/`;
+};
 
-
-  
-
-  return `/api/tenants/`
-}
-
-export const tenantsList = async ( options?: RequestInit): Promise<tenantsListResponse> => {
-  
-  return customFetch<tenantsListResponse>(getTenantsListUrl(),
-  {      
+export const tenantsList = async (options?: RequestInit): Promise<tenantsListResponse> => {
+  return customFetch<tenantsListResponse>(getTenantsListUrl(), {
     ...options,
     method: 'GET'
-    
-    
-  }
-);}
-
-
-
-
+  });
+};
 
 export const getTenantsListInfiniteQueryKey = () => {
-    return [
-    'infinite', `/api/tenants/`
-    ] as const;
-    }
+  return ['infinite', `/api/tenants/`] as const;
+};
 
 export const getTenantsListQueryKey = () => {
-    return [
-    `/api/tenants/`
-    ] as const;
-    }
+  return [`/api/tenants/`] as const;
+};
 
-    
-export const getTenantsListInfiniteQueryOptions = <TData = InfiniteData<Awaited<ReturnType<typeof tenantsList>>>, TError = TenantErrorResponse>( options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof tenantsList>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
-) => {
+export const getTenantsListInfiniteQueryOptions = <
+  TData = InfiniteData<Awaited<ReturnType<typeof tenantsList>>>,
+  TError = TenantErrorResponse
+>(options?: {
+  query?: Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof tenantsList>>, TError, TData>>;
+  request?: SecondParameter<typeof customFetch>;
+}) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
 
-const {query: queryOptions, request: requestOptions} = options ?? {};
+  const queryKey = queryOptions?.queryKey ?? getTenantsListInfiniteQueryKey();
 
-  const queryKey =  queryOptions?.queryKey ?? getTenantsListInfiniteQueryKey();
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof tenantsList>>> = ({ signal }) =>
+    tenantsList({ signal, ...requestOptions });
 
-  
+  return { queryKey, queryFn, ...queryOptions } as UseInfiniteQueryOptions<
+    Awaited<ReturnType<typeof tenantsList>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof tenantsList>>> = ({ signal }) => tenantsList({ signal, ...requestOptions });
+export type TenantsListInfiniteQueryResult = NonNullable<Awaited<ReturnType<typeof tenantsList>>>;
+export type TenantsListInfiniteQueryError = TenantErrorResponse;
 
-      
-
-      
-
-   return  { queryKey, queryFn, ...queryOptions} as UseInfiniteQueryOptions<Awaited<ReturnType<typeof tenantsList>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type TenantsListInfiniteQueryResult = NonNullable<Awaited<ReturnType<typeof tenantsList>>>
-export type TenantsListInfiniteQueryError = TenantErrorResponse
-
-
-export function useTenantsListInfinite<TData = InfiniteData<Awaited<ReturnType<typeof tenantsList>>>, TError = TenantErrorResponse>(
-  options: { query:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof tenantsList>>, TError, TData>> & Pick<
+export function useTenantsListInfinite<
+  TData = InfiniteData<Awaited<ReturnType<typeof tenantsList>>>,
+  TError = TenantErrorResponse
+>(
+  options: {
+    query: Partial<
+      UseInfiniteQueryOptions<Awaited<ReturnType<typeof tenantsList>>, TError, TData>
+    > &
+      Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof tenantsList>>,
           TError,
           Awaited<ReturnType<typeof tenantsList>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  DefinedUseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useTenantsListInfinite<TData = InfiniteData<Awaited<ReturnType<typeof tenantsList>>>, TError = TenantErrorResponse>(
-  options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof tenantsList>>, TError, TData>> & Pick<
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): DefinedUseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useTenantsListInfinite<
+  TData = InfiniteData<Awaited<ReturnType<typeof tenantsList>>>,
+  TError = TenantErrorResponse
+>(
+  options?: {
+    query?: Partial<
+      UseInfiniteQueryOptions<Awaited<ReturnType<typeof tenantsList>>, TError, TData>
+    > &
+      Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof tenantsList>>,
           TError,
           Awaited<ReturnType<typeof tenantsList>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useTenantsListInfinite<TData = InfiniteData<Awaited<ReturnType<typeof tenantsList>>>, TError = TenantErrorResponse>(
-  options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof tenantsList>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useTenantsListInfinite<
+  TData = InfiniteData<Awaited<ReturnType<typeof tenantsList>>>,
+  TError = TenantErrorResponse
+>(
+  options?: {
+    query?: Partial<
+      UseInfiniteQueryOptions<Awaited<ReturnType<typeof tenantsList>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 /**
  * @summary List tenants
  */
 
-export function useTenantsListInfinite<TData = InfiniteData<Awaited<ReturnType<typeof tenantsList>>>, TError = TenantErrorResponse>(
-  options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof tenantsList>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient 
- ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+export function useTenantsListInfinite<
+  TData = InfiniteData<Awaited<ReturnType<typeof tenantsList>>>,
+  TError = TenantErrorResponse
+>(
+  options?: {
+    query?: Partial<
+      UseInfiniteQueryOptions<Awaited<ReturnType<typeof tenantsList>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+  const queryOptions = getTenantsListInfiniteQueryOptions(options);
 
-  const queryOptions = getTenantsListInfiniteQueryOptions(options)
+  const query = useInfiniteQuery(queryOptions, queryClient) as UseInfiniteQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
 
-  const query = useInfiniteQuery(queryOptions, queryClient) as  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-
-  query.queryKey = queryOptions.queryKey ;
+  query.queryKey = queryOptions.queryKey;
 
   return query;
 }
 
+export const getTenantsListQueryOptions = <
+  TData = Awaited<ReturnType<typeof tenantsList>>,
+  TError = TenantErrorResponse
+>(options?: {
+  query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof tenantsList>>, TError, TData>>;
+  request?: SecondParameter<typeof customFetch>;
+}) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
 
+  const queryKey = queryOptions?.queryKey ?? getTenantsListQueryKey();
 
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof tenantsList>>> = ({ signal }) =>
+    tenantsList({ signal, ...requestOptions });
 
-export const getTenantsListQueryOptions = <TData = Awaited<ReturnType<typeof tenantsList>>, TError = TenantErrorResponse>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof tenantsList>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
-) => {
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof tenantsList>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
 
-const {query: queryOptions, request: requestOptions} = options ?? {};
+export type TenantsListQueryResult = NonNullable<Awaited<ReturnType<typeof tenantsList>>>;
+export type TenantsListQueryError = TenantErrorResponse;
 
-  const queryKey =  queryOptions?.queryKey ?? getTenantsListQueryKey();
-
-  
-
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof tenantsList>>> = ({ signal }) => tenantsList({ signal, ...requestOptions });
-
-      
-
-      
-
-   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof tenantsList>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type TenantsListQueryResult = NonNullable<Awaited<ReturnType<typeof tenantsList>>>
-export type TenantsListQueryError = TenantErrorResponse
-
-
-export function useTenantsList<TData = Awaited<ReturnType<typeof tenantsList>>, TError = TenantErrorResponse>(
-  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof tenantsList>>, TError, TData>> & Pick<
+export function useTenantsList<
+  TData = Awaited<ReturnType<typeof tenantsList>>,
+  TError = TenantErrorResponse
+>(
+  options: {
+    query: Partial<UseQueryOptions<Awaited<ReturnType<typeof tenantsList>>, TError, TData>> &
+      Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof tenantsList>>,
           TError,
           Awaited<ReturnType<typeof tenantsList>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useTenantsList<TData = Awaited<ReturnType<typeof tenantsList>>, TError = TenantErrorResponse>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof tenantsList>>, TError, TData>> & Pick<
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useTenantsList<
+  TData = Awaited<ReturnType<typeof tenantsList>>,
+  TError = TenantErrorResponse
+>(
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof tenantsList>>, TError, TData>> &
+      Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof tenantsList>>,
           TError,
           Awaited<ReturnType<typeof tenantsList>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useTenantsList<TData = Awaited<ReturnType<typeof tenantsList>>, TError = TenantErrorResponse>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof tenantsList>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useTenantsList<
+  TData = Awaited<ReturnType<typeof tenantsList>>,
+  TError = TenantErrorResponse
+>(
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof tenantsList>>, TError, TData>>;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 /**
  * @summary List tenants
  */
 
-export function useTenantsList<TData = Awaited<ReturnType<typeof tenantsList>>, TError = TenantErrorResponse>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof tenantsList>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient 
- ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+export function useTenantsList<
+  TData = Awaited<ReturnType<typeof tenantsList>>,
+  TError = TenantErrorResponse
+>(
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof tenantsList>>, TError, TData>>;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+  const queryOptions = getTenantsListQueryOptions(options);
 
-  const queryOptions = getTenantsListQueryOptions(options)
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+  };
 
-  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-
-  query.queryKey = queryOptions.queryKey ;
+  query.queryKey = queryOptions.queryKey;
 
   return query;
 }
-
-
-
-
 
 /**
  * Only platform superadmin can create tenant. Requires admin_user_id.
  * @summary Create tenant
  */
 export type tenantsCreateResponse201 = {
-  data: Tenant
-  status: 201
-}
+  data: Tenant;
+  status: 201;
+};
 
 export type tenantsCreateResponse400 = {
-  data: TenantErrorResponse
-  status: 400
-}
+  data: TenantErrorResponse;
+  status: 400;
+};
 
 export type tenantsCreateResponse403 = {
-  data: TenantErrorResponse
-  status: 403
-}
-    
-export type tenantsCreateResponseSuccess = (tenantsCreateResponse201) & {
+  data: TenantErrorResponse;
+  status: 403;
+};
+
+export type tenantsCreateResponseSuccess = tenantsCreateResponse201 & {
   headers: Headers;
 };
 export type tenantsCreateResponseError = (tenantsCreateResponse400 | tenantsCreateResponse403) & {
   headers: Headers;
 };
 
-export type tenantsCreateResponse = (tenantsCreateResponseSuccess | tenantsCreateResponseError)
+export type tenantsCreateResponse = tenantsCreateResponseSuccess | tenantsCreateResponseError;
 
 export const getTenantsCreateUrl = () => {
+  return `/api/tenants/`;
+};
 
-
-  
-
-  return `/api/tenants/`
-}
-
-export const tenantsCreate = async (tenant: NonReadonly<Tenant>, options?: RequestInit): Promise<tenantsCreateResponse> => {
-  
-  return customFetch<tenantsCreateResponse>(getTenantsCreateUrl(),
-  {      
+export const tenantsCreate = async (
+  tenant: NonReadonly<Tenant>,
+  options?: RequestInit
+): Promise<tenantsCreateResponse> => {
+  return customFetch<tenantsCreateResponse>(getTenantsCreateUrl(), {
     ...options,
     method: 'POST',
     headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(
-      tenant,)
-  }
-);}
+    body: JSON.stringify(tenant)
+  });
+};
 
+export const getTenantsCreateMutationOptions = <
+  TError = TenantErrorResponse,
+  TContext = unknown
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof tenantsCreate>>,
+    TError,
+    { data: NonReadonly<Tenant> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof tenantsCreate>>,
+  TError,
+  { data: NonReadonly<Tenant> },
+  TContext
+> => {
+  const mutationKey = ['tenantsCreate'];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
 
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof tenantsCreate>>,
+    { data: NonReadonly<Tenant> }
+  > = (props) => {
+    const { data } = props ?? {};
 
+    return tenantsCreate(data, requestOptions);
+  };
 
-export const getTenantsCreateMutationOptions = <TError = TenantErrorResponse,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof tenantsCreate>>, TError,{data: NonReadonly<Tenant>}, TContext>, request?: SecondParameter<typeof customFetch>}
-): UseMutationOptions<Awaited<ReturnType<typeof tenantsCreate>>, TError,{data: NonReadonly<Tenant>}, TContext> => {
+  return { mutationFn, ...mutationOptions };
+};
 
-const mutationKey = ['tenantsCreate'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
+export type TenantsCreateMutationResult = NonNullable<Awaited<ReturnType<typeof tenantsCreate>>>;
+export type TenantsCreateMutationBody = NonReadonly<Tenant>;
+export type TenantsCreateMutationError = TenantErrorResponse;
 
-      
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof tenantsCreate>>, {data: NonReadonly<Tenant>}> = (props) => {
-          const {data} = props ?? {};
-
-          return  tenantsCreate(data,requestOptions)
-        }
-
-        
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type TenantsCreateMutationResult = NonNullable<Awaited<ReturnType<typeof tenantsCreate>>>
-    export type TenantsCreateMutationBody = NonReadonly<Tenant>
-    export type TenantsCreateMutationError = TenantErrorResponse
-
-    /**
+/**
  * @summary Create tenant
  */
-export const useTenantsCreate = <TError = TenantErrorResponse,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof tenantsCreate>>, TError,{data: NonReadonly<Tenant>}, TContext>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof tenantsCreate>>,
-        TError,
-        {data: NonReadonly<Tenant>},
-        TContext
-      > => {
+export const useTenantsCreate = <TError = TenantErrorResponse, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof tenantsCreate>>,
+      TError,
+      { data: NonReadonly<Tenant> },
+      TContext
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseMutationResult<
+  Awaited<ReturnType<typeof tenantsCreate>>,
+  TError,
+  { data: NonReadonly<Tenant> },
+  TContext
+> => {
+  const mutationOptions = getTenantsCreateMutationOptions(options);
 
-      const mutationOptions = getTenantsCreateMutationOptions(options);
+  return useMutation(mutationOptions, queryClient);
+};
 
-      return useMutation(mutationOptions, queryClient);
-    }
-    
 /**
  * @summary Get tenant by id
  */
 export type tenantsRetrieveResponse200 = {
-  data: Tenant
-  status: 200
-}
+  data: Tenant;
+  status: 200;
+};
 
 export type tenantsRetrieveResponse404 = {
-  data: TenantErrorResponse
-  status: 404
-}
-    
-export type tenantsRetrieveResponseSuccess = (tenantsRetrieveResponse200) & {
-  headers: Headers;
-};
-export type tenantsRetrieveResponseError = (tenantsRetrieveResponse404) & {
-  headers: Headers;
+  data: TenantErrorResponse;
+  status: 404;
 };
 
-export type tenantsRetrieveResponse = (tenantsRetrieveResponseSuccess | tenantsRetrieveResponseError)
+export type tenantsRetrieveResponseSuccess = tenantsRetrieveResponse200 & {
+  headers: Headers;
+};
+export type tenantsRetrieveResponseError = tenantsRetrieveResponse404 & {
+  headers: Headers;
+};
 
-export const getTenantsRetrieveUrl = (id: string,) => {
+export type tenantsRetrieveResponse = tenantsRetrieveResponseSuccess | tenantsRetrieveResponseError;
 
+export const getTenantsRetrieveUrl = (id: string) => {
+  return `/api/tenants/${id}/`;
+};
 
-  
-
-  return `/api/tenants/${id}/`
-}
-
-export const tenantsRetrieve = async (id: string, options?: RequestInit): Promise<tenantsRetrieveResponse> => {
-  
-  return customFetch<tenantsRetrieveResponse>(getTenantsRetrieveUrl(id),
-  {      
+export const tenantsRetrieve = async (
+  id: string,
+  options?: RequestInit
+): Promise<tenantsRetrieveResponse> => {
+  return customFetch<tenantsRetrieveResponse>(getTenantsRetrieveUrl(id), {
     ...options,
     method: 'GET'
-    
-    
+  });
+};
+
+export const getTenantsRetrieveInfiniteQueryKey = (id?: string) => {
+  return ['infinite', `/api/tenants/${id}/`] as const;
+};
+
+export const getTenantsRetrieveQueryKey = (id?: string) => {
+  return [`/api/tenants/${id}/`] as const;
+};
+
+export const getTenantsRetrieveInfiniteQueryOptions = <
+  TData = InfiniteData<Awaited<ReturnType<typeof tenantsRetrieve>>>,
+  TError = TenantErrorResponse
+>(
+  id: string,
+  options?: {
+    query?: Partial<
+      UseInfiniteQueryOptions<Awaited<ReturnType<typeof tenantsRetrieve>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof customFetch>;
   }
-);}
-
-
-
-
-
-export const getTenantsRetrieveInfiniteQueryKey = (id?: string,) => {
-    return [
-    'infinite', `/api/tenants/${id}/`
-    ] as const;
-    }
-
-export const getTenantsRetrieveQueryKey = (id?: string,) => {
-    return [
-    `/api/tenants/${id}/`
-    ] as const;
-    }
-
-    
-export const getTenantsRetrieveInfiniteQueryOptions = <TData = InfiniteData<Awaited<ReturnType<typeof tenantsRetrieve>>>, TError = TenantErrorResponse>(id: string, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof tenantsRetrieve>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
 ) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
 
-const {query: queryOptions, request: requestOptions} = options ?? {};
+  const queryKey = queryOptions?.queryKey ?? getTenantsRetrieveInfiniteQueryKey(id);
 
-  const queryKey =  queryOptions?.queryKey ?? getTenantsRetrieveInfiniteQueryKey(id);
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof tenantsRetrieve>>> = ({ signal }) =>
+    tenantsRetrieve(id, { signal, ...requestOptions });
 
-  
+  return { queryKey, queryFn, enabled: !!id, ...queryOptions } as UseInfiniteQueryOptions<
+    Awaited<ReturnType<typeof tenantsRetrieve>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof tenantsRetrieve>>> = ({ signal }) => tenantsRetrieve(id, { signal, ...requestOptions });
+export type TenantsRetrieveInfiniteQueryResult = NonNullable<
+  Awaited<ReturnType<typeof tenantsRetrieve>>
+>;
+export type TenantsRetrieveInfiniteQueryError = TenantErrorResponse;
 
-      
-
-      
-
-   return  { queryKey, queryFn, enabled: !!(id), ...queryOptions} as UseInfiniteQueryOptions<Awaited<ReturnType<typeof tenantsRetrieve>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type TenantsRetrieveInfiniteQueryResult = NonNullable<Awaited<ReturnType<typeof tenantsRetrieve>>>
-export type TenantsRetrieveInfiniteQueryError = TenantErrorResponse
-
-
-export function useTenantsRetrieveInfinite<TData = InfiniteData<Awaited<ReturnType<typeof tenantsRetrieve>>>, TError = TenantErrorResponse>(
- id: string, options: { query:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof tenantsRetrieve>>, TError, TData>> & Pick<
+export function useTenantsRetrieveInfinite<
+  TData = InfiniteData<Awaited<ReturnType<typeof tenantsRetrieve>>>,
+  TError = TenantErrorResponse
+>(
+  id: string,
+  options: {
+    query: Partial<
+      UseInfiniteQueryOptions<Awaited<ReturnType<typeof tenantsRetrieve>>, TError, TData>
+    > &
+      Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof tenantsRetrieve>>,
           TError,
           Awaited<ReturnType<typeof tenantsRetrieve>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  DefinedUseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useTenantsRetrieveInfinite<TData = InfiniteData<Awaited<ReturnType<typeof tenantsRetrieve>>>, TError = TenantErrorResponse>(
- id: string, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof tenantsRetrieve>>, TError, TData>> & Pick<
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): DefinedUseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useTenantsRetrieveInfinite<
+  TData = InfiniteData<Awaited<ReturnType<typeof tenantsRetrieve>>>,
+  TError = TenantErrorResponse
+>(
+  id: string,
+  options?: {
+    query?: Partial<
+      UseInfiniteQueryOptions<Awaited<ReturnType<typeof tenantsRetrieve>>, TError, TData>
+    > &
+      Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof tenantsRetrieve>>,
           TError,
           Awaited<ReturnType<typeof tenantsRetrieve>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useTenantsRetrieveInfinite<TData = InfiniteData<Awaited<ReturnType<typeof tenantsRetrieve>>>, TError = TenantErrorResponse>(
- id: string, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof tenantsRetrieve>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useTenantsRetrieveInfinite<
+  TData = InfiniteData<Awaited<ReturnType<typeof tenantsRetrieve>>>,
+  TError = TenantErrorResponse
+>(
+  id: string,
+  options?: {
+    query?: Partial<
+      UseInfiniteQueryOptions<Awaited<ReturnType<typeof tenantsRetrieve>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 /**
  * @summary Get tenant by id
  */
 
-export function useTenantsRetrieveInfinite<TData = InfiniteData<Awaited<ReturnType<typeof tenantsRetrieve>>>, TError = TenantErrorResponse>(
- id: string, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof tenantsRetrieve>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient 
- ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+export function useTenantsRetrieveInfinite<
+  TData = InfiniteData<Awaited<ReturnType<typeof tenantsRetrieve>>>,
+  TError = TenantErrorResponse
+>(
+  id: string,
+  options?: {
+    query?: Partial<
+      UseInfiniteQueryOptions<Awaited<ReturnType<typeof tenantsRetrieve>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+  const queryOptions = getTenantsRetrieveInfiniteQueryOptions(id, options);
 
-  const queryOptions = getTenantsRetrieveInfiniteQueryOptions(id,options)
+  const query = useInfiniteQuery(queryOptions, queryClient) as UseInfiniteQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
 
-  const query = useInfiniteQuery(queryOptions, queryClient) as  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-
-  query.queryKey = queryOptions.queryKey ;
+  query.queryKey = queryOptions.queryKey;
 
   return query;
 }
 
-
-
-
-export const getTenantsRetrieveQueryOptions = <TData = Awaited<ReturnType<typeof tenantsRetrieve>>, TError = TenantErrorResponse>(id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof tenantsRetrieve>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+export const getTenantsRetrieveQueryOptions = <
+  TData = Awaited<ReturnType<typeof tenantsRetrieve>>,
+  TError = TenantErrorResponse
+>(
+  id: string,
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof tenantsRetrieve>>, TError, TData>>;
+    request?: SecondParameter<typeof customFetch>;
+  }
 ) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
 
-const {query: queryOptions, request: requestOptions} = options ?? {};
+  const queryKey = queryOptions?.queryKey ?? getTenantsRetrieveQueryKey(id);
 
-  const queryKey =  queryOptions?.queryKey ?? getTenantsRetrieveQueryKey(id);
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof tenantsRetrieve>>> = ({ signal }) =>
+    tenantsRetrieve(id, { signal, ...requestOptions });
 
-  
+  return { queryKey, queryFn, enabled: !!id, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof tenantsRetrieve>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof tenantsRetrieve>>> = ({ signal }) => tenantsRetrieve(id, { signal, ...requestOptions });
+export type TenantsRetrieveQueryResult = NonNullable<Awaited<ReturnType<typeof tenantsRetrieve>>>;
+export type TenantsRetrieveQueryError = TenantErrorResponse;
 
-      
-
-      
-
-   return  { queryKey, queryFn, enabled: !!(id), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof tenantsRetrieve>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type TenantsRetrieveQueryResult = NonNullable<Awaited<ReturnType<typeof tenantsRetrieve>>>
-export type TenantsRetrieveQueryError = TenantErrorResponse
-
-
-export function useTenantsRetrieve<TData = Awaited<ReturnType<typeof tenantsRetrieve>>, TError = TenantErrorResponse>(
- id: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof tenantsRetrieve>>, TError, TData>> & Pick<
+export function useTenantsRetrieve<
+  TData = Awaited<ReturnType<typeof tenantsRetrieve>>,
+  TError = TenantErrorResponse
+>(
+  id: string,
+  options: {
+    query: Partial<UseQueryOptions<Awaited<ReturnType<typeof tenantsRetrieve>>, TError, TData>> &
+      Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof tenantsRetrieve>>,
           TError,
           Awaited<ReturnType<typeof tenantsRetrieve>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useTenantsRetrieve<TData = Awaited<ReturnType<typeof tenantsRetrieve>>, TError = TenantErrorResponse>(
- id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof tenantsRetrieve>>, TError, TData>> & Pick<
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useTenantsRetrieve<
+  TData = Awaited<ReturnType<typeof tenantsRetrieve>>,
+  TError = TenantErrorResponse
+>(
+  id: string,
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof tenantsRetrieve>>, TError, TData>> &
+      Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof tenantsRetrieve>>,
           TError,
           Awaited<ReturnType<typeof tenantsRetrieve>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useTenantsRetrieve<TData = Awaited<ReturnType<typeof tenantsRetrieve>>, TError = TenantErrorResponse>(
- id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof tenantsRetrieve>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useTenantsRetrieve<
+  TData = Awaited<ReturnType<typeof tenantsRetrieve>>,
+  TError = TenantErrorResponse
+>(
+  id: string,
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof tenantsRetrieve>>, TError, TData>>;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 /**
  * @summary Get tenant by id
  */
 
-export function useTenantsRetrieve<TData = Awaited<ReturnType<typeof tenantsRetrieve>>, TError = TenantErrorResponse>(
- id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof tenantsRetrieve>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient 
- ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+export function useTenantsRetrieve<
+  TData = Awaited<ReturnType<typeof tenantsRetrieve>>,
+  TError = TenantErrorResponse
+>(
+  id: string,
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof tenantsRetrieve>>, TError, TData>>;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+  const queryOptions = getTenantsRetrieveQueryOptions(id, options);
 
-  const queryOptions = getTenantsRetrieveQueryOptions(id,options)
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+  };
 
-  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-
-  query.queryKey = queryOptions.queryKey ;
+  query.queryKey = queryOptions.queryKey;
 
   return query;
 }
-
-
-
-
 
 /**
  * @summary Put tenant by id
  */
 export type tenantsUpdateResponse200 = {
-  data: Tenant
-  status: 200
-}
+  data: Tenant;
+  status: 200;
+};
 
 export type tenantsUpdateResponse400 = {
-  data: TenantErrorResponse
-  status: 400
-}
+  data: TenantErrorResponse;
+  status: 400;
+};
 
 export type tenantsUpdateResponse404 = {
-  data: TenantErrorResponse
-  status: 404
-}
-    
-export type tenantsUpdateResponseSuccess = (tenantsUpdateResponse200) & {
+  data: TenantErrorResponse;
+  status: 404;
+};
+
+export type tenantsUpdateResponseSuccess = tenantsUpdateResponse200 & {
   headers: Headers;
 };
 export type tenantsUpdateResponseError = (tenantsUpdateResponse400 | tenantsUpdateResponse404) & {
   headers: Headers;
 };
 
-export type tenantsUpdateResponse = (tenantsUpdateResponseSuccess | tenantsUpdateResponseError)
+export type tenantsUpdateResponse = tenantsUpdateResponseSuccess | tenantsUpdateResponseError;
 
-export const getTenantsUpdateUrl = (id: string,) => {
+export const getTenantsUpdateUrl = (id: string) => {
+  return `/api/tenants/${id}/`;
+};
 
-
-  
-
-  return `/api/tenants/${id}/`
-}
-
-export const tenantsUpdate = async (id: string,
-    tenant: NonReadonly<Tenant>, options?: RequestInit): Promise<tenantsUpdateResponse> => {
-  
-  return customFetch<tenantsUpdateResponse>(getTenantsUpdateUrl(id),
-  {      
+export const tenantsUpdate = async (
+  id: string,
+  tenant: NonReadonly<Tenant>,
+  options?: RequestInit
+): Promise<tenantsUpdateResponse> => {
+  return customFetch<tenantsUpdateResponse>(getTenantsUpdateUrl(id), {
     ...options,
     method: 'PUT',
     headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(
-      tenant,)
-  }
-);}
+    body: JSON.stringify(tenant)
+  });
+};
 
+export const getTenantsUpdateMutationOptions = <
+  TError = TenantErrorResponse,
+  TContext = unknown
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof tenantsUpdate>>,
+    TError,
+    { id: string; data: NonReadonly<Tenant> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof tenantsUpdate>>,
+  TError,
+  { id: string; data: NonReadonly<Tenant> },
+  TContext
+> => {
+  const mutationKey = ['tenantsUpdate'];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
 
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof tenantsUpdate>>,
+    { id: string; data: NonReadonly<Tenant> }
+  > = (props) => {
+    const { id, data } = props ?? {};
 
+    return tenantsUpdate(id, data, requestOptions);
+  };
 
-export const getTenantsUpdateMutationOptions = <TError = TenantErrorResponse,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof tenantsUpdate>>, TError,{id: string;data: NonReadonly<Tenant>}, TContext>, request?: SecondParameter<typeof customFetch>}
-): UseMutationOptions<Awaited<ReturnType<typeof tenantsUpdate>>, TError,{id: string;data: NonReadonly<Tenant>}, TContext> => {
+  return { mutationFn, ...mutationOptions };
+};
 
-const mutationKey = ['tenantsUpdate'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
+export type TenantsUpdateMutationResult = NonNullable<Awaited<ReturnType<typeof tenantsUpdate>>>;
+export type TenantsUpdateMutationBody = NonReadonly<Tenant>;
+export type TenantsUpdateMutationError = TenantErrorResponse;
 
-      
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof tenantsUpdate>>, {id: string;data: NonReadonly<Tenant>}> = (props) => {
-          const {id,data} = props ?? {};
-
-          return  tenantsUpdate(id,data,requestOptions)
-        }
-
-        
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type TenantsUpdateMutationResult = NonNullable<Awaited<ReturnType<typeof tenantsUpdate>>>
-    export type TenantsUpdateMutationBody = NonReadonly<Tenant>
-    export type TenantsUpdateMutationError = TenantErrorResponse
-
-    /**
+/**
  * @summary Put tenant by id
  */
-export const useTenantsUpdate = <TError = TenantErrorResponse,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof tenantsUpdate>>, TError,{id: string;data: NonReadonly<Tenant>}, TContext>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof tenantsUpdate>>,
-        TError,
-        {id: string;data: NonReadonly<Tenant>},
-        TContext
-      > => {
+export const useTenantsUpdate = <TError = TenantErrorResponse, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof tenantsUpdate>>,
+      TError,
+      { id: string; data: NonReadonly<Tenant> },
+      TContext
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseMutationResult<
+  Awaited<ReturnType<typeof tenantsUpdate>>,
+  TError,
+  { id: string; data: NonReadonly<Tenant> },
+  TContext
+> => {
+  const mutationOptions = getTenantsUpdateMutationOptions(options);
 
-      const mutationOptions = getTenantsUpdateMutationOptions(options);
+  return useMutation(mutationOptions, queryClient);
+};
 
-      return useMutation(mutationOptions, queryClient);
-    }
-    
 /**
  * @summary Patch tenant by id
  */
 export type tenantsPartialUpdateResponse200 = {
-  data: Tenant
-  status: 200
-}
+  data: Tenant;
+  status: 200;
+};
 
 export type tenantsPartialUpdateResponse400 = {
-  data: TenantErrorResponse
-  status: 400
-}
+  data: TenantErrorResponse;
+  status: 400;
+};
 
 export type tenantsPartialUpdateResponse404 = {
-  data: TenantErrorResponse
-  status: 404
-}
-    
-export type tenantsPartialUpdateResponseSuccess = (tenantsPartialUpdateResponse200) & {
-  headers: Headers;
-};
-export type tenantsPartialUpdateResponseError = (tenantsPartialUpdateResponse400 | tenantsPartialUpdateResponse404) & {
-  headers: Headers;
+  data: TenantErrorResponse;
+  status: 404;
 };
 
-export type tenantsPartialUpdateResponse = (tenantsPartialUpdateResponseSuccess | tenantsPartialUpdateResponseError)
+export type tenantsPartialUpdateResponseSuccess = tenantsPartialUpdateResponse200 & {
+  headers: Headers;
+};
+export type tenantsPartialUpdateResponseError = (
+  | tenantsPartialUpdateResponse400
+  | tenantsPartialUpdateResponse404
+) & {
+  headers: Headers;
+};
 
-export const getTenantsPartialUpdateUrl = (id: string,) => {
+export type tenantsPartialUpdateResponse =
+  | tenantsPartialUpdateResponseSuccess
+  | tenantsPartialUpdateResponseError;
 
+export const getTenantsPartialUpdateUrl = (id: string) => {
+  return `/api/tenants/${id}/`;
+};
 
-  
-
-  return `/api/tenants/${id}/`
-}
-
-export const tenantsPartialUpdate = async (id: string,
-    patchedTenant: NonReadonly<PatchedTenant>, options?: RequestInit): Promise<tenantsPartialUpdateResponse> => {
-  
-  return customFetch<tenantsPartialUpdateResponse>(getTenantsPartialUpdateUrl(id),
-  {      
+export const tenantsPartialUpdate = async (
+  id: string,
+  patchedTenant: NonReadonly<PatchedTenant>,
+  options?: RequestInit
+): Promise<tenantsPartialUpdateResponse> => {
+  return customFetch<tenantsPartialUpdateResponse>(getTenantsPartialUpdateUrl(id), {
     ...options,
     method: 'PATCH',
     headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(
-      patchedTenant,)
-  }
-);}
+    body: JSON.stringify(patchedTenant)
+  });
+};
 
+export const getTenantsPartialUpdateMutationOptions = <
+  TError = TenantErrorResponse,
+  TContext = unknown
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof tenantsPartialUpdate>>,
+    TError,
+    { id: string; data: NonReadonly<PatchedTenant> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof tenantsPartialUpdate>>,
+  TError,
+  { id: string; data: NonReadonly<PatchedTenant> },
+  TContext
+> => {
+  const mutationKey = ['tenantsPartialUpdate'];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
 
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof tenantsPartialUpdate>>,
+    { id: string; data: NonReadonly<PatchedTenant> }
+  > = (props) => {
+    const { id, data } = props ?? {};
 
+    return tenantsPartialUpdate(id, data, requestOptions);
+  };
 
-export const getTenantsPartialUpdateMutationOptions = <TError = TenantErrorResponse,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof tenantsPartialUpdate>>, TError,{id: string;data: NonReadonly<PatchedTenant>}, TContext>, request?: SecondParameter<typeof customFetch>}
-): UseMutationOptions<Awaited<ReturnType<typeof tenantsPartialUpdate>>, TError,{id: string;data: NonReadonly<PatchedTenant>}, TContext> => {
+  return { mutationFn, ...mutationOptions };
+};
 
-const mutationKey = ['tenantsPartialUpdate'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
+export type TenantsPartialUpdateMutationResult = NonNullable<
+  Awaited<ReturnType<typeof tenantsPartialUpdate>>
+>;
+export type TenantsPartialUpdateMutationBody = NonReadonly<PatchedTenant>;
+export type TenantsPartialUpdateMutationError = TenantErrorResponse;
 
-      
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof tenantsPartialUpdate>>, {id: string;data: NonReadonly<PatchedTenant>}> = (props) => {
-          const {id,data} = props ?? {};
-
-          return  tenantsPartialUpdate(id,data,requestOptions)
-        }
-
-        
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type TenantsPartialUpdateMutationResult = NonNullable<Awaited<ReturnType<typeof tenantsPartialUpdate>>>
-    export type TenantsPartialUpdateMutationBody = NonReadonly<PatchedTenant>
-    export type TenantsPartialUpdateMutationError = TenantErrorResponse
-
-    /**
+/**
  * @summary Patch tenant by id
  */
-export const useTenantsPartialUpdate = <TError = TenantErrorResponse,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof tenantsPartialUpdate>>, TError,{id: string;data: NonReadonly<PatchedTenant>}, TContext>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof tenantsPartialUpdate>>,
-        TError,
-        {id: string;data: NonReadonly<PatchedTenant>},
-        TContext
-      > => {
+export const useTenantsPartialUpdate = <TError = TenantErrorResponse, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof tenantsPartialUpdate>>,
+      TError,
+      { id: string; data: NonReadonly<PatchedTenant> },
+      TContext
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseMutationResult<
+  Awaited<ReturnType<typeof tenantsPartialUpdate>>,
+  TError,
+  { id: string; data: NonReadonly<PatchedTenant> },
+  TContext
+> => {
+  const mutationOptions = getTenantsPartialUpdateMutationOptions(options);
 
-      const mutationOptions = getTenantsPartialUpdateMutationOptions(options);
+  return useMutation(mutationOptions, queryClient);
+};
 
-      return useMutation(mutationOptions, queryClient);
-    }
-    
 /**
  * @summary List tenant users by tenant id
  */
 export type tenantsUsersListResponse200 = {
-  data: UserList[]
-  status: 200
-}
+  data: UserList[];
+  status: 200;
+};
 
 export type tenantsUsersListResponse403 = {
-  data: ErrorResponse
-  status: 403
-}
-    
-export type tenantsUsersListResponseSuccess = (tenantsUsersListResponse200) & {
-  headers: Headers;
-};
-export type tenantsUsersListResponseError = (tenantsUsersListResponse403) & {
-  headers: Headers;
+  data: ErrorResponse;
+  status: 403;
 };
 
-export type tenantsUsersListResponse = (tenantsUsersListResponseSuccess | tenantsUsersListResponseError)
+export type tenantsUsersListResponseSuccess = tenantsUsersListResponse200 & {
+  headers: Headers;
+};
+export type tenantsUsersListResponseError = tenantsUsersListResponse403 & {
+  headers: Headers;
+};
 
-export const getTenantsUsersListUrl = (tenantId: string,) => {
+export type tenantsUsersListResponse =
+  | tenantsUsersListResponseSuccess
+  | tenantsUsersListResponseError;
 
+export const getTenantsUsersListUrl = (tenantId: string) => {
+  return `/api/tenants/${tenantId}/users/`;
+};
 
-  
-
-  return `/api/tenants/${tenantId}/users/`
-}
-
-export const tenantsUsersList = async (tenantId: string, options?: RequestInit): Promise<tenantsUsersListResponse> => {
-  
-  return customFetch<tenantsUsersListResponse>(getTenantsUsersListUrl(tenantId),
-  {      
+export const tenantsUsersList = async (
+  tenantId: string,
+  options?: RequestInit
+): Promise<tenantsUsersListResponse> => {
+  return customFetch<tenantsUsersListResponse>(getTenantsUsersListUrl(tenantId), {
     ...options,
     method: 'GET'
-    
-    
+  });
+};
+
+export const getTenantsUsersListInfiniteQueryKey = (tenantId?: string) => {
+  return ['infinite', `/api/tenants/${tenantId}/users/`] as const;
+};
+
+export const getTenantsUsersListQueryKey = (tenantId?: string) => {
+  return [`/api/tenants/${tenantId}/users/`] as const;
+};
+
+export const getTenantsUsersListInfiniteQueryOptions = <
+  TData = InfiniteData<Awaited<ReturnType<typeof tenantsUsersList>>>,
+  TError = ErrorResponse
+>(
+  tenantId: string,
+  options?: {
+    query?: Partial<
+      UseInfiniteQueryOptions<Awaited<ReturnType<typeof tenantsUsersList>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof customFetch>;
   }
-);}
-
-
-
-
-
-export const getTenantsUsersListInfiniteQueryKey = (tenantId?: string,) => {
-    return [
-    'infinite', `/api/tenants/${tenantId}/users/`
-    ] as const;
-    }
-
-export const getTenantsUsersListQueryKey = (tenantId?: string,) => {
-    return [
-    `/api/tenants/${tenantId}/users/`
-    ] as const;
-    }
-
-    
-export const getTenantsUsersListInfiniteQueryOptions = <TData = InfiniteData<Awaited<ReturnType<typeof tenantsUsersList>>>, TError = ErrorResponse>(tenantId: string, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof tenantsUsersList>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
 ) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
 
-const {query: queryOptions, request: requestOptions} = options ?? {};
+  const queryKey = queryOptions?.queryKey ?? getTenantsUsersListInfiniteQueryKey(tenantId);
 
-  const queryKey =  queryOptions?.queryKey ?? getTenantsUsersListInfiniteQueryKey(tenantId);
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof tenantsUsersList>>> = ({ signal }) =>
+    tenantsUsersList(tenantId, { signal, ...requestOptions });
 
-  
+  return { queryKey, queryFn, enabled: !!tenantId, ...queryOptions } as UseInfiniteQueryOptions<
+    Awaited<ReturnType<typeof tenantsUsersList>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof tenantsUsersList>>> = ({ signal }) => tenantsUsersList(tenantId, { signal, ...requestOptions });
+export type TenantsUsersListInfiniteQueryResult = NonNullable<
+  Awaited<ReturnType<typeof tenantsUsersList>>
+>;
+export type TenantsUsersListInfiniteQueryError = ErrorResponse;
 
-      
-
-      
-
-   return  { queryKey, queryFn, enabled: !!(tenantId), ...queryOptions} as UseInfiniteQueryOptions<Awaited<ReturnType<typeof tenantsUsersList>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type TenantsUsersListInfiniteQueryResult = NonNullable<Awaited<ReturnType<typeof tenantsUsersList>>>
-export type TenantsUsersListInfiniteQueryError = ErrorResponse
-
-
-export function useTenantsUsersListInfinite<TData = InfiniteData<Awaited<ReturnType<typeof tenantsUsersList>>>, TError = ErrorResponse>(
- tenantId: string, options: { query:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof tenantsUsersList>>, TError, TData>> & Pick<
+export function useTenantsUsersListInfinite<
+  TData = InfiniteData<Awaited<ReturnType<typeof tenantsUsersList>>>,
+  TError = ErrorResponse
+>(
+  tenantId: string,
+  options: {
+    query: Partial<
+      UseInfiniteQueryOptions<Awaited<ReturnType<typeof tenantsUsersList>>, TError, TData>
+    > &
+      Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof tenantsUsersList>>,
           TError,
           Awaited<ReturnType<typeof tenantsUsersList>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  DefinedUseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useTenantsUsersListInfinite<TData = InfiniteData<Awaited<ReturnType<typeof tenantsUsersList>>>, TError = ErrorResponse>(
- tenantId: string, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof tenantsUsersList>>, TError, TData>> & Pick<
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): DefinedUseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useTenantsUsersListInfinite<
+  TData = InfiniteData<Awaited<ReturnType<typeof tenantsUsersList>>>,
+  TError = ErrorResponse
+>(
+  tenantId: string,
+  options?: {
+    query?: Partial<
+      UseInfiniteQueryOptions<Awaited<ReturnType<typeof tenantsUsersList>>, TError, TData>
+    > &
+      Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof tenantsUsersList>>,
           TError,
           Awaited<ReturnType<typeof tenantsUsersList>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useTenantsUsersListInfinite<TData = InfiniteData<Awaited<ReturnType<typeof tenantsUsersList>>>, TError = ErrorResponse>(
- tenantId: string, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof tenantsUsersList>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useTenantsUsersListInfinite<
+  TData = InfiniteData<Awaited<ReturnType<typeof tenantsUsersList>>>,
+  TError = ErrorResponse
+>(
+  tenantId: string,
+  options?: {
+    query?: Partial<
+      UseInfiniteQueryOptions<Awaited<ReturnType<typeof tenantsUsersList>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 /**
  * @summary List tenant users by tenant id
  */
 
-export function useTenantsUsersListInfinite<TData = InfiniteData<Awaited<ReturnType<typeof tenantsUsersList>>>, TError = ErrorResponse>(
- tenantId: string, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof tenantsUsersList>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient 
- ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+export function useTenantsUsersListInfinite<
+  TData = InfiniteData<Awaited<ReturnType<typeof tenantsUsersList>>>,
+  TError = ErrorResponse
+>(
+  tenantId: string,
+  options?: {
+    query?: Partial<
+      UseInfiniteQueryOptions<Awaited<ReturnType<typeof tenantsUsersList>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+  const queryOptions = getTenantsUsersListInfiniteQueryOptions(tenantId, options);
 
-  const queryOptions = getTenantsUsersListInfiniteQueryOptions(tenantId,options)
+  const query = useInfiniteQuery(queryOptions, queryClient) as UseInfiniteQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
 
-  const query = useInfiniteQuery(queryOptions, queryClient) as  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-
-  query.queryKey = queryOptions.queryKey ;
+  query.queryKey = queryOptions.queryKey;
 
   return query;
 }
 
-
-
-
-export const getTenantsUsersListQueryOptions = <TData = Awaited<ReturnType<typeof tenantsUsersList>>, TError = ErrorResponse>(tenantId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof tenantsUsersList>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+export const getTenantsUsersListQueryOptions = <
+  TData = Awaited<ReturnType<typeof tenantsUsersList>>,
+  TError = ErrorResponse
+>(
+  tenantId: string,
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof tenantsUsersList>>, TError, TData>>;
+    request?: SecondParameter<typeof customFetch>;
+  }
 ) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
 
-const {query: queryOptions, request: requestOptions} = options ?? {};
+  const queryKey = queryOptions?.queryKey ?? getTenantsUsersListQueryKey(tenantId);
 
-  const queryKey =  queryOptions?.queryKey ?? getTenantsUsersListQueryKey(tenantId);
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof tenantsUsersList>>> = ({ signal }) =>
+    tenantsUsersList(tenantId, { signal, ...requestOptions });
 
-  
+  return { queryKey, queryFn, enabled: !!tenantId, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof tenantsUsersList>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof tenantsUsersList>>> = ({ signal }) => tenantsUsersList(tenantId, { signal, ...requestOptions });
+export type TenantsUsersListQueryResult = NonNullable<Awaited<ReturnType<typeof tenantsUsersList>>>;
+export type TenantsUsersListQueryError = ErrorResponse;
 
-      
-
-      
-
-   return  { queryKey, queryFn, enabled: !!(tenantId), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof tenantsUsersList>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type TenantsUsersListQueryResult = NonNullable<Awaited<ReturnType<typeof tenantsUsersList>>>
-export type TenantsUsersListQueryError = ErrorResponse
-
-
-export function useTenantsUsersList<TData = Awaited<ReturnType<typeof tenantsUsersList>>, TError = ErrorResponse>(
- tenantId: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof tenantsUsersList>>, TError, TData>> & Pick<
+export function useTenantsUsersList<
+  TData = Awaited<ReturnType<typeof tenantsUsersList>>,
+  TError = ErrorResponse
+>(
+  tenantId: string,
+  options: {
+    query: Partial<UseQueryOptions<Awaited<ReturnType<typeof tenantsUsersList>>, TError, TData>> &
+      Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof tenantsUsersList>>,
           TError,
           Awaited<ReturnType<typeof tenantsUsersList>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useTenantsUsersList<TData = Awaited<ReturnType<typeof tenantsUsersList>>, TError = ErrorResponse>(
- tenantId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof tenantsUsersList>>, TError, TData>> & Pick<
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useTenantsUsersList<
+  TData = Awaited<ReturnType<typeof tenantsUsersList>>,
+  TError = ErrorResponse
+>(
+  tenantId: string,
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof tenantsUsersList>>, TError, TData>> &
+      Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof tenantsUsersList>>,
           TError,
           Awaited<ReturnType<typeof tenantsUsersList>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useTenantsUsersList<TData = Awaited<ReturnType<typeof tenantsUsersList>>, TError = ErrorResponse>(
- tenantId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof tenantsUsersList>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useTenantsUsersList<
+  TData = Awaited<ReturnType<typeof tenantsUsersList>>,
+  TError = ErrorResponse
+>(
+  tenantId: string,
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof tenantsUsersList>>, TError, TData>>;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 /**
  * @summary List tenant users by tenant id
  */
 
-export function useTenantsUsersList<TData = Awaited<ReturnType<typeof tenantsUsersList>>, TError = ErrorResponse>(
- tenantId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof tenantsUsersList>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient 
- ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+export function useTenantsUsersList<
+  TData = Awaited<ReturnType<typeof tenantsUsersList>>,
+  TError = ErrorResponse
+>(
+  tenantId: string,
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof tenantsUsersList>>, TError, TData>>;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+  const queryOptions = getTenantsUsersListQueryOptions(tenantId, options);
 
-  const queryOptions = getTenantsUsersListQueryOptions(tenantId,options)
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+  };
 
-  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-
-  query.queryKey = queryOptions.queryKey ;
+  query.queryKey = queryOptions.queryKey;
 
   return query;
 }
-
-
-
-
 
 /**
  * Accepts either a single user object or a non-empty list of user objects.
  * @summary Create tenant user by tenant id
  */
 export type tenantsUsersCreateResponse201 = {
-  data: UserCreate
-  status: 201
-}
+  data: UserCreate;
+  status: 201;
+};
 
 export type tenantsUsersCreateResponse400 = {
-  data: ErrorResponse
-  status: 400
-}
+  data: ErrorResponse;
+  status: 400;
+};
 
 export type tenantsUsersCreateResponse403 = {
-  data: ErrorResponse
-  status: 403
-}
-    
-export type tenantsUsersCreateResponseSuccess = (tenantsUsersCreateResponse201) & {
-  headers: Headers;
-};
-export type tenantsUsersCreateResponseError = (tenantsUsersCreateResponse400 | tenantsUsersCreateResponse403) & {
-  headers: Headers;
+  data: ErrorResponse;
+  status: 403;
 };
 
-export type tenantsUsersCreateResponse = (tenantsUsersCreateResponseSuccess | tenantsUsersCreateResponseError)
+export type tenantsUsersCreateResponseSuccess = tenantsUsersCreateResponse201 & {
+  headers: Headers;
+};
+export type tenantsUsersCreateResponseError = (
+  | tenantsUsersCreateResponse400
+  | tenantsUsersCreateResponse403
+) & {
+  headers: Headers;
+};
 
-export const getTenantsUsersCreateUrl = (tenantId: string,) => {
+export type tenantsUsersCreateResponse =
+  | tenantsUsersCreateResponseSuccess
+  | tenantsUsersCreateResponseError;
 
+export const getTenantsUsersCreateUrl = (tenantId: string) => {
+  return `/api/tenants/${tenantId}/users/`;
+};
 
-  
-
-  return `/api/tenants/${tenantId}/users/`
-}
-
-export const tenantsUsersCreate = async (tenantId: string,
-    userCreate: NonReadonly<UserCreate>, options?: RequestInit): Promise<tenantsUsersCreateResponse> => {
-  
-  return customFetch<tenantsUsersCreateResponse>(getTenantsUsersCreateUrl(tenantId),
-  {      
+export const tenantsUsersCreate = async (
+  tenantId: string,
+  userCreate: NonReadonly<UserCreate>,
+  options?: RequestInit
+): Promise<tenantsUsersCreateResponse> => {
+  return customFetch<tenantsUsersCreateResponse>(getTenantsUsersCreateUrl(tenantId), {
     ...options,
     method: 'POST',
     headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(
-      userCreate,)
-  }
-);}
+    body: JSON.stringify(userCreate)
+  });
+};
 
+export const getTenantsUsersCreateMutationOptions = <
+  TError = ErrorResponse,
+  TContext = unknown
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof tenantsUsersCreate>>,
+    TError,
+    { tenantId: string; data: NonReadonly<UserCreate> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof tenantsUsersCreate>>,
+  TError,
+  { tenantId: string; data: NonReadonly<UserCreate> },
+  TContext
+> => {
+  const mutationKey = ['tenantsUsersCreate'];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
 
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof tenantsUsersCreate>>,
+    { tenantId: string; data: NonReadonly<UserCreate> }
+  > = (props) => {
+    const { tenantId, data } = props ?? {};
 
+    return tenantsUsersCreate(tenantId, data, requestOptions);
+  };
 
-export const getTenantsUsersCreateMutationOptions = <TError = ErrorResponse,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof tenantsUsersCreate>>, TError,{tenantId: string;data: NonReadonly<UserCreate>}, TContext>, request?: SecondParameter<typeof customFetch>}
-): UseMutationOptions<Awaited<ReturnType<typeof tenantsUsersCreate>>, TError,{tenantId: string;data: NonReadonly<UserCreate>}, TContext> => {
+  return { mutationFn, ...mutationOptions };
+};
 
-const mutationKey = ['tenantsUsersCreate'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
+export type TenantsUsersCreateMutationResult = NonNullable<
+  Awaited<ReturnType<typeof tenantsUsersCreate>>
+>;
+export type TenantsUsersCreateMutationBody = NonReadonly<UserCreate>;
+export type TenantsUsersCreateMutationError = ErrorResponse;
 
-      
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof tenantsUsersCreate>>, {tenantId: string;data: NonReadonly<UserCreate>}> = (props) => {
-          const {tenantId,data} = props ?? {};
-
-          return  tenantsUsersCreate(tenantId,data,requestOptions)
-        }
-
-        
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type TenantsUsersCreateMutationResult = NonNullable<Awaited<ReturnType<typeof tenantsUsersCreate>>>
-    export type TenantsUsersCreateMutationBody = NonReadonly<UserCreate>
-    export type TenantsUsersCreateMutationError = ErrorResponse
-
-    /**
+/**
  * @summary Create tenant user by tenant id
  */
-export const useTenantsUsersCreate = <TError = ErrorResponse,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof tenantsUsersCreate>>, TError,{tenantId: string;data: NonReadonly<UserCreate>}, TContext>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof tenantsUsersCreate>>,
-        TError,
-        {tenantId: string;data: NonReadonly<UserCreate>},
-        TContext
-      > => {
+export const useTenantsUsersCreate = <TError = ErrorResponse, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof tenantsUsersCreate>>,
+      TError,
+      { tenantId: string; data: NonReadonly<UserCreate> },
+      TContext
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseMutationResult<
+  Awaited<ReturnType<typeof tenantsUsersCreate>>,
+  TError,
+  { tenantId: string; data: NonReadonly<UserCreate> },
+  TContext
+> => {
+  const mutationOptions = getTenantsUsersCreateMutationOptions(options);
 
-      const mutationOptions = getTenantsUsersCreateMutationOptions(options);
+  return useMutation(mutationOptions, queryClient);
+};
 
-      return useMutation(mutationOptions, queryClient);
-    }
-    
 /**
  * @summary Get current tenant
  */
 export type tenantsCurrentRetrieveResponse200 = {
-  data: Tenant
-  status: 200
-}
+  data: Tenant;
+  status: 200;
+};
 
 export type tenantsCurrentRetrieveResponse403 = {
-  data: TenantErrorResponse
-  status: 403
-}
-    
-export type tenantsCurrentRetrieveResponseSuccess = (tenantsCurrentRetrieveResponse200) & {
+  data: TenantErrorResponse;
+  status: 403;
+};
+
+export type tenantsCurrentRetrieveResponseSuccess = tenantsCurrentRetrieveResponse200 & {
   headers: Headers;
 };
-export type tenantsCurrentRetrieveResponseError = (tenantsCurrentRetrieveResponse403) & {
+export type tenantsCurrentRetrieveResponseError = tenantsCurrentRetrieveResponse403 & {
   headers: Headers;
 };
 
-export type tenantsCurrentRetrieveResponse = (tenantsCurrentRetrieveResponseSuccess | tenantsCurrentRetrieveResponseError)
+export type tenantsCurrentRetrieveResponse =
+  | tenantsCurrentRetrieveResponseSuccess
+  | tenantsCurrentRetrieveResponseError;
 
 export const getTenantsCurrentRetrieveUrl = () => {
+  return `/api/tenants/current/`;
+};
 
-
-  
-
-  return `/api/tenants/current/`
-}
-
-export const tenantsCurrentRetrieve = async ( options?: RequestInit): Promise<tenantsCurrentRetrieveResponse> => {
-  
-  return customFetch<tenantsCurrentRetrieveResponse>(getTenantsCurrentRetrieveUrl(),
-  {      
+export const tenantsCurrentRetrieve = async (
+  options?: RequestInit
+): Promise<tenantsCurrentRetrieveResponse> => {
+  return customFetch<tenantsCurrentRetrieveResponse>(getTenantsCurrentRetrieveUrl(), {
     ...options,
     method: 'GET'
-    
-    
-  }
-);}
-
-
-
-
+  });
+};
 
 export const getTenantsCurrentRetrieveInfiniteQueryKey = () => {
-    return [
-    'infinite', `/api/tenants/current/`
-    ] as const;
-    }
+  return ['infinite', `/api/tenants/current/`] as const;
+};
 
 export const getTenantsCurrentRetrieveQueryKey = () => {
-    return [
-    `/api/tenants/current/`
-    ] as const;
-    }
+  return [`/api/tenants/current/`] as const;
+};
 
-    
-export const getTenantsCurrentRetrieveInfiniteQueryOptions = <TData = InfiniteData<Awaited<ReturnType<typeof tenantsCurrentRetrieve>>>, TError = TenantErrorResponse>( options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof tenantsCurrentRetrieve>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
-) => {
+export const getTenantsCurrentRetrieveInfiniteQueryOptions = <
+  TData = InfiniteData<Awaited<ReturnType<typeof tenantsCurrentRetrieve>>>,
+  TError = TenantErrorResponse
+>(options?: {
+  query?: Partial<
+    UseInfiniteQueryOptions<Awaited<ReturnType<typeof tenantsCurrentRetrieve>>, TError, TData>
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
 
-const {query: queryOptions, request: requestOptions} = options ?? {};
+  const queryKey = queryOptions?.queryKey ?? getTenantsCurrentRetrieveInfiniteQueryKey();
 
-  const queryKey =  queryOptions?.queryKey ?? getTenantsCurrentRetrieveInfiniteQueryKey();
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof tenantsCurrentRetrieve>>> = ({ signal }) =>
+    tenantsCurrentRetrieve({ signal, ...requestOptions });
 
-  
+  return { queryKey, queryFn, ...queryOptions } as UseInfiniteQueryOptions<
+    Awaited<ReturnType<typeof tenantsCurrentRetrieve>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof tenantsCurrentRetrieve>>> = ({ signal }) => tenantsCurrentRetrieve({ signal, ...requestOptions });
+export type TenantsCurrentRetrieveInfiniteQueryResult = NonNullable<
+  Awaited<ReturnType<typeof tenantsCurrentRetrieve>>
+>;
+export type TenantsCurrentRetrieveInfiniteQueryError = TenantErrorResponse;
 
-      
-
-      
-
-   return  { queryKey, queryFn, ...queryOptions} as UseInfiniteQueryOptions<Awaited<ReturnType<typeof tenantsCurrentRetrieve>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type TenantsCurrentRetrieveInfiniteQueryResult = NonNullable<Awaited<ReturnType<typeof tenantsCurrentRetrieve>>>
-export type TenantsCurrentRetrieveInfiniteQueryError = TenantErrorResponse
-
-
-export function useTenantsCurrentRetrieveInfinite<TData = InfiniteData<Awaited<ReturnType<typeof tenantsCurrentRetrieve>>>, TError = TenantErrorResponse>(
-  options: { query:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof tenantsCurrentRetrieve>>, TError, TData>> & Pick<
+export function useTenantsCurrentRetrieveInfinite<
+  TData = InfiniteData<Awaited<ReturnType<typeof tenantsCurrentRetrieve>>>,
+  TError = TenantErrorResponse
+>(
+  options: {
+    query: Partial<
+      UseInfiniteQueryOptions<Awaited<ReturnType<typeof tenantsCurrentRetrieve>>, TError, TData>
+    > &
+      Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof tenantsCurrentRetrieve>>,
           TError,
           Awaited<ReturnType<typeof tenantsCurrentRetrieve>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  DefinedUseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useTenantsCurrentRetrieveInfinite<TData = InfiniteData<Awaited<ReturnType<typeof tenantsCurrentRetrieve>>>, TError = TenantErrorResponse>(
-  options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof tenantsCurrentRetrieve>>, TError, TData>> & Pick<
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): DefinedUseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useTenantsCurrentRetrieveInfinite<
+  TData = InfiniteData<Awaited<ReturnType<typeof tenantsCurrentRetrieve>>>,
+  TError = TenantErrorResponse
+>(
+  options?: {
+    query?: Partial<
+      UseInfiniteQueryOptions<Awaited<ReturnType<typeof tenantsCurrentRetrieve>>, TError, TData>
+    > &
+      Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof tenantsCurrentRetrieve>>,
           TError,
           Awaited<ReturnType<typeof tenantsCurrentRetrieve>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useTenantsCurrentRetrieveInfinite<TData = InfiniteData<Awaited<ReturnType<typeof tenantsCurrentRetrieve>>>, TError = TenantErrorResponse>(
-  options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof tenantsCurrentRetrieve>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useTenantsCurrentRetrieveInfinite<
+  TData = InfiniteData<Awaited<ReturnType<typeof tenantsCurrentRetrieve>>>,
+  TError = TenantErrorResponse
+>(
+  options?: {
+    query?: Partial<
+      UseInfiniteQueryOptions<Awaited<ReturnType<typeof tenantsCurrentRetrieve>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 /**
  * @summary Get current tenant
  */
 
-export function useTenantsCurrentRetrieveInfinite<TData = InfiniteData<Awaited<ReturnType<typeof tenantsCurrentRetrieve>>>, TError = TenantErrorResponse>(
-  options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof tenantsCurrentRetrieve>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient 
- ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+export function useTenantsCurrentRetrieveInfinite<
+  TData = InfiniteData<Awaited<ReturnType<typeof tenantsCurrentRetrieve>>>,
+  TError = TenantErrorResponse
+>(
+  options?: {
+    query?: Partial<
+      UseInfiniteQueryOptions<Awaited<ReturnType<typeof tenantsCurrentRetrieve>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+  const queryOptions = getTenantsCurrentRetrieveInfiniteQueryOptions(options);
 
-  const queryOptions = getTenantsCurrentRetrieveInfiniteQueryOptions(options)
+  const query = useInfiniteQuery(queryOptions, queryClient) as UseInfiniteQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
 
-  const query = useInfiniteQuery(queryOptions, queryClient) as  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-
-  query.queryKey = queryOptions.queryKey ;
+  query.queryKey = queryOptions.queryKey;
 
   return query;
 }
 
+export const getTenantsCurrentRetrieveQueryOptions = <
+  TData = Awaited<ReturnType<typeof tenantsCurrentRetrieve>>,
+  TError = TenantErrorResponse
+>(options?: {
+  query?: Partial<
+    UseQueryOptions<Awaited<ReturnType<typeof tenantsCurrentRetrieve>>, TError, TData>
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
 
+  const queryKey = queryOptions?.queryKey ?? getTenantsCurrentRetrieveQueryKey();
 
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof tenantsCurrentRetrieve>>> = ({ signal }) =>
+    tenantsCurrentRetrieve({ signal, ...requestOptions });
 
-export const getTenantsCurrentRetrieveQueryOptions = <TData = Awaited<ReturnType<typeof tenantsCurrentRetrieve>>, TError = TenantErrorResponse>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof tenantsCurrentRetrieve>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
-) => {
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof tenantsCurrentRetrieve>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
 
-const {query: queryOptions, request: requestOptions} = options ?? {};
+export type TenantsCurrentRetrieveQueryResult = NonNullable<
+  Awaited<ReturnType<typeof tenantsCurrentRetrieve>>
+>;
+export type TenantsCurrentRetrieveQueryError = TenantErrorResponse;
 
-  const queryKey =  queryOptions?.queryKey ?? getTenantsCurrentRetrieveQueryKey();
-
-  
-
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof tenantsCurrentRetrieve>>> = ({ signal }) => tenantsCurrentRetrieve({ signal, ...requestOptions });
-
-      
-
-      
-
-   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof tenantsCurrentRetrieve>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type TenantsCurrentRetrieveQueryResult = NonNullable<Awaited<ReturnType<typeof tenantsCurrentRetrieve>>>
-export type TenantsCurrentRetrieveQueryError = TenantErrorResponse
-
-
-export function useTenantsCurrentRetrieve<TData = Awaited<ReturnType<typeof tenantsCurrentRetrieve>>, TError = TenantErrorResponse>(
-  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof tenantsCurrentRetrieve>>, TError, TData>> & Pick<
+export function useTenantsCurrentRetrieve<
+  TData = Awaited<ReturnType<typeof tenantsCurrentRetrieve>>,
+  TError = TenantErrorResponse
+>(
+  options: {
+    query: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof tenantsCurrentRetrieve>>, TError, TData>
+    > &
+      Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof tenantsCurrentRetrieve>>,
           TError,
           Awaited<ReturnType<typeof tenantsCurrentRetrieve>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useTenantsCurrentRetrieve<TData = Awaited<ReturnType<typeof tenantsCurrentRetrieve>>, TError = TenantErrorResponse>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof tenantsCurrentRetrieve>>, TError, TData>> & Pick<
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useTenantsCurrentRetrieve<
+  TData = Awaited<ReturnType<typeof tenantsCurrentRetrieve>>,
+  TError = TenantErrorResponse
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof tenantsCurrentRetrieve>>, TError, TData>
+    > &
+      Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof tenantsCurrentRetrieve>>,
           TError,
           Awaited<ReturnType<typeof tenantsCurrentRetrieve>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useTenantsCurrentRetrieve<TData = Awaited<ReturnType<typeof tenantsCurrentRetrieve>>, TError = TenantErrorResponse>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof tenantsCurrentRetrieve>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useTenantsCurrentRetrieve<
+  TData = Awaited<ReturnType<typeof tenantsCurrentRetrieve>>,
+  TError = TenantErrorResponse
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof tenantsCurrentRetrieve>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 /**
  * @summary Get current tenant
  */
 
-export function useTenantsCurrentRetrieve<TData = Awaited<ReturnType<typeof tenantsCurrentRetrieve>>, TError = TenantErrorResponse>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof tenantsCurrentRetrieve>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient 
- ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+export function useTenantsCurrentRetrieve<
+  TData = Awaited<ReturnType<typeof tenantsCurrentRetrieve>>,
+  TError = TenantErrorResponse
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof tenantsCurrentRetrieve>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+  const queryOptions = getTenantsCurrentRetrieveQueryOptions(options);
 
-  const queryOptions = getTenantsCurrentRetrieveQueryOptions(options)
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+  };
 
-  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-
-  query.queryKey = queryOptions.queryKey ;
+  query.queryKey = queryOptions.queryKey;
 
   return query;
 }
-
-
-
-
 
 /**
  * @summary Patch current tenant
  */
 export type tenantsCurrentPartialUpdateResponse200 = {
-  data: Tenant
-  status: 200
-}
+  data: Tenant;
+  status: 200;
+};
 
 export type tenantsCurrentPartialUpdateResponse400 = {
-  data: TenantErrorResponse
-  status: 400
-}
+  data: TenantErrorResponse;
+  status: 400;
+};
 
 export type tenantsCurrentPartialUpdateResponse403 = {
-  data: TenantErrorResponse
-  status: 403
-}
-    
-export type tenantsCurrentPartialUpdateResponseSuccess = (tenantsCurrentPartialUpdateResponse200) & {
+  data: TenantErrorResponse;
+  status: 403;
+};
+
+export type tenantsCurrentPartialUpdateResponseSuccess = tenantsCurrentPartialUpdateResponse200 & {
   headers: Headers;
 };
-export type tenantsCurrentPartialUpdateResponseError = (tenantsCurrentPartialUpdateResponse400 | tenantsCurrentPartialUpdateResponse403) & {
+export type tenantsCurrentPartialUpdateResponseError = (
+  | tenantsCurrentPartialUpdateResponse400
+  | tenantsCurrentPartialUpdateResponse403
+) & {
   headers: Headers;
 };
 
-export type tenantsCurrentPartialUpdateResponse = (tenantsCurrentPartialUpdateResponseSuccess | tenantsCurrentPartialUpdateResponseError)
+export type tenantsCurrentPartialUpdateResponse =
+  | tenantsCurrentPartialUpdateResponseSuccess
+  | tenantsCurrentPartialUpdateResponseError;
 
 export const getTenantsCurrentPartialUpdateUrl = () => {
+  return `/api/tenants/current/`;
+};
 
-
-  
-
-  return `/api/tenants/current/`
-}
-
-export const tenantsCurrentPartialUpdate = async (patchedTenant: NonReadonly<PatchedTenant>, options?: RequestInit): Promise<tenantsCurrentPartialUpdateResponse> => {
-  
-  return customFetch<tenantsCurrentPartialUpdateResponse>(getTenantsCurrentPartialUpdateUrl(),
-  {      
+export const tenantsCurrentPartialUpdate = async (
+  patchedTenant: NonReadonly<PatchedTenant>,
+  options?: RequestInit
+): Promise<tenantsCurrentPartialUpdateResponse> => {
+  return customFetch<tenantsCurrentPartialUpdateResponse>(getTenantsCurrentPartialUpdateUrl(), {
     ...options,
     method: 'PATCH',
     headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(
-      patchedTenant,)
-  }
-);}
+    body: JSON.stringify(patchedTenant)
+  });
+};
 
+export const getTenantsCurrentPartialUpdateMutationOptions = <
+  TError = TenantErrorResponse,
+  TContext = unknown
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof tenantsCurrentPartialUpdate>>,
+    TError,
+    { data: NonReadonly<PatchedTenant> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof tenantsCurrentPartialUpdate>>,
+  TError,
+  { data: NonReadonly<PatchedTenant> },
+  TContext
+> => {
+  const mutationKey = ['tenantsCurrentPartialUpdate'];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
 
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof tenantsCurrentPartialUpdate>>,
+    { data: NonReadonly<PatchedTenant> }
+  > = (props) => {
+    const { data } = props ?? {};
 
+    return tenantsCurrentPartialUpdate(data, requestOptions);
+  };
 
-export const getTenantsCurrentPartialUpdateMutationOptions = <TError = TenantErrorResponse,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof tenantsCurrentPartialUpdate>>, TError,{data: NonReadonly<PatchedTenant>}, TContext>, request?: SecondParameter<typeof customFetch>}
-): UseMutationOptions<Awaited<ReturnType<typeof tenantsCurrentPartialUpdate>>, TError,{data: NonReadonly<PatchedTenant>}, TContext> => {
+  return { mutationFn, ...mutationOptions };
+};
 
-const mutationKey = ['tenantsCurrentPartialUpdate'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
+export type TenantsCurrentPartialUpdateMutationResult = NonNullable<
+  Awaited<ReturnType<typeof tenantsCurrentPartialUpdate>>
+>;
+export type TenantsCurrentPartialUpdateMutationBody = NonReadonly<PatchedTenant>;
+export type TenantsCurrentPartialUpdateMutationError = TenantErrorResponse;
 
-      
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof tenantsCurrentPartialUpdate>>, {data: NonReadonly<PatchedTenant>}> = (props) => {
-          const {data} = props ?? {};
-
-          return  tenantsCurrentPartialUpdate(data,requestOptions)
-        }
-
-        
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type TenantsCurrentPartialUpdateMutationResult = NonNullable<Awaited<ReturnType<typeof tenantsCurrentPartialUpdate>>>
-    export type TenantsCurrentPartialUpdateMutationBody = NonReadonly<PatchedTenant>
-    export type TenantsCurrentPartialUpdateMutationError = TenantErrorResponse
-
-    /**
+/**
  * @summary Patch current tenant
  */
-export const useTenantsCurrentPartialUpdate = <TError = TenantErrorResponse,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof tenantsCurrentPartialUpdate>>, TError,{data: NonReadonly<PatchedTenant>}, TContext>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof tenantsCurrentPartialUpdate>>,
-        TError,
-        {data: NonReadonly<PatchedTenant>},
-        TContext
-      > => {
+export const useTenantsCurrentPartialUpdate = <TError = TenantErrorResponse, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof tenantsCurrentPartialUpdate>>,
+      TError,
+      { data: NonReadonly<PatchedTenant> },
+      TContext
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseMutationResult<
+  Awaited<ReturnType<typeof tenantsCurrentPartialUpdate>>,
+  TError,
+  { data: NonReadonly<PatchedTenant> },
+  TContext
+> => {
+  const mutationOptions = getTenantsCurrentPartialUpdateMutationOptions(options);
 
-      const mutationOptions = getTenantsCurrentPartialUpdateMutationOptions(options);
+  return useMutation(mutationOptions, queryClient);
+};
 
-      return useMutation(mutationOptions, queryClient);
-    }
-    
 /**
  * @summary Get current tenant settings
  */
 export type tenantsCurrentSettingsRetrieveResponse200 = {
-  data: TenantSettings
-  status: 200
-}
+  data: TenantSettings;
+  status: 200;
+};
 
 export type tenantsCurrentSettingsRetrieveResponse403 = {
-  data: TenantErrorResponse
-  status: 403
-}
-    
-export type tenantsCurrentSettingsRetrieveResponseSuccess = (tenantsCurrentSettingsRetrieveResponse200) & {
-  headers: Headers;
-};
-export type tenantsCurrentSettingsRetrieveResponseError = (tenantsCurrentSettingsRetrieveResponse403) & {
-  headers: Headers;
+  data: TenantErrorResponse;
+  status: 403;
 };
 
-export type tenantsCurrentSettingsRetrieveResponse = (tenantsCurrentSettingsRetrieveResponseSuccess | tenantsCurrentSettingsRetrieveResponseError)
+export type tenantsCurrentSettingsRetrieveResponseSuccess =
+  tenantsCurrentSettingsRetrieveResponse200 & {
+    headers: Headers;
+  };
+export type tenantsCurrentSettingsRetrieveResponseError =
+  tenantsCurrentSettingsRetrieveResponse403 & {
+    headers: Headers;
+  };
+
+export type tenantsCurrentSettingsRetrieveResponse =
+  | tenantsCurrentSettingsRetrieveResponseSuccess
+  | tenantsCurrentSettingsRetrieveResponseError;
 
 export const getTenantsCurrentSettingsRetrieveUrl = () => {
+  return `/api/tenants/current/settings/`;
+};
 
-
-  
-
-  return `/api/tenants/current/settings/`
-}
-
-export const tenantsCurrentSettingsRetrieve = async ( options?: RequestInit): Promise<tenantsCurrentSettingsRetrieveResponse> => {
-  
-  return customFetch<tenantsCurrentSettingsRetrieveResponse>(getTenantsCurrentSettingsRetrieveUrl(),
-  {      
-    ...options,
-    method: 'GET'
-    
-    
-  }
-);}
-
-
-
-
+export const tenantsCurrentSettingsRetrieve = async (
+  options?: RequestInit
+): Promise<tenantsCurrentSettingsRetrieveResponse> => {
+  return customFetch<tenantsCurrentSettingsRetrieveResponse>(
+    getTenantsCurrentSettingsRetrieveUrl(),
+    {
+      ...options,
+      method: 'GET'
+    }
+  );
+};
 
 export const getTenantsCurrentSettingsRetrieveInfiniteQueryKey = () => {
-    return [
-    'infinite', `/api/tenants/current/settings/`
-    ] as const;
-    }
+  return ['infinite', `/api/tenants/current/settings/`] as const;
+};
 
 export const getTenantsCurrentSettingsRetrieveQueryKey = () => {
-    return [
-    `/api/tenants/current/settings/`
-    ] as const;
-    }
+  return [`/api/tenants/current/settings/`] as const;
+};
 
-    
-export const getTenantsCurrentSettingsRetrieveInfiniteQueryOptions = <TData = InfiniteData<Awaited<ReturnType<typeof tenantsCurrentSettingsRetrieve>>>, TError = TenantErrorResponse>( options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof tenantsCurrentSettingsRetrieve>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
-) => {
+export const getTenantsCurrentSettingsRetrieveInfiniteQueryOptions = <
+  TData = InfiniteData<Awaited<ReturnType<typeof tenantsCurrentSettingsRetrieve>>>,
+  TError = TenantErrorResponse
+>(options?: {
+  query?: Partial<
+    UseInfiniteQueryOptions<
+      Awaited<ReturnType<typeof tenantsCurrentSettingsRetrieve>>,
+      TError,
+      TData
+    >
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
 
-const {query: queryOptions, request: requestOptions} = options ?? {};
+  const queryKey = queryOptions?.queryKey ?? getTenantsCurrentSettingsRetrieveInfiniteQueryKey();
 
-  const queryKey =  queryOptions?.queryKey ?? getTenantsCurrentSettingsRetrieveInfiniteQueryKey();
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof tenantsCurrentSettingsRetrieve>>> = ({
+    signal
+  }) => tenantsCurrentSettingsRetrieve({ signal, ...requestOptions });
 
-  
+  return { queryKey, queryFn, ...queryOptions } as UseInfiniteQueryOptions<
+    Awaited<ReturnType<typeof tenantsCurrentSettingsRetrieve>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof tenantsCurrentSettingsRetrieve>>> = ({ signal }) => tenantsCurrentSettingsRetrieve({ signal, ...requestOptions });
+export type TenantsCurrentSettingsRetrieveInfiniteQueryResult = NonNullable<
+  Awaited<ReturnType<typeof tenantsCurrentSettingsRetrieve>>
+>;
+export type TenantsCurrentSettingsRetrieveInfiniteQueryError = TenantErrorResponse;
 
-      
-
-      
-
-   return  { queryKey, queryFn, ...queryOptions} as UseInfiniteQueryOptions<Awaited<ReturnType<typeof tenantsCurrentSettingsRetrieve>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type TenantsCurrentSettingsRetrieveInfiniteQueryResult = NonNullable<Awaited<ReturnType<typeof tenantsCurrentSettingsRetrieve>>>
-export type TenantsCurrentSettingsRetrieveInfiniteQueryError = TenantErrorResponse
-
-
-export function useTenantsCurrentSettingsRetrieveInfinite<TData = InfiniteData<Awaited<ReturnType<typeof tenantsCurrentSettingsRetrieve>>>, TError = TenantErrorResponse>(
-  options: { query:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof tenantsCurrentSettingsRetrieve>>, TError, TData>> & Pick<
+export function useTenantsCurrentSettingsRetrieveInfinite<
+  TData = InfiniteData<Awaited<ReturnType<typeof tenantsCurrentSettingsRetrieve>>>,
+  TError = TenantErrorResponse
+>(
+  options: {
+    query: Partial<
+      UseInfiniteQueryOptions<
+        Awaited<ReturnType<typeof tenantsCurrentSettingsRetrieve>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof tenantsCurrentSettingsRetrieve>>,
           TError,
           Awaited<ReturnType<typeof tenantsCurrentSettingsRetrieve>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  DefinedUseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useTenantsCurrentSettingsRetrieveInfinite<TData = InfiniteData<Awaited<ReturnType<typeof tenantsCurrentSettingsRetrieve>>>, TError = TenantErrorResponse>(
-  options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof tenantsCurrentSettingsRetrieve>>, TError, TData>> & Pick<
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): DefinedUseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useTenantsCurrentSettingsRetrieveInfinite<
+  TData = InfiniteData<Awaited<ReturnType<typeof tenantsCurrentSettingsRetrieve>>>,
+  TError = TenantErrorResponse
+>(
+  options?: {
+    query?: Partial<
+      UseInfiniteQueryOptions<
+        Awaited<ReturnType<typeof tenantsCurrentSettingsRetrieve>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof tenantsCurrentSettingsRetrieve>>,
           TError,
           Awaited<ReturnType<typeof tenantsCurrentSettingsRetrieve>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useTenantsCurrentSettingsRetrieveInfinite<TData = InfiniteData<Awaited<ReturnType<typeof tenantsCurrentSettingsRetrieve>>>, TError = TenantErrorResponse>(
-  options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof tenantsCurrentSettingsRetrieve>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useTenantsCurrentSettingsRetrieveInfinite<
+  TData = InfiniteData<Awaited<ReturnType<typeof tenantsCurrentSettingsRetrieve>>>,
+  TError = TenantErrorResponse
+>(
+  options?: {
+    query?: Partial<
+      UseInfiniteQueryOptions<
+        Awaited<ReturnType<typeof tenantsCurrentSettingsRetrieve>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 /**
  * @summary Get current tenant settings
  */
 
-export function useTenantsCurrentSettingsRetrieveInfinite<TData = InfiniteData<Awaited<ReturnType<typeof tenantsCurrentSettingsRetrieve>>>, TError = TenantErrorResponse>(
-  options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof tenantsCurrentSettingsRetrieve>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient 
- ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+export function useTenantsCurrentSettingsRetrieveInfinite<
+  TData = InfiniteData<Awaited<ReturnType<typeof tenantsCurrentSettingsRetrieve>>>,
+  TError = TenantErrorResponse
+>(
+  options?: {
+    query?: Partial<
+      UseInfiniteQueryOptions<
+        Awaited<ReturnType<typeof tenantsCurrentSettingsRetrieve>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+  const queryOptions = getTenantsCurrentSettingsRetrieveInfiniteQueryOptions(options);
 
-  const queryOptions = getTenantsCurrentSettingsRetrieveInfiniteQueryOptions(options)
+  const query = useInfiniteQuery(queryOptions, queryClient) as UseInfiniteQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
 
-  const query = useInfiniteQuery(queryOptions, queryClient) as  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-
-  query.queryKey = queryOptions.queryKey ;
+  query.queryKey = queryOptions.queryKey;
 
   return query;
 }
 
+export const getTenantsCurrentSettingsRetrieveQueryOptions = <
+  TData = Awaited<ReturnType<typeof tenantsCurrentSettingsRetrieve>>,
+  TError = TenantErrorResponse
+>(options?: {
+  query?: Partial<
+    UseQueryOptions<Awaited<ReturnType<typeof tenantsCurrentSettingsRetrieve>>, TError, TData>
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
 
+  const queryKey = queryOptions?.queryKey ?? getTenantsCurrentSettingsRetrieveQueryKey();
 
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof tenantsCurrentSettingsRetrieve>>> = ({
+    signal
+  }) => tenantsCurrentSettingsRetrieve({ signal, ...requestOptions });
 
-export const getTenantsCurrentSettingsRetrieveQueryOptions = <TData = Awaited<ReturnType<typeof tenantsCurrentSettingsRetrieve>>, TError = TenantErrorResponse>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof tenantsCurrentSettingsRetrieve>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
-) => {
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof tenantsCurrentSettingsRetrieve>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
 
-const {query: queryOptions, request: requestOptions} = options ?? {};
+export type TenantsCurrentSettingsRetrieveQueryResult = NonNullable<
+  Awaited<ReturnType<typeof tenantsCurrentSettingsRetrieve>>
+>;
+export type TenantsCurrentSettingsRetrieveQueryError = TenantErrorResponse;
 
-  const queryKey =  queryOptions?.queryKey ?? getTenantsCurrentSettingsRetrieveQueryKey();
-
-  
-
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof tenantsCurrentSettingsRetrieve>>> = ({ signal }) => tenantsCurrentSettingsRetrieve({ signal, ...requestOptions });
-
-      
-
-      
-
-   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof tenantsCurrentSettingsRetrieve>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type TenantsCurrentSettingsRetrieveQueryResult = NonNullable<Awaited<ReturnType<typeof tenantsCurrentSettingsRetrieve>>>
-export type TenantsCurrentSettingsRetrieveQueryError = TenantErrorResponse
-
-
-export function useTenantsCurrentSettingsRetrieve<TData = Awaited<ReturnType<typeof tenantsCurrentSettingsRetrieve>>, TError = TenantErrorResponse>(
-  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof tenantsCurrentSettingsRetrieve>>, TError, TData>> & Pick<
+export function useTenantsCurrentSettingsRetrieve<
+  TData = Awaited<ReturnType<typeof tenantsCurrentSettingsRetrieve>>,
+  TError = TenantErrorResponse
+>(
+  options: {
+    query: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof tenantsCurrentSettingsRetrieve>>, TError, TData>
+    > &
+      Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof tenantsCurrentSettingsRetrieve>>,
           TError,
           Awaited<ReturnType<typeof tenantsCurrentSettingsRetrieve>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useTenantsCurrentSettingsRetrieve<TData = Awaited<ReturnType<typeof tenantsCurrentSettingsRetrieve>>, TError = TenantErrorResponse>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof tenantsCurrentSettingsRetrieve>>, TError, TData>> & Pick<
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useTenantsCurrentSettingsRetrieve<
+  TData = Awaited<ReturnType<typeof tenantsCurrentSettingsRetrieve>>,
+  TError = TenantErrorResponse
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof tenantsCurrentSettingsRetrieve>>, TError, TData>
+    > &
+      Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof tenantsCurrentSettingsRetrieve>>,
           TError,
           Awaited<ReturnType<typeof tenantsCurrentSettingsRetrieve>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useTenantsCurrentSettingsRetrieve<TData = Awaited<ReturnType<typeof tenantsCurrentSettingsRetrieve>>, TError = TenantErrorResponse>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof tenantsCurrentSettingsRetrieve>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useTenantsCurrentSettingsRetrieve<
+  TData = Awaited<ReturnType<typeof tenantsCurrentSettingsRetrieve>>,
+  TError = TenantErrorResponse
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof tenantsCurrentSettingsRetrieve>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 /**
  * @summary Get current tenant settings
  */
 
-export function useTenantsCurrentSettingsRetrieve<TData = Awaited<ReturnType<typeof tenantsCurrentSettingsRetrieve>>, TError = TenantErrorResponse>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof tenantsCurrentSettingsRetrieve>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient 
- ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+export function useTenantsCurrentSettingsRetrieve<
+  TData = Awaited<ReturnType<typeof tenantsCurrentSettingsRetrieve>>,
+  TError = TenantErrorResponse
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof tenantsCurrentSettingsRetrieve>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+  const queryOptions = getTenantsCurrentSettingsRetrieveQueryOptions(options);
 
-  const queryOptions = getTenantsCurrentSettingsRetrieveQueryOptions(options)
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+  };
 
-  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-
-  query.queryKey = queryOptions.queryKey ;
+  query.queryKey = queryOptions.queryKey;
 
   return query;
 }
-
-
-
-
 
 /**
  * @summary Patch current tenant settings
  */
 export type tenantsCurrentSettingsPartialUpdateResponse200 = {
-  data: TenantSettings
-  status: 200
-}
+  data: TenantSettings;
+  status: 200;
+};
 
 export type tenantsCurrentSettingsPartialUpdateResponse400 = {
-  data: TenantErrorResponse
-  status: 400
-}
+  data: TenantErrorResponse;
+  status: 400;
+};
 
 export type tenantsCurrentSettingsPartialUpdateResponse403 = {
-  data: TenantErrorResponse
-  status: 403
-}
-    
-export type tenantsCurrentSettingsPartialUpdateResponseSuccess = (tenantsCurrentSettingsPartialUpdateResponse200) & {
-  headers: Headers;
+  data: TenantErrorResponse;
+  status: 403;
 };
-export type tenantsCurrentSettingsPartialUpdateResponseError = (tenantsCurrentSettingsPartialUpdateResponse400 | tenantsCurrentSettingsPartialUpdateResponse403) & {
+
+export type tenantsCurrentSettingsPartialUpdateResponseSuccess =
+  tenantsCurrentSettingsPartialUpdateResponse200 & {
+    headers: Headers;
+  };
+export type tenantsCurrentSettingsPartialUpdateResponseError = (
+  | tenantsCurrentSettingsPartialUpdateResponse400
+  | tenantsCurrentSettingsPartialUpdateResponse403
+) & {
   headers: Headers;
 };
 
-export type tenantsCurrentSettingsPartialUpdateResponse = (tenantsCurrentSettingsPartialUpdateResponseSuccess | tenantsCurrentSettingsPartialUpdateResponseError)
+export type tenantsCurrentSettingsPartialUpdateResponse =
+  | tenantsCurrentSettingsPartialUpdateResponseSuccess
+  | tenantsCurrentSettingsPartialUpdateResponseError;
 
 export const getTenantsCurrentSettingsPartialUpdateUrl = () => {
+  return `/api/tenants/current/settings/`;
+};
 
+export const tenantsCurrentSettingsPartialUpdate = async (
+  patchedTenantSettings: NonReadonly<PatchedTenantSettings>,
+  options?: RequestInit
+): Promise<tenantsCurrentSettingsPartialUpdateResponse> => {
+  return customFetch<tenantsCurrentSettingsPartialUpdateResponse>(
+    getTenantsCurrentSettingsPartialUpdateUrl(),
+    {
+      ...options,
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json', ...options?.headers },
+      body: JSON.stringify(patchedTenantSettings)
+    }
+  );
+};
 
-  
+export const getTenantsCurrentSettingsPartialUpdateMutationOptions = <
+  TError = TenantErrorResponse,
+  TContext = unknown
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof tenantsCurrentSettingsPartialUpdate>>,
+    TError,
+    { data: NonReadonly<PatchedTenantSettings> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof tenantsCurrentSettingsPartialUpdate>>,
+  TError,
+  { data: NonReadonly<PatchedTenantSettings> },
+  TContext
+> => {
+  const mutationKey = ['tenantsCurrentSettingsPartialUpdate'];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
 
-  return `/api/tenants/current/settings/`
-}
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof tenantsCurrentSettingsPartialUpdate>>,
+    { data: NonReadonly<PatchedTenantSettings> }
+  > = (props) => {
+    const { data } = props ?? {};
 
-export const tenantsCurrentSettingsPartialUpdate = async (patchedTenantSettings: NonReadonly<PatchedTenantSettings>, options?: RequestInit): Promise<tenantsCurrentSettingsPartialUpdateResponse> => {
-  
-  return customFetch<tenantsCurrentSettingsPartialUpdateResponse>(getTenantsCurrentSettingsPartialUpdateUrl(),
-  {      
-    ...options,
-    method: 'PATCH',
-    headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(
-      patchedTenantSettings,)
-  }
-);}
+    return tenantsCurrentSettingsPartialUpdate(data, requestOptions);
+  };
 
+  return { mutationFn, ...mutationOptions };
+};
 
+export type TenantsCurrentSettingsPartialUpdateMutationResult = NonNullable<
+  Awaited<ReturnType<typeof tenantsCurrentSettingsPartialUpdate>>
+>;
+export type TenantsCurrentSettingsPartialUpdateMutationBody = NonReadonly<PatchedTenantSettings>;
+export type TenantsCurrentSettingsPartialUpdateMutationError = TenantErrorResponse;
 
-
-export const getTenantsCurrentSettingsPartialUpdateMutationOptions = <TError = TenantErrorResponse,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof tenantsCurrentSettingsPartialUpdate>>, TError,{data: NonReadonly<PatchedTenantSettings>}, TContext>, request?: SecondParameter<typeof customFetch>}
-): UseMutationOptions<Awaited<ReturnType<typeof tenantsCurrentSettingsPartialUpdate>>, TError,{data: NonReadonly<PatchedTenantSettings>}, TContext> => {
-
-const mutationKey = ['tenantsCurrentSettingsPartialUpdate'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
-
-      
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof tenantsCurrentSettingsPartialUpdate>>, {data: NonReadonly<PatchedTenantSettings>}> = (props) => {
-          const {data} = props ?? {};
-
-          return  tenantsCurrentSettingsPartialUpdate(data,requestOptions)
-        }
-
-        
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type TenantsCurrentSettingsPartialUpdateMutationResult = NonNullable<Awaited<ReturnType<typeof tenantsCurrentSettingsPartialUpdate>>>
-    export type TenantsCurrentSettingsPartialUpdateMutationBody = NonReadonly<PatchedTenantSettings>
-    export type TenantsCurrentSettingsPartialUpdateMutationError = TenantErrorResponse
-
-    /**
+/**
  * @summary Patch current tenant settings
  */
-export const useTenantsCurrentSettingsPartialUpdate = <TError = TenantErrorResponse,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof tenantsCurrentSettingsPartialUpdate>>, TError,{data: NonReadonly<PatchedTenantSettings>}, TContext>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof tenantsCurrentSettingsPartialUpdate>>,
-        TError,
-        {data: NonReadonly<PatchedTenantSettings>},
-        TContext
-      > => {
+export const useTenantsCurrentSettingsPartialUpdate = <
+  TError = TenantErrorResponse,
+  TContext = unknown
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof tenantsCurrentSettingsPartialUpdate>>,
+      TError,
+      { data: NonReadonly<PatchedTenantSettings> },
+      TContext
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseMutationResult<
+  Awaited<ReturnType<typeof tenantsCurrentSettingsPartialUpdate>>,
+  TError,
+  { data: NonReadonly<PatchedTenantSettings> },
+  TContext
+> => {
+  const mutationOptions = getTenantsCurrentSettingsPartialUpdateMutationOptions(options);
 
-      const mutationOptions = getTenantsCurrentSettingsPartialUpdateMutationOptions(options);
+  return useMutation(mutationOptions, queryClient);
+};
 
-      return useMutation(mutationOptions, queryClient);
-    }
-    
 /**
  * @summary List users in current tenant
  */
 export type tenantsCurrentUsersListResponse200 = {
-  data: UserList[]
-  status: 200
-}
+  data: UserList[];
+  status: 200;
+};
 
 export type tenantsCurrentUsersListResponse403 = {
-  data: ErrorResponse
-  status: 403
-}
-    
-export type tenantsCurrentUsersListResponseSuccess = (tenantsCurrentUsersListResponse200) & {
+  data: ErrorResponse;
+  status: 403;
+};
+
+export type tenantsCurrentUsersListResponseSuccess = tenantsCurrentUsersListResponse200 & {
   headers: Headers;
 };
-export type tenantsCurrentUsersListResponseError = (tenantsCurrentUsersListResponse403) & {
+export type tenantsCurrentUsersListResponseError = tenantsCurrentUsersListResponse403 & {
   headers: Headers;
 };
 
-export type tenantsCurrentUsersListResponse = (tenantsCurrentUsersListResponseSuccess | tenantsCurrentUsersListResponseError)
+export type tenantsCurrentUsersListResponse =
+  | tenantsCurrentUsersListResponseSuccess
+  | tenantsCurrentUsersListResponseError;
 
 export const getTenantsCurrentUsersListUrl = () => {
+  return `/api/tenants/current/users/`;
+};
 
-
-  
-
-  return `/api/tenants/current/users/`
-}
-
-export const tenantsCurrentUsersList = async ( options?: RequestInit): Promise<tenantsCurrentUsersListResponse> => {
-  
-  return customFetch<tenantsCurrentUsersListResponse>(getTenantsCurrentUsersListUrl(),
-  {      
+export const tenantsCurrentUsersList = async (
+  options?: RequestInit
+): Promise<tenantsCurrentUsersListResponse> => {
+  return customFetch<tenantsCurrentUsersListResponse>(getTenantsCurrentUsersListUrl(), {
     ...options,
     method: 'GET'
-    
-    
-  }
-);}
-
-
-
-
+  });
+};
 
 export const getTenantsCurrentUsersListInfiniteQueryKey = () => {
-    return [
-    'infinite', `/api/tenants/current/users/`
-    ] as const;
-    }
+  return ['infinite', `/api/tenants/current/users/`] as const;
+};
 
 export const getTenantsCurrentUsersListQueryKey = () => {
-    return [
-    `/api/tenants/current/users/`
-    ] as const;
-    }
+  return [`/api/tenants/current/users/`] as const;
+};
 
-    
-export const getTenantsCurrentUsersListInfiniteQueryOptions = <TData = InfiniteData<Awaited<ReturnType<typeof tenantsCurrentUsersList>>>, TError = ErrorResponse>( options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof tenantsCurrentUsersList>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
-) => {
+export const getTenantsCurrentUsersListInfiniteQueryOptions = <
+  TData = InfiniteData<Awaited<ReturnType<typeof tenantsCurrentUsersList>>>,
+  TError = ErrorResponse
+>(options?: {
+  query?: Partial<
+    UseInfiniteQueryOptions<Awaited<ReturnType<typeof tenantsCurrentUsersList>>, TError, TData>
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
 
-const {query: queryOptions, request: requestOptions} = options ?? {};
+  const queryKey = queryOptions?.queryKey ?? getTenantsCurrentUsersListInfiniteQueryKey();
 
-  const queryKey =  queryOptions?.queryKey ?? getTenantsCurrentUsersListInfiniteQueryKey();
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof tenantsCurrentUsersList>>> = ({
+    signal
+  }) => tenantsCurrentUsersList({ signal, ...requestOptions });
 
-  
+  return { queryKey, queryFn, ...queryOptions } as UseInfiniteQueryOptions<
+    Awaited<ReturnType<typeof tenantsCurrentUsersList>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof tenantsCurrentUsersList>>> = ({ signal }) => tenantsCurrentUsersList({ signal, ...requestOptions });
+export type TenantsCurrentUsersListInfiniteQueryResult = NonNullable<
+  Awaited<ReturnType<typeof tenantsCurrentUsersList>>
+>;
+export type TenantsCurrentUsersListInfiniteQueryError = ErrorResponse;
 
-      
-
-      
-
-   return  { queryKey, queryFn, ...queryOptions} as UseInfiniteQueryOptions<Awaited<ReturnType<typeof tenantsCurrentUsersList>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type TenantsCurrentUsersListInfiniteQueryResult = NonNullable<Awaited<ReturnType<typeof tenantsCurrentUsersList>>>
-export type TenantsCurrentUsersListInfiniteQueryError = ErrorResponse
-
-
-export function useTenantsCurrentUsersListInfinite<TData = InfiniteData<Awaited<ReturnType<typeof tenantsCurrentUsersList>>>, TError = ErrorResponse>(
-  options: { query:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof tenantsCurrentUsersList>>, TError, TData>> & Pick<
+export function useTenantsCurrentUsersListInfinite<
+  TData = InfiniteData<Awaited<ReturnType<typeof tenantsCurrentUsersList>>>,
+  TError = ErrorResponse
+>(
+  options: {
+    query: Partial<
+      UseInfiniteQueryOptions<Awaited<ReturnType<typeof tenantsCurrentUsersList>>, TError, TData>
+    > &
+      Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof tenantsCurrentUsersList>>,
           TError,
           Awaited<ReturnType<typeof tenantsCurrentUsersList>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  DefinedUseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useTenantsCurrentUsersListInfinite<TData = InfiniteData<Awaited<ReturnType<typeof tenantsCurrentUsersList>>>, TError = ErrorResponse>(
-  options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof tenantsCurrentUsersList>>, TError, TData>> & Pick<
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): DefinedUseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useTenantsCurrentUsersListInfinite<
+  TData = InfiniteData<Awaited<ReturnType<typeof tenantsCurrentUsersList>>>,
+  TError = ErrorResponse
+>(
+  options?: {
+    query?: Partial<
+      UseInfiniteQueryOptions<Awaited<ReturnType<typeof tenantsCurrentUsersList>>, TError, TData>
+    > &
+      Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof tenantsCurrentUsersList>>,
           TError,
           Awaited<ReturnType<typeof tenantsCurrentUsersList>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useTenantsCurrentUsersListInfinite<TData = InfiniteData<Awaited<ReturnType<typeof tenantsCurrentUsersList>>>, TError = ErrorResponse>(
-  options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof tenantsCurrentUsersList>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useTenantsCurrentUsersListInfinite<
+  TData = InfiniteData<Awaited<ReturnType<typeof tenantsCurrentUsersList>>>,
+  TError = ErrorResponse
+>(
+  options?: {
+    query?: Partial<
+      UseInfiniteQueryOptions<Awaited<ReturnType<typeof tenantsCurrentUsersList>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 /**
  * @summary List users in current tenant
  */
 
-export function useTenantsCurrentUsersListInfinite<TData = InfiniteData<Awaited<ReturnType<typeof tenantsCurrentUsersList>>>, TError = ErrorResponse>(
-  options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof tenantsCurrentUsersList>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient 
- ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+export function useTenantsCurrentUsersListInfinite<
+  TData = InfiniteData<Awaited<ReturnType<typeof tenantsCurrentUsersList>>>,
+  TError = ErrorResponse
+>(
+  options?: {
+    query?: Partial<
+      UseInfiniteQueryOptions<Awaited<ReturnType<typeof tenantsCurrentUsersList>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+  const queryOptions = getTenantsCurrentUsersListInfiniteQueryOptions(options);
 
-  const queryOptions = getTenantsCurrentUsersListInfiniteQueryOptions(options)
+  const query = useInfiniteQuery(queryOptions, queryClient) as UseInfiniteQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
 
-  const query = useInfiniteQuery(queryOptions, queryClient) as  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-
-  query.queryKey = queryOptions.queryKey ;
+  query.queryKey = queryOptions.queryKey;
 
   return query;
 }
 
+export const getTenantsCurrentUsersListQueryOptions = <
+  TData = Awaited<ReturnType<typeof tenantsCurrentUsersList>>,
+  TError = ErrorResponse
+>(options?: {
+  query?: Partial<
+    UseQueryOptions<Awaited<ReturnType<typeof tenantsCurrentUsersList>>, TError, TData>
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
 
+  const queryKey = queryOptions?.queryKey ?? getTenantsCurrentUsersListQueryKey();
 
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof tenantsCurrentUsersList>>> = ({
+    signal
+  }) => tenantsCurrentUsersList({ signal, ...requestOptions });
 
-export const getTenantsCurrentUsersListQueryOptions = <TData = Awaited<ReturnType<typeof tenantsCurrentUsersList>>, TError = ErrorResponse>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof tenantsCurrentUsersList>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
-) => {
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof tenantsCurrentUsersList>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
 
-const {query: queryOptions, request: requestOptions} = options ?? {};
+export type TenantsCurrentUsersListQueryResult = NonNullable<
+  Awaited<ReturnType<typeof tenantsCurrentUsersList>>
+>;
+export type TenantsCurrentUsersListQueryError = ErrorResponse;
 
-  const queryKey =  queryOptions?.queryKey ?? getTenantsCurrentUsersListQueryKey();
-
-  
-
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof tenantsCurrentUsersList>>> = ({ signal }) => tenantsCurrentUsersList({ signal, ...requestOptions });
-
-      
-
-      
-
-   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof tenantsCurrentUsersList>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type TenantsCurrentUsersListQueryResult = NonNullable<Awaited<ReturnType<typeof tenantsCurrentUsersList>>>
-export type TenantsCurrentUsersListQueryError = ErrorResponse
-
-
-export function useTenantsCurrentUsersList<TData = Awaited<ReturnType<typeof tenantsCurrentUsersList>>, TError = ErrorResponse>(
-  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof tenantsCurrentUsersList>>, TError, TData>> & Pick<
+export function useTenantsCurrentUsersList<
+  TData = Awaited<ReturnType<typeof tenantsCurrentUsersList>>,
+  TError = ErrorResponse
+>(
+  options: {
+    query: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof tenantsCurrentUsersList>>, TError, TData>
+    > &
+      Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof tenantsCurrentUsersList>>,
           TError,
           Awaited<ReturnType<typeof tenantsCurrentUsersList>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useTenantsCurrentUsersList<TData = Awaited<ReturnType<typeof tenantsCurrentUsersList>>, TError = ErrorResponse>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof tenantsCurrentUsersList>>, TError, TData>> & Pick<
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useTenantsCurrentUsersList<
+  TData = Awaited<ReturnType<typeof tenantsCurrentUsersList>>,
+  TError = ErrorResponse
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof tenantsCurrentUsersList>>, TError, TData>
+    > &
+      Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof tenantsCurrentUsersList>>,
           TError,
           Awaited<ReturnType<typeof tenantsCurrentUsersList>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useTenantsCurrentUsersList<TData = Awaited<ReturnType<typeof tenantsCurrentUsersList>>, TError = ErrorResponse>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof tenantsCurrentUsersList>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useTenantsCurrentUsersList<
+  TData = Awaited<ReturnType<typeof tenantsCurrentUsersList>>,
+  TError = ErrorResponse
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof tenantsCurrentUsersList>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 /**
  * @summary List users in current tenant
  */
 
-export function useTenantsCurrentUsersList<TData = Awaited<ReturnType<typeof tenantsCurrentUsersList>>, TError = ErrorResponse>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof tenantsCurrentUsersList>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient 
- ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+export function useTenantsCurrentUsersList<
+  TData = Awaited<ReturnType<typeof tenantsCurrentUsersList>>,
+  TError = ErrorResponse
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof tenantsCurrentUsersList>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+  const queryOptions = getTenantsCurrentUsersListQueryOptions(options);
 
-  const queryOptions = getTenantsCurrentUsersListQueryOptions(options)
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+  };
 
-  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-
-  query.queryKey = queryOptions.queryKey ;
+  query.queryKey = queryOptions.queryKey;
 
   return query;
 }
-
-
-
-
 
 /**
  * @summary Create user in current tenant
  */
 export type tenantsCurrentUsersCreateResponse201 = {
-  data: UserCreate
-  status: 201
-}
+  data: UserCreate;
+  status: 201;
+};
 
 export type tenantsCurrentUsersCreateResponse400 = {
-  data: ErrorResponse
-  status: 400
-}
+  data: ErrorResponse;
+  status: 400;
+};
 
 export type tenantsCurrentUsersCreateResponse403 = {
-  data: ErrorResponse
-  status: 403
-}
-    
-export type tenantsCurrentUsersCreateResponseSuccess = (tenantsCurrentUsersCreateResponse201) & {
+  data: ErrorResponse;
+  status: 403;
+};
+
+export type tenantsCurrentUsersCreateResponseSuccess = tenantsCurrentUsersCreateResponse201 & {
   headers: Headers;
 };
-export type tenantsCurrentUsersCreateResponseError = (tenantsCurrentUsersCreateResponse400 | tenantsCurrentUsersCreateResponse403) & {
+export type tenantsCurrentUsersCreateResponseError = (
+  | tenantsCurrentUsersCreateResponse400
+  | tenantsCurrentUsersCreateResponse403
+) & {
   headers: Headers;
 };
 
-export type tenantsCurrentUsersCreateResponse = (tenantsCurrentUsersCreateResponseSuccess | tenantsCurrentUsersCreateResponseError)
+export type tenantsCurrentUsersCreateResponse =
+  | tenantsCurrentUsersCreateResponseSuccess
+  | tenantsCurrentUsersCreateResponseError;
 
 export const getTenantsCurrentUsersCreateUrl = () => {
+  return `/api/tenants/current/users/`;
+};
 
-
-  
-
-  return `/api/tenants/current/users/`
-}
-
-export const tenantsCurrentUsersCreate = async (userCreate: NonReadonly<UserCreate>, options?: RequestInit): Promise<tenantsCurrentUsersCreateResponse> => {
-  
-  return customFetch<tenantsCurrentUsersCreateResponse>(getTenantsCurrentUsersCreateUrl(),
-  {      
+export const tenantsCurrentUsersCreate = async (
+  userCreate: NonReadonly<UserCreate>,
+  options?: RequestInit
+): Promise<tenantsCurrentUsersCreateResponse> => {
+  return customFetch<tenantsCurrentUsersCreateResponse>(getTenantsCurrentUsersCreateUrl(), {
     ...options,
     method: 'POST',
     headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(
-      userCreate,)
-  }
-);}
+    body: JSON.stringify(userCreate)
+  });
+};
 
+export const getTenantsCurrentUsersCreateMutationOptions = <
+  TError = ErrorResponse,
+  TContext = unknown
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof tenantsCurrentUsersCreate>>,
+    TError,
+    { data: NonReadonly<UserCreate> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof tenantsCurrentUsersCreate>>,
+  TError,
+  { data: NonReadonly<UserCreate> },
+  TContext
+> => {
+  const mutationKey = ['tenantsCurrentUsersCreate'];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
 
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof tenantsCurrentUsersCreate>>,
+    { data: NonReadonly<UserCreate> }
+  > = (props) => {
+    const { data } = props ?? {};
 
+    return tenantsCurrentUsersCreate(data, requestOptions);
+  };
 
-export const getTenantsCurrentUsersCreateMutationOptions = <TError = ErrorResponse,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof tenantsCurrentUsersCreate>>, TError,{data: NonReadonly<UserCreate>}, TContext>, request?: SecondParameter<typeof customFetch>}
-): UseMutationOptions<Awaited<ReturnType<typeof tenantsCurrentUsersCreate>>, TError,{data: NonReadonly<UserCreate>}, TContext> => {
+  return { mutationFn, ...mutationOptions };
+};
 
-const mutationKey = ['tenantsCurrentUsersCreate'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
+export type TenantsCurrentUsersCreateMutationResult = NonNullable<
+  Awaited<ReturnType<typeof tenantsCurrentUsersCreate>>
+>;
+export type TenantsCurrentUsersCreateMutationBody = NonReadonly<UserCreate>;
+export type TenantsCurrentUsersCreateMutationError = ErrorResponse;
 
-      
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof tenantsCurrentUsersCreate>>, {data: NonReadonly<UserCreate>}> = (props) => {
-          const {data} = props ?? {};
-
-          return  tenantsCurrentUsersCreate(data,requestOptions)
-        }
-
-        
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type TenantsCurrentUsersCreateMutationResult = NonNullable<Awaited<ReturnType<typeof tenantsCurrentUsersCreate>>>
-    export type TenantsCurrentUsersCreateMutationBody = NonReadonly<UserCreate>
-    export type TenantsCurrentUsersCreateMutationError = ErrorResponse
-
-    /**
+/**
  * @summary Create user in current tenant
  */
-export const useTenantsCurrentUsersCreate = <TError = ErrorResponse,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof tenantsCurrentUsersCreate>>, TError,{data: NonReadonly<UserCreate>}, TContext>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof tenantsCurrentUsersCreate>>,
-        TError,
-        {data: NonReadonly<UserCreate>},
-        TContext
-      > => {
+export const useTenantsCurrentUsersCreate = <TError = ErrorResponse, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof tenantsCurrentUsersCreate>>,
+      TError,
+      { data: NonReadonly<UserCreate> },
+      TContext
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseMutationResult<
+  Awaited<ReturnType<typeof tenantsCurrentUsersCreate>>,
+  TError,
+  { data: NonReadonly<UserCreate> },
+  TContext
+> => {
+  const mutationOptions = getTenantsCurrentUsersCreateMutationOptions(options);
 
-      const mutationOptions = getTenantsCurrentUsersCreateMutationOptions(options);
+  return useMutation(mutationOptions, queryClient);
+};
 
-      return useMutation(mutationOptions, queryClient);
-    }
-    
 /**
  * @summary Update user in current tenant
  */
 export type tenantsCurrentUsersPartialUpdateResponse200 = {
-  data: CurrentTenantUserUpdate
-  status: 200
-}
+  data: CurrentTenantUserUpdate;
+  status: 200;
+};
 
 export type tenantsCurrentUsersPartialUpdateResponse400 = {
-  data: ErrorResponse
-  status: 400
-}
+  data: ErrorResponse;
+  status: 400;
+};
 
 export type tenantsCurrentUsersPartialUpdateResponse403 = {
-  data: ErrorResponse
-  status: 403
-}
+  data: ErrorResponse;
+  status: 403;
+};
 
 export type tenantsCurrentUsersPartialUpdateResponse404 = {
-  data: ErrorResponse
-  status: 404
-}
-    
-export type tenantsCurrentUsersPartialUpdateResponseSuccess = (tenantsCurrentUsersPartialUpdateResponse200) & {
-  headers: Headers;
-};
-export type tenantsCurrentUsersPartialUpdateResponseError = (tenantsCurrentUsersPartialUpdateResponse400 | tenantsCurrentUsersPartialUpdateResponse403 | tenantsCurrentUsersPartialUpdateResponse404) & {
-  headers: Headers;
+  data: ErrorResponse;
+  status: 404;
 };
 
-export type tenantsCurrentUsersPartialUpdateResponse = (tenantsCurrentUsersPartialUpdateResponseSuccess | tenantsCurrentUsersPartialUpdateResponseError)
+export type tenantsCurrentUsersPartialUpdateResponseSuccess =
+  tenantsCurrentUsersPartialUpdateResponse200 & {
+    headers: Headers;
+  };
+export type tenantsCurrentUsersPartialUpdateResponseError = (
+  | tenantsCurrentUsersPartialUpdateResponse400
+  | tenantsCurrentUsersPartialUpdateResponse403
+  | tenantsCurrentUsersPartialUpdateResponse404
+) & {
+  headers: Headers;
+};
 
-export const getTenantsCurrentUsersPartialUpdateUrl = (userId: string,) => {
+export type tenantsCurrentUsersPartialUpdateResponse =
+  | tenantsCurrentUsersPartialUpdateResponseSuccess
+  | tenantsCurrentUsersPartialUpdateResponseError;
 
+export const getTenantsCurrentUsersPartialUpdateUrl = (userId: string) => {
+  return `/api/tenants/current/users/${userId}/`;
+};
 
-  
+export const tenantsCurrentUsersPartialUpdate = async (
+  userId: string,
+  patchedCurrentTenantUserUpdate: PatchedCurrentTenantUserUpdate,
+  options?: RequestInit
+): Promise<tenantsCurrentUsersPartialUpdateResponse> => {
+  return customFetch<tenantsCurrentUsersPartialUpdateResponse>(
+    getTenantsCurrentUsersPartialUpdateUrl(userId),
+    {
+      ...options,
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json', ...options?.headers },
+      body: JSON.stringify(patchedCurrentTenantUserUpdate)
+    }
+  );
+};
 
-  return `/api/tenants/current/users/${userId}/`
-}
+export const getTenantsCurrentUsersPartialUpdateMutationOptions = <
+  TError = ErrorResponse,
+  TContext = unknown
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof tenantsCurrentUsersPartialUpdate>>,
+    TError,
+    { userId: string; data: PatchedCurrentTenantUserUpdate },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof tenantsCurrentUsersPartialUpdate>>,
+  TError,
+  { userId: string; data: PatchedCurrentTenantUserUpdate },
+  TContext
+> => {
+  const mutationKey = ['tenantsCurrentUsersPartialUpdate'];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
 
-export const tenantsCurrentUsersPartialUpdate = async (userId: string,
-    patchedCurrentTenantUserUpdate: PatchedCurrentTenantUserUpdate, options?: RequestInit): Promise<tenantsCurrentUsersPartialUpdateResponse> => {
-  
-  return customFetch<tenantsCurrentUsersPartialUpdateResponse>(getTenantsCurrentUsersPartialUpdateUrl(userId),
-  {      
-    ...options,
-    method: 'PATCH',
-    headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(
-      patchedCurrentTenantUserUpdate,)
-  }
-);}
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof tenantsCurrentUsersPartialUpdate>>,
+    { userId: string; data: PatchedCurrentTenantUserUpdate }
+  > = (props) => {
+    const { userId, data } = props ?? {};
 
+    return tenantsCurrentUsersPartialUpdate(userId, data, requestOptions);
+  };
 
+  return { mutationFn, ...mutationOptions };
+};
 
+export type TenantsCurrentUsersPartialUpdateMutationResult = NonNullable<
+  Awaited<ReturnType<typeof tenantsCurrentUsersPartialUpdate>>
+>;
+export type TenantsCurrentUsersPartialUpdateMutationBody = PatchedCurrentTenantUserUpdate;
+export type TenantsCurrentUsersPartialUpdateMutationError = ErrorResponse;
 
-export const getTenantsCurrentUsersPartialUpdateMutationOptions = <TError = ErrorResponse,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof tenantsCurrentUsersPartialUpdate>>, TError,{userId: string;data: PatchedCurrentTenantUserUpdate}, TContext>, request?: SecondParameter<typeof customFetch>}
-): UseMutationOptions<Awaited<ReturnType<typeof tenantsCurrentUsersPartialUpdate>>, TError,{userId: string;data: PatchedCurrentTenantUserUpdate}, TContext> => {
-
-const mutationKey = ['tenantsCurrentUsersPartialUpdate'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
-
-      
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof tenantsCurrentUsersPartialUpdate>>, {userId: string;data: PatchedCurrentTenantUserUpdate}> = (props) => {
-          const {userId,data} = props ?? {};
-
-          return  tenantsCurrentUsersPartialUpdate(userId,data,requestOptions)
-        }
-
-        
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type TenantsCurrentUsersPartialUpdateMutationResult = NonNullable<Awaited<ReturnType<typeof tenantsCurrentUsersPartialUpdate>>>
-    export type TenantsCurrentUsersPartialUpdateMutationBody = PatchedCurrentTenantUserUpdate
-    export type TenantsCurrentUsersPartialUpdateMutationError = ErrorResponse
-
-    /**
+/**
  * @summary Update user in current tenant
  */
-export const useTenantsCurrentUsersPartialUpdate = <TError = ErrorResponse,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof tenantsCurrentUsersPartialUpdate>>, TError,{userId: string;data: PatchedCurrentTenantUserUpdate}, TContext>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof tenantsCurrentUsersPartialUpdate>>,
-        TError,
-        {userId: string;data: PatchedCurrentTenantUserUpdate},
-        TContext
-      > => {
+export const useTenantsCurrentUsersPartialUpdate = <TError = ErrorResponse, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof tenantsCurrentUsersPartialUpdate>>,
+      TError,
+      { userId: string; data: PatchedCurrentTenantUserUpdate },
+      TContext
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseMutationResult<
+  Awaited<ReturnType<typeof tenantsCurrentUsersPartialUpdate>>,
+  TError,
+  { userId: string; data: PatchedCurrentTenantUserUpdate },
+  TContext
+> => {
+  const mutationOptions = getTenantsCurrentUsersPartialUpdateMutationOptions(options);
 
-      const mutationOptions = getTenantsCurrentUsersPartialUpdateMutationOptions(options);
+  return useMutation(mutationOptions, queryClient);
+};
 
-      return useMutation(mutationOptions, queryClient);
-    }
-    
 /**
  * Superadmin lists all users. Tenant admin lists users only from the current tenant context.
  * @summary List users
  */
 export type usersListResponse200 = {
-  data: UserList[]
-  status: 200
-}
+  data: UserList[];
+  status: 200;
+};
 
 export type usersListResponse403 = {
-  data: ErrorResponse
-  status: 403
-}
-    
-export type usersListResponseSuccess = (usersListResponse200) & {
+  data: ErrorResponse;
+  status: 403;
+};
+
+export type usersListResponseSuccess = usersListResponse200 & {
   headers: Headers;
 };
-export type usersListResponseError = (usersListResponse403) & {
+export type usersListResponseError = usersListResponse403 & {
   headers: Headers;
 };
 
-export type usersListResponse = (usersListResponseSuccess | usersListResponseError)
+export type usersListResponse = usersListResponseSuccess | usersListResponseError;
 
 export const getUsersListUrl = () => {
+  return `/api/users/`;
+};
 
-
-  
-
-  return `/api/users/`
-}
-
-export const usersList = async ( options?: RequestInit): Promise<usersListResponse> => {
-  
-  return customFetch<usersListResponse>(getUsersListUrl(),
-  {      
+export const usersList = async (options?: RequestInit): Promise<usersListResponse> => {
+  return customFetch<usersListResponse>(getUsersListUrl(), {
     ...options,
     method: 'GET'
-    
-    
-  }
-);}
-
-
-
-
+  });
+};
 
 export const getUsersListInfiniteQueryKey = () => {
-    return [
-    'infinite', `/api/users/`
-    ] as const;
-    }
+  return ['infinite', `/api/users/`] as const;
+};
 
 export const getUsersListQueryKey = () => {
-    return [
-    `/api/users/`
-    ] as const;
-    }
+  return [`/api/users/`] as const;
+};
 
-    
-export const getUsersListInfiniteQueryOptions = <TData = InfiniteData<Awaited<ReturnType<typeof usersList>>>, TError = ErrorResponse>( options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof usersList>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
-) => {
+export const getUsersListInfiniteQueryOptions = <
+  TData = InfiniteData<Awaited<ReturnType<typeof usersList>>>,
+  TError = ErrorResponse
+>(options?: {
+  query?: Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof usersList>>, TError, TData>>;
+  request?: SecondParameter<typeof customFetch>;
+}) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
 
-const {query: queryOptions, request: requestOptions} = options ?? {};
+  const queryKey = queryOptions?.queryKey ?? getUsersListInfiniteQueryKey();
 
-  const queryKey =  queryOptions?.queryKey ?? getUsersListInfiniteQueryKey();
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof usersList>>> = ({ signal }) =>
+    usersList({ signal, ...requestOptions });
 
-  
+  return { queryKey, queryFn, ...queryOptions } as UseInfiniteQueryOptions<
+    Awaited<ReturnType<typeof usersList>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof usersList>>> = ({ signal }) => usersList({ signal, ...requestOptions });
+export type UsersListInfiniteQueryResult = NonNullable<Awaited<ReturnType<typeof usersList>>>;
+export type UsersListInfiniteQueryError = ErrorResponse;
 
-      
-
-      
-
-   return  { queryKey, queryFn, ...queryOptions} as UseInfiniteQueryOptions<Awaited<ReturnType<typeof usersList>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type UsersListInfiniteQueryResult = NonNullable<Awaited<ReturnType<typeof usersList>>>
-export type UsersListInfiniteQueryError = ErrorResponse
-
-
-export function useUsersListInfinite<TData = InfiniteData<Awaited<ReturnType<typeof usersList>>>, TError = ErrorResponse>(
-  options: { query:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof usersList>>, TError, TData>> & Pick<
+export function useUsersListInfinite<
+  TData = InfiniteData<Awaited<ReturnType<typeof usersList>>>,
+  TError = ErrorResponse
+>(
+  options: {
+    query: Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof usersList>>, TError, TData>> &
+      Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof usersList>>,
           TError,
           Awaited<ReturnType<typeof usersList>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  DefinedUseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useUsersListInfinite<TData = InfiniteData<Awaited<ReturnType<typeof usersList>>>, TError = ErrorResponse>(
-  options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof usersList>>, TError, TData>> & Pick<
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): DefinedUseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useUsersListInfinite<
+  TData = InfiniteData<Awaited<ReturnType<typeof usersList>>>,
+  TError = ErrorResponse
+>(
+  options?: {
+    query?: Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof usersList>>, TError, TData>> &
+      Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof usersList>>,
           TError,
           Awaited<ReturnType<typeof usersList>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useUsersListInfinite<TData = InfiniteData<Awaited<ReturnType<typeof usersList>>>, TError = ErrorResponse>(
-  options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof usersList>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useUsersListInfinite<
+  TData = InfiniteData<Awaited<ReturnType<typeof usersList>>>,
+  TError = ErrorResponse
+>(
+  options?: {
+    query?: Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof usersList>>, TError, TData>>;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 /**
  * @summary List users
  */
 
-export function useUsersListInfinite<TData = InfiniteData<Awaited<ReturnType<typeof usersList>>>, TError = ErrorResponse>(
-  options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof usersList>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient 
- ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+export function useUsersListInfinite<
+  TData = InfiniteData<Awaited<ReturnType<typeof usersList>>>,
+  TError = ErrorResponse
+>(
+  options?: {
+    query?: Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof usersList>>, TError, TData>>;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+  const queryOptions = getUsersListInfiniteQueryOptions(options);
 
-  const queryOptions = getUsersListInfiniteQueryOptions(options)
+  const query = useInfiniteQuery(queryOptions, queryClient) as UseInfiniteQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
 
-  const query = useInfiniteQuery(queryOptions, queryClient) as  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-
-  query.queryKey = queryOptions.queryKey ;
+  query.queryKey = queryOptions.queryKey;
 
   return query;
 }
 
+export const getUsersListQueryOptions = <
+  TData = Awaited<ReturnType<typeof usersList>>,
+  TError = ErrorResponse
+>(options?: {
+  query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof usersList>>, TError, TData>>;
+  request?: SecondParameter<typeof customFetch>;
+}) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
 
+  const queryKey = queryOptions?.queryKey ?? getUsersListQueryKey();
 
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof usersList>>> = ({ signal }) =>
+    usersList({ signal, ...requestOptions });
 
-export const getUsersListQueryOptions = <TData = Awaited<ReturnType<typeof usersList>>, TError = ErrorResponse>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof usersList>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
-) => {
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof usersList>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
 
-const {query: queryOptions, request: requestOptions} = options ?? {};
-
-  const queryKey =  queryOptions?.queryKey ?? getUsersListQueryKey();
-
-  
-
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof usersList>>> = ({ signal }) => usersList({ signal, ...requestOptions });
-
-      
-
-      
-
-   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof usersList>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type UsersListQueryResult = NonNullable<Awaited<ReturnType<typeof usersList>>>
-export type UsersListQueryError = ErrorResponse
-
+export type UsersListQueryResult = NonNullable<Awaited<ReturnType<typeof usersList>>>;
+export type UsersListQueryError = ErrorResponse;
 
 export function useUsersList<TData = Awaited<ReturnType<typeof usersList>>, TError = ErrorResponse>(
-  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof usersList>>, TError, TData>> & Pick<
+  options: {
+    query: Partial<UseQueryOptions<Awaited<ReturnType<typeof usersList>>, TError, TData>> &
+      Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof usersList>>,
           TError,
           Awaited<ReturnType<typeof usersList>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 export function useUsersList<TData = Awaited<ReturnType<typeof usersList>>, TError = ErrorResponse>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof usersList>>, TError, TData>> & Pick<
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof usersList>>, TError, TData>> &
+      Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof usersList>>,
           TError,
           Awaited<ReturnType<typeof usersList>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 export function useUsersList<TData = Awaited<ReturnType<typeof usersList>>, TError = ErrorResponse>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof usersList>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof usersList>>, TError, TData>>;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 /**
  * @summary List users
  */
 
 export function useUsersList<TData = Awaited<ReturnType<typeof usersList>>, TError = ErrorResponse>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof usersList>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient 
- ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof usersList>>, TError, TData>>;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+  const queryOptions = getUsersListQueryOptions(options);
 
-  const queryOptions = getUsersListQueryOptions(options)
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+  };
 
-  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-
-  query.queryKey = queryOptions.queryKey ;
+  query.queryKey = queryOptions.queryKey;
 
   return query;
 }
-
-
-
-
 
 /**
  * @summary Create user
  */
 export type usersCreateResponse201 = {
-  data: UserCreate
-  status: 201
-}
+  data: UserCreate;
+  status: 201;
+};
 
 export type usersCreateResponse400 = {
-  data: ErrorResponse
-  status: 400
-}
+  data: ErrorResponse;
+  status: 400;
+};
 
 export type usersCreateResponse403 = {
-  data: ErrorResponse
-  status: 403
-}
-    
-export type usersCreateResponseSuccess = (usersCreateResponse201) & {
+  data: ErrorResponse;
+  status: 403;
+};
+
+export type usersCreateResponseSuccess = usersCreateResponse201 & {
   headers: Headers;
 };
 export type usersCreateResponseError = (usersCreateResponse400 | usersCreateResponse403) & {
   headers: Headers;
 };
 
-export type usersCreateResponse = (usersCreateResponseSuccess | usersCreateResponseError)
+export type usersCreateResponse = usersCreateResponseSuccess | usersCreateResponseError;
 
 export const getUsersCreateUrl = () => {
+  return `/api/users/`;
+};
 
-
-  
-
-  return `/api/users/`
-}
-
-export const usersCreate = async (userCreate: NonReadonly<UserCreate>, options?: RequestInit): Promise<usersCreateResponse> => {
-  
-  return customFetch<usersCreateResponse>(getUsersCreateUrl(),
-  {      
+export const usersCreate = async (
+  userCreate: NonReadonly<UserCreate>,
+  options?: RequestInit
+): Promise<usersCreateResponse> => {
+  return customFetch<usersCreateResponse>(getUsersCreateUrl(), {
     ...options,
     method: 'POST',
     headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(
-      userCreate,)
-  }
-);}
+    body: JSON.stringify(userCreate)
+  });
+};
 
+export const getUsersCreateMutationOptions = <
+  TError = ErrorResponse,
+  TContext = unknown
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof usersCreate>>,
+    TError,
+    { data: NonReadonly<UserCreate> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof usersCreate>>,
+  TError,
+  { data: NonReadonly<UserCreate> },
+  TContext
+> => {
+  const mutationKey = ['usersCreate'];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
 
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof usersCreate>>,
+    { data: NonReadonly<UserCreate> }
+  > = (props) => {
+    const { data } = props ?? {};
 
+    return usersCreate(data, requestOptions);
+  };
 
-export const getUsersCreateMutationOptions = <TError = ErrorResponse,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof usersCreate>>, TError,{data: NonReadonly<UserCreate>}, TContext>, request?: SecondParameter<typeof customFetch>}
-): UseMutationOptions<Awaited<ReturnType<typeof usersCreate>>, TError,{data: NonReadonly<UserCreate>}, TContext> => {
+  return { mutationFn, ...mutationOptions };
+};
 
-const mutationKey = ['usersCreate'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
+export type UsersCreateMutationResult = NonNullable<Awaited<ReturnType<typeof usersCreate>>>;
+export type UsersCreateMutationBody = NonReadonly<UserCreate>;
+export type UsersCreateMutationError = ErrorResponse;
 
-      
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof usersCreate>>, {data: NonReadonly<UserCreate>}> = (props) => {
-          const {data} = props ?? {};
-
-          return  usersCreate(data,requestOptions)
-        }
-
-        
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type UsersCreateMutationResult = NonNullable<Awaited<ReturnType<typeof usersCreate>>>
-    export type UsersCreateMutationBody = NonReadonly<UserCreate>
-    export type UsersCreateMutationError = ErrorResponse
-
-    /**
+/**
  * @summary Create user
  */
-export const useUsersCreate = <TError = ErrorResponse,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof usersCreate>>, TError,{data: NonReadonly<UserCreate>}, TContext>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof usersCreate>>,
-        TError,
-        {data: NonReadonly<UserCreate>},
-        TContext
-      > => {
+export const useUsersCreate = <TError = ErrorResponse, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof usersCreate>>,
+      TError,
+      { data: NonReadonly<UserCreate> },
+      TContext
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseMutationResult<
+  Awaited<ReturnType<typeof usersCreate>>,
+  TError,
+  { data: NonReadonly<UserCreate> },
+  TContext
+> => {
+  const mutationOptions = getUsersCreateMutationOptions(options);
 
-      const mutationOptions = getUsersCreateMutationOptions(options);
+  return useMutation(mutationOptions, queryClient);
+};
 
-      return useMutation(mutationOptions, queryClient);
-    }
-    
 /**
  * @summary Load public survey by token
  */
 export type publicSurveysRetrieveResponse200 = {
-  data: PublicForm
-  status: 200
-}
-    
-export type publicSurveysRetrieveResponseSuccess = (publicSurveysRetrieveResponse200) & {
+  data: PublicForm;
+  status: 200;
+};
+
+export type publicSurveysRetrieveResponseSuccess = publicSurveysRetrieveResponse200 & {
   headers: Headers;
 };
-;
 
-export type publicSurveysRetrieveResponse = (publicSurveysRetrieveResponseSuccess)
+export type publicSurveysRetrieveResponse = publicSurveysRetrieveResponseSuccess;
 
-export const getPublicSurveysRetrieveUrl = (token: string,) => {
+export const getPublicSurveysRetrieveUrl = (token: string) => {
+  return `/public/surveys/${token}/`;
+};
 
-
-  
-
-  return `/public/surveys/${token}/`
-}
-
-export const publicSurveysRetrieve = async (token: string, options?: RequestInit): Promise<publicSurveysRetrieveResponse> => {
-  
-  return customFetch<publicSurveysRetrieveResponse>(getPublicSurveysRetrieveUrl(token),
-  {      
+export const publicSurveysRetrieve = async (
+  token: string,
+  options?: RequestInit
+): Promise<publicSurveysRetrieveResponse> => {
+  return customFetch<publicSurveysRetrieveResponse>(getPublicSurveysRetrieveUrl(token), {
     ...options,
     method: 'GET'
-    
-    
+  });
+};
+
+export const getPublicSurveysRetrieveInfiniteQueryKey = (token?: string) => {
+  return ['infinite', `/public/surveys/${token}/`] as const;
+};
+
+export const getPublicSurveysRetrieveQueryKey = (token?: string) => {
+  return [`/public/surveys/${token}/`] as const;
+};
+
+export const getPublicSurveysRetrieveInfiniteQueryOptions = <
+  TData = InfiniteData<Awaited<ReturnType<typeof publicSurveysRetrieve>>>,
+  TError = unknown
+>(
+  token: string,
+  options?: {
+    query?: Partial<
+      UseInfiniteQueryOptions<Awaited<ReturnType<typeof publicSurveysRetrieve>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof customFetch>;
   }
-);}
-
-
-
-
-
-export const getPublicSurveysRetrieveInfiniteQueryKey = (token?: string,) => {
-    return [
-    'infinite', `/public/surveys/${token}/`
-    ] as const;
-    }
-
-export const getPublicSurveysRetrieveQueryKey = (token?: string,) => {
-    return [
-    `/public/surveys/${token}/`
-    ] as const;
-    }
-
-    
-export const getPublicSurveysRetrieveInfiniteQueryOptions = <TData = InfiniteData<Awaited<ReturnType<typeof publicSurveysRetrieve>>>, TError = unknown>(token: string, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof publicSurveysRetrieve>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
 ) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
 
-const {query: queryOptions, request: requestOptions} = options ?? {};
+  const queryKey = queryOptions?.queryKey ?? getPublicSurveysRetrieveInfiniteQueryKey(token);
 
-  const queryKey =  queryOptions?.queryKey ?? getPublicSurveysRetrieveInfiniteQueryKey(token);
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof publicSurveysRetrieve>>> = ({ signal }) =>
+    publicSurveysRetrieve(token, { signal, ...requestOptions });
 
-  
+  return { queryKey, queryFn, enabled: !!token, ...queryOptions } as UseInfiniteQueryOptions<
+    Awaited<ReturnType<typeof publicSurveysRetrieve>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof publicSurveysRetrieve>>> = ({ signal }) => publicSurveysRetrieve(token, { signal, ...requestOptions });
+export type PublicSurveysRetrieveInfiniteQueryResult = NonNullable<
+  Awaited<ReturnType<typeof publicSurveysRetrieve>>
+>;
+export type PublicSurveysRetrieveInfiniteQueryError = unknown;
 
-      
-
-      
-
-   return  { queryKey, queryFn, enabled: !!(token), ...queryOptions} as UseInfiniteQueryOptions<Awaited<ReturnType<typeof publicSurveysRetrieve>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type PublicSurveysRetrieveInfiniteQueryResult = NonNullable<Awaited<ReturnType<typeof publicSurveysRetrieve>>>
-export type PublicSurveysRetrieveInfiniteQueryError = unknown
-
-
-export function usePublicSurveysRetrieveInfinite<TData = InfiniteData<Awaited<ReturnType<typeof publicSurveysRetrieve>>>, TError = unknown>(
- token: string, options: { query:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof publicSurveysRetrieve>>, TError, TData>> & Pick<
+export function usePublicSurveysRetrieveInfinite<
+  TData = InfiniteData<Awaited<ReturnType<typeof publicSurveysRetrieve>>>,
+  TError = unknown
+>(
+  token: string,
+  options: {
+    query: Partial<
+      UseInfiniteQueryOptions<Awaited<ReturnType<typeof publicSurveysRetrieve>>, TError, TData>
+    > &
+      Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof publicSurveysRetrieve>>,
           TError,
           Awaited<ReturnType<typeof publicSurveysRetrieve>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  DefinedUseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function usePublicSurveysRetrieveInfinite<TData = InfiniteData<Awaited<ReturnType<typeof publicSurveysRetrieve>>>, TError = unknown>(
- token: string, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof publicSurveysRetrieve>>, TError, TData>> & Pick<
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): DefinedUseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function usePublicSurveysRetrieveInfinite<
+  TData = InfiniteData<Awaited<ReturnType<typeof publicSurveysRetrieve>>>,
+  TError = unknown
+>(
+  token: string,
+  options?: {
+    query?: Partial<
+      UseInfiniteQueryOptions<Awaited<ReturnType<typeof publicSurveysRetrieve>>, TError, TData>
+    > &
+      Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof publicSurveysRetrieve>>,
           TError,
           Awaited<ReturnType<typeof publicSurveysRetrieve>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function usePublicSurveysRetrieveInfinite<TData = InfiniteData<Awaited<ReturnType<typeof publicSurveysRetrieve>>>, TError = unknown>(
- token: string, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof publicSurveysRetrieve>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function usePublicSurveysRetrieveInfinite<
+  TData = InfiniteData<Awaited<ReturnType<typeof publicSurveysRetrieve>>>,
+  TError = unknown
+>(
+  token: string,
+  options?: {
+    query?: Partial<
+      UseInfiniteQueryOptions<Awaited<ReturnType<typeof publicSurveysRetrieve>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 /**
  * @summary Load public survey by token
  */
 
-export function usePublicSurveysRetrieveInfinite<TData = InfiniteData<Awaited<ReturnType<typeof publicSurveysRetrieve>>>, TError = unknown>(
- token: string, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof publicSurveysRetrieve>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient 
- ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+export function usePublicSurveysRetrieveInfinite<
+  TData = InfiniteData<Awaited<ReturnType<typeof publicSurveysRetrieve>>>,
+  TError = unknown
+>(
+  token: string,
+  options?: {
+    query?: Partial<
+      UseInfiniteQueryOptions<Awaited<ReturnType<typeof publicSurveysRetrieve>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+  const queryOptions = getPublicSurveysRetrieveInfiniteQueryOptions(token, options);
 
-  const queryOptions = getPublicSurveysRetrieveInfiniteQueryOptions(token,options)
+  const query = useInfiniteQuery(queryOptions, queryClient) as UseInfiniteQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
 
-  const query = useInfiniteQuery(queryOptions, queryClient) as  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-
-  query.queryKey = queryOptions.queryKey ;
+  query.queryKey = queryOptions.queryKey;
 
   return query;
 }
 
-
-
-
-export const getPublicSurveysRetrieveQueryOptions = <TData = Awaited<ReturnType<typeof publicSurveysRetrieve>>, TError = unknown>(token: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof publicSurveysRetrieve>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+export const getPublicSurveysRetrieveQueryOptions = <
+  TData = Awaited<ReturnType<typeof publicSurveysRetrieve>>,
+  TError = unknown
+>(
+  token: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof publicSurveysRetrieve>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  }
 ) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
 
-const {query: queryOptions, request: requestOptions} = options ?? {};
+  const queryKey = queryOptions?.queryKey ?? getPublicSurveysRetrieveQueryKey(token);
 
-  const queryKey =  queryOptions?.queryKey ?? getPublicSurveysRetrieveQueryKey(token);
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof publicSurveysRetrieve>>> = ({ signal }) =>
+    publicSurveysRetrieve(token, { signal, ...requestOptions });
 
-  
+  return { queryKey, queryFn, enabled: !!token, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof publicSurveysRetrieve>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof publicSurveysRetrieve>>> = ({ signal }) => publicSurveysRetrieve(token, { signal, ...requestOptions });
+export type PublicSurveysRetrieveQueryResult = NonNullable<
+  Awaited<ReturnType<typeof publicSurveysRetrieve>>
+>;
+export type PublicSurveysRetrieveQueryError = unknown;
 
-      
-
-      
-
-   return  { queryKey, queryFn, enabled: !!(token), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof publicSurveysRetrieve>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type PublicSurveysRetrieveQueryResult = NonNullable<Awaited<ReturnType<typeof publicSurveysRetrieve>>>
-export type PublicSurveysRetrieveQueryError = unknown
-
-
-export function usePublicSurveysRetrieve<TData = Awaited<ReturnType<typeof publicSurveysRetrieve>>, TError = unknown>(
- token: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof publicSurveysRetrieve>>, TError, TData>> & Pick<
+export function usePublicSurveysRetrieve<
+  TData = Awaited<ReturnType<typeof publicSurveysRetrieve>>,
+  TError = unknown
+>(
+  token: string,
+  options: {
+    query: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof publicSurveysRetrieve>>, TError, TData>
+    > &
+      Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof publicSurveysRetrieve>>,
           TError,
           Awaited<ReturnType<typeof publicSurveysRetrieve>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function usePublicSurveysRetrieve<TData = Awaited<ReturnType<typeof publicSurveysRetrieve>>, TError = unknown>(
- token: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof publicSurveysRetrieve>>, TError, TData>> & Pick<
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function usePublicSurveysRetrieve<
+  TData = Awaited<ReturnType<typeof publicSurveysRetrieve>>,
+  TError = unknown
+>(
+  token: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof publicSurveysRetrieve>>, TError, TData>
+    > &
+      Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof publicSurveysRetrieve>>,
           TError,
           Awaited<ReturnType<typeof publicSurveysRetrieve>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function usePublicSurveysRetrieve<TData = Awaited<ReturnType<typeof publicSurveysRetrieve>>, TError = unknown>(
- token: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof publicSurveysRetrieve>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function usePublicSurveysRetrieve<
+  TData = Awaited<ReturnType<typeof publicSurveysRetrieve>>,
+  TError = unknown
+>(
+  token: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof publicSurveysRetrieve>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 /**
  * @summary Load public survey by token
  */
 
-export function usePublicSurveysRetrieve<TData = Awaited<ReturnType<typeof publicSurveysRetrieve>>, TError = unknown>(
- token: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof publicSurveysRetrieve>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient 
- ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+export function usePublicSurveysRetrieve<
+  TData = Awaited<ReturnType<typeof publicSurveysRetrieve>>,
+  TError = unknown
+>(
+  token: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof publicSurveysRetrieve>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+  const queryOptions = getPublicSurveysRetrieveQueryOptions(token, options);
 
-  const queryOptions = getPublicSurveysRetrieveQueryOptions(token,options)
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+  };
 
-  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-
-  query.queryKey = queryOptions.queryKey ;
+  query.queryKey = queryOptions.queryKey;
 
   return query;
 }
-
-
-
-
 
 /**
  * @summary Submit public survey answers by token
  */
 export type publicSurveysSubmitCreateResponse200 = {
-  data: PublicSurveySubmit
-  status: 200
-}
-    
-export type publicSurveysSubmitCreateResponseSuccess = (publicSurveysSubmitCreateResponse200) & {
+  data: PublicSurveySubmit;
+  status: 200;
+};
+
+export type publicSurveysSubmitCreateResponseSuccess = publicSurveysSubmitCreateResponse200 & {
   headers: Headers;
 };
-;
 
-export type publicSurveysSubmitCreateResponse = (publicSurveysSubmitCreateResponseSuccess)
+export type publicSurveysSubmitCreateResponse = publicSurveysSubmitCreateResponseSuccess;
 
-export const getPublicSurveysSubmitCreateUrl = (token: string,) => {
+export const getPublicSurveysSubmitCreateUrl = (token: string) => {
+  return `/public/surveys/${token}/submit/`;
+};
 
-
-  
-
-  return `/public/surveys/${token}/submit/`
-}
-
-export const publicSurveysSubmitCreate = async (token: string,
-    publicSurveySubmit: PublicSurveySubmit, options?: RequestInit): Promise<publicSurveysSubmitCreateResponse> => {
-  
-  return customFetch<publicSurveysSubmitCreateResponse>(getPublicSurveysSubmitCreateUrl(token),
-  {      
+export const publicSurveysSubmitCreate = async (
+  token: string,
+  publicSurveySubmit: PublicSurveySubmit,
+  options?: RequestInit
+): Promise<publicSurveysSubmitCreateResponse> => {
+  return customFetch<publicSurveysSubmitCreateResponse>(getPublicSurveysSubmitCreateUrl(token), {
     ...options,
     method: 'POST',
     headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(
-      publicSurveySubmit,)
-  }
-);}
+    body: JSON.stringify(publicSurveySubmit)
+  });
+};
 
+export const getPublicSurveysSubmitCreateMutationOptions = <
+  TError = unknown,
+  TContext = unknown
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof publicSurveysSubmitCreate>>,
+    TError,
+    { token: string; data: PublicSurveySubmit },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof publicSurveysSubmitCreate>>,
+  TError,
+  { token: string; data: PublicSurveySubmit },
+  TContext
+> => {
+  const mutationKey = ['publicSurveysSubmitCreate'];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
 
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof publicSurveysSubmitCreate>>,
+    { token: string; data: PublicSurveySubmit }
+  > = (props) => {
+    const { token, data } = props ?? {};
 
+    return publicSurveysSubmitCreate(token, data, requestOptions);
+  };
 
-export const getPublicSurveysSubmitCreateMutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof publicSurveysSubmitCreate>>, TError,{token: string;data: PublicSurveySubmit}, TContext>, request?: SecondParameter<typeof customFetch>}
-): UseMutationOptions<Awaited<ReturnType<typeof publicSurveysSubmitCreate>>, TError,{token: string;data: PublicSurveySubmit}, TContext> => {
+  return { mutationFn, ...mutationOptions };
+};
 
-const mutationKey = ['publicSurveysSubmitCreate'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
+export type PublicSurveysSubmitCreateMutationResult = NonNullable<
+  Awaited<ReturnType<typeof publicSurveysSubmitCreate>>
+>;
+export type PublicSurveysSubmitCreateMutationBody = PublicSurveySubmit;
+export type PublicSurveysSubmitCreateMutationError = unknown;
 
-      
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof publicSurveysSubmitCreate>>, {token: string;data: PublicSurveySubmit}> = (props) => {
-          const {token,data} = props ?? {};
-
-          return  publicSurveysSubmitCreate(token,data,requestOptions)
-        }
-
-        
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type PublicSurveysSubmitCreateMutationResult = NonNullable<Awaited<ReturnType<typeof publicSurveysSubmitCreate>>>
-    export type PublicSurveysSubmitCreateMutationBody = PublicSurveySubmit
-    export type PublicSurveysSubmitCreateMutationError = unknown
-
-    /**
+/**
  * @summary Submit public survey answers by token
  */
-export const usePublicSurveysSubmitCreate = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof publicSurveysSubmitCreate>>, TError,{token: string;data: PublicSurveySubmit}, TContext>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof publicSurveysSubmitCreate>>,
-        TError,
-        {token: string;data: PublicSurveySubmit},
-        TContext
-      > => {
+export const usePublicSurveysSubmitCreate = <TError = unknown, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof publicSurveysSubmitCreate>>,
+      TError,
+      { token: string; data: PublicSurveySubmit },
+      TContext
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseMutationResult<
+  Awaited<ReturnType<typeof publicSurveysSubmitCreate>>,
+  TError,
+  { token: string; data: PublicSurveySubmit },
+  TContext
+> => {
+  const mutationOptions = getPublicSurveysSubmitCreateMutationOptions(options);
 
-      const mutationOptions = getPublicSurveysSubmitCreateMutationOptions(options);
+  return useMutation(mutationOptions, queryClient);
+};
 
-      return useMutation(mutationOptions, queryClient);
-    }
-    
 /**
  * @summary Public unsubscribe by recipient token
  */
 export type publicUnsubscribeCreateResponse200 = {
-  data: void
-  status: 200
-}
-    
-export type publicUnsubscribeCreateResponseSuccess = (publicUnsubscribeCreateResponse200) & {
+  data: void;
+  status: 200;
+};
+
+export type publicUnsubscribeCreateResponseSuccess = publicUnsubscribeCreateResponse200 & {
   headers: Headers;
 };
-;
 
-export type publicUnsubscribeCreateResponse = (publicUnsubscribeCreateResponseSuccess)
+export type publicUnsubscribeCreateResponse = publicUnsubscribeCreateResponseSuccess;
 
-export const getPublicUnsubscribeCreateUrl = (token: string,) => {
+export const getPublicUnsubscribeCreateUrl = (token: string) => {
+  return `/public/unsubscribe/${token}/`;
+};
 
-
-  
-
-  return `/public/unsubscribe/${token}/`
-}
-
-export const publicUnsubscribeCreate = async (token: string, options?: RequestInit): Promise<publicUnsubscribeCreateResponse> => {
-  
-  return customFetch<publicUnsubscribeCreateResponse>(getPublicUnsubscribeCreateUrl(token),
-  {      
+export const publicUnsubscribeCreate = async (
+  token: string,
+  options?: RequestInit
+): Promise<publicUnsubscribeCreateResponse> => {
+  return customFetch<publicUnsubscribeCreateResponse>(getPublicUnsubscribeCreateUrl(token), {
     ...options,
     method: 'POST'
-    
-    
-  }
-);}
+  });
+};
 
+export const getPublicUnsubscribeCreateMutationOptions = <
+  TError = unknown,
+  TContext = unknown
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof publicUnsubscribeCreate>>,
+    TError,
+    { token: string },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof publicUnsubscribeCreate>>,
+  TError,
+  { token: string },
+  TContext
+> => {
+  const mutationKey = ['publicUnsubscribeCreate'];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
 
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof publicUnsubscribeCreate>>,
+    { token: string }
+  > = (props) => {
+    const { token } = props ?? {};
 
+    return publicUnsubscribeCreate(token, requestOptions);
+  };
 
-export const getPublicUnsubscribeCreateMutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof publicUnsubscribeCreate>>, TError,{token: string}, TContext>, request?: SecondParameter<typeof customFetch>}
-): UseMutationOptions<Awaited<ReturnType<typeof publicUnsubscribeCreate>>, TError,{token: string}, TContext> => {
+  return { mutationFn, ...mutationOptions };
+};
 
-const mutationKey = ['publicUnsubscribeCreate'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
+export type PublicUnsubscribeCreateMutationResult = NonNullable<
+  Awaited<ReturnType<typeof publicUnsubscribeCreate>>
+>;
 
-      
+export type PublicUnsubscribeCreateMutationError = unknown;
 
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof publicUnsubscribeCreate>>, {token: string}> = (props) => {
-          const {token} = props ?? {};
-
-          return  publicUnsubscribeCreate(token,requestOptions)
-        }
-
-        
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type PublicUnsubscribeCreateMutationResult = NonNullable<Awaited<ReturnType<typeof publicUnsubscribeCreate>>>
-    
-    export type PublicUnsubscribeCreateMutationError = unknown
-
-    /**
+/**
  * @summary Public unsubscribe by recipient token
  */
-export const usePublicUnsubscribeCreate = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof publicUnsubscribeCreate>>, TError,{token: string}, TContext>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof publicUnsubscribeCreate>>,
-        TError,
-        {token: string},
-        TContext
-      > => {
+export const usePublicUnsubscribeCreate = <TError = unknown, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof publicUnsubscribeCreate>>,
+      TError,
+      { token: string },
+      TContext
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseMutationResult<
+  Awaited<ReturnType<typeof publicUnsubscribeCreate>>,
+  TError,
+  { token: string },
+  TContext
+> => {
+  const mutationOptions = getPublicUnsubscribeCreateMutationOptions(options);
 
-      const mutationOptions = getPublicUnsubscribeCreateMutationOptions(options);
-
-      return useMutation(mutationOptions, queryClient);
-    }
-    
+  return useMutation(mutationOptions, queryClient);
+};

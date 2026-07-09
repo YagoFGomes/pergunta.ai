@@ -9,13 +9,15 @@ import type { QuestionTypeEnum } from './questionTypeEnum';
 
 export interface PatchedFormQuestion {
   readonly id?: string;
-  readonly tenant?: string;
+  /** @nullable */
+  readonly tenant?: string | null;
   readonly form?: string;
   /** @maxLength 255 */
   label?: string;
   question_type?: QuestionTypeEnum;
   is_required?: boolean;
   readonly order?: number;
+  indicators?: string[];
   readonly created_at?: string;
   readonly updated_at?: string;
 }

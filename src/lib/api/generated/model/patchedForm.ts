@@ -9,13 +9,18 @@ import type { Status37cEnum } from './status37cEnum';
 
 export interface PatchedForm {
   readonly id?: string;
-  readonly tenant?: string;
-  framework?: string;
+  /** @nullable */
+  readonly tenant?: string | null;
+  /** @nullable */
+  framework?: string | null;
   readonly framework_code?: string;
   /** @maxLength 255 */
   title?: string;
   description?: string;
   status?: Status37cEnum;
+  /** Global seed template, not tied to any tenant. */
+  readonly is_template?: boolean;
+  readonly question_count?: string;
   readonly created_by?: string;
   readonly created_at?: string;
   readonly updated_at?: string;

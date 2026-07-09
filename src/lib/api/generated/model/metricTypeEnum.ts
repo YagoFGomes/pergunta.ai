@@ -8,12 +8,12 @@
 
 /**
  * * `NPS` - NPS
-* `CSAT` - CSAT
-* `CES` - CES
-* `CSI` - CSI
+ * `CSAT` - CSAT
+ * `CES` - CES
+ * `CSI` - CSI
+ * `CXI` - CXI
  */
-export type MetricTypeEnum = typeof MetricTypeEnum[keyof typeof MetricTypeEnum];
-
+export type MetricTypeEnum = (typeof MetricTypeEnum)[keyof typeof MetricTypeEnum];
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const MetricTypeEnum = {
@@ -21,4 +21,5 @@ export const MetricTypeEnum = {
   CSAT: 'CSAT',
   CES: 'CES',
   CSI: 'CSI',
+  CXI: 'CXI'
 } as const;
