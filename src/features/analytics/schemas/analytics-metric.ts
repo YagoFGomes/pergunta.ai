@@ -42,6 +42,14 @@ export const ANALYTICS_METRIC_DASHBOARD_CONFIG: Record<
     description: 'Acompanhamento de Customer Satisfaction Index.',
     scoreLabel: 'CSI atual',
     interpretation: 'Indice composto consolidado a partir das dimensoes respondidas.'
+  },
+  [MetricTypeEnum.CXI]: {
+    type: MetricTypeEnum.CXI,
+    title: 'Analytics CXI',
+    description: 'Acompanhamento de Customer Experience Index.',
+    scoreLabel: 'CXI atual',
+    interpretation:
+      'Indice que mede a qualidade geral da experiência ao longo da jornada do cliente.'
   }
 };
 
