@@ -300,7 +300,6 @@ function SurveyFormEditor({ mode, initialForm }: SurveyFormEditorProps) {
               title='Descricao'
               description='Use uma descricao curta para orientar operadores internos.'
               columns={1}
-              separated
             >
               <FormTextareaField
                 name='description'
