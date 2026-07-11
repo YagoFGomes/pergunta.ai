@@ -1,6 +1,5 @@
 'use client';
 
-import Link from 'next/link';
 import type { Column, ColumnDef } from '@tanstack/react-table';
 
 import { Icons } from '@/components/icons';
@@ -58,7 +57,7 @@ export function getContactListsColumns({
         <div className='flex min-w-[240px] flex-col gap-1'>
           <span className='font-medium'>{row.original.name}</span>
           <span className='text-muted-foreground line-clamp-2 text-xs'>
-            {row.original.description || 'Sem descricao'}
+            {row.original.description || 'Sem descrição'}
           </span>
         </div>
       )

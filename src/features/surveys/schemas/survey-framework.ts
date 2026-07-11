@@ -5,13 +5,13 @@ export const surveyFrameworkFormSchema = z.object({
     .string()
     .trim()
     .min(2, 'Informe ao menos 2 caracteres.')
-    .max(20, 'Maximo de 20 caracteres.'),
+    .max(20, 'Máximo de 20 caracteres.'),
   name: z
     .string()
     .trim()
     .min(3, 'Informe ao menos 3 caracteres.')
-    .max(120, 'Maximo de 120 caracteres.'),
-  description: z.string().trim().max(1000, 'Maximo de 1000 caracteres.').optional(),
+    .max(120, 'Máximo de 120 caracteres.'),
+  description: z.string().trim().max(1000, 'Máximo de 1000 caracteres.').optional(),
   is_active: z.boolean()
 });
 
@@ -22,12 +22,12 @@ export const surveyFrameworkFieldSchemas = {
     .string()
     .trim()
     .min(2, 'Informe ao menos 2 caracteres.')
-    .max(20, 'Maximo de 20 caracteres.'),
+    .max(20, 'Máximo de 20 caracteres.'),
   name: z
     .string()
     .trim()
     .min(3, 'Informe ao menos 3 caracteres.')
-    .max(120, 'Maximo de 120 caracteres.'),
-  description: z.string().trim().max(1000, 'Maximo de 1000 caracteres.'),
+    .max(120, 'Máximo de 120 caracteres.'),
+  description: z.string().trim().max(1000, 'Máximo de 1000 caracteres.'),
   is_active: z.boolean()
 };

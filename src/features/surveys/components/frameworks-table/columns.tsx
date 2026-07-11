@@ -27,7 +27,7 @@ export function getSurveyFrameworksColumns({
       accessorKey: 'code',
       enableSorting: false,
       header: ({ column }: { column: Column<SurveyFramework, unknown> }) => (
-        <DataTableColumnHeader column={column} title='Codigo' />
+        <DataTableColumnHeader column={column} title='Código' />
       ),
       cell: ({ row }) => <span className='font-medium uppercase'>{row.original.code}</span>
     },
@@ -45,11 +45,11 @@ export function getSurveyFrameworksColumns({
       accessorKey: 'description',
       enableSorting: false,
       header: ({ column }: { column: Column<SurveyFramework, unknown> }) => (
-        <DataTableColumnHeader column={column} title='Descricao' />
+        <DataTableColumnHeader column={column} title='Descrição' />
       ),
       cell: ({ row }) => (
         <span className='text-muted-foreground line-clamp-2 text-sm'>
-          {row.original.description || 'Sem descricao'}
+          {row.original.description || 'Sem descrição'}
         </span>
       )
     },
@@ -98,25 +98,25 @@ export function getSurveyFrameworksColumns({
         return (
           <div className='flex justify-end'>
             <ModuleRowActions
-              triggerAriaLabel='Abrir ações do framework'
+              triggerAriaLabel='Abrir ações do indicador'
               items={[
                 {
                   key: 'toggle-active',
-                  label: framework.is_active ? 'Desativar framework' : 'Ativar framework',
+                  label: framework.is_active ? 'Desativar' : 'Ativar',
                   icon: framework.is_active ? Icons.lock : Icons.check,
                   onSelect: () => onToggleActive?.(framework),
                   disabled: disableActions || !onToggleActive
                 },
                 {
                   key: 'edit',
-                  label: 'Editar framework',
+                  label: 'Editar',
                   icon: Icons.edit,
                   onSelect: () => onEdit?.(framework),
                   disabled: disableActions || !onEdit || !canEdit
                 },
                 {
                   key: 'delete',
-                  label: 'Excluir framework',
+                  label: 'Excluir',
                   icon: Icons.trash,
                   onSelect: () => onDeactivateAsDelete?.(framework),
                   disabled: disableActions || !onDeactivateAsDelete || !canDeactivateAsDelete,

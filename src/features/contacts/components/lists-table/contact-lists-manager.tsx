@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 
@@ -60,6 +60,14 @@ function normalizeValues(values: ContactListFormValues): ContactListFormValues {
     name: values.name.trim(),
     description: (values.description || '').trim(),
     status: values.status
+  };
+}
+
+function getContactListFormValues(list: EmailList): ContactListFormValues {
+  return {
+    name: list.name,
+    description: list.description ?? '',
+    status: list.status ?? Status372Enum.ACTIVE
   };
 }
 
@@ -150,6 +158,27 @@ export function ContactListsManager() {
   const { FormTextField, FormTextareaField, FormSelectField } =
     useFormFields<ContactListFormValues>();
 
+  useEffect(() => {
+    if (!isFormDialogOpen) {
+      if (formMode !== 'create' || selectedList) {
+        setFormMode('create');
+        setSelectedList(null);
+        form.reset(DEFAULT_VALUES);
+      }
+
+      return;
+    }
+
+    if (formMode === 'create') {
+      form.reset(DEFAULT_VALUES);
+      return;
+    }
+
+    if (formMode === 'edit' && selectedList) {
+      form.reset(getContactListFormValues(selectedList));
+    }
+  }, [form, formMode, isFormDialogOpen, selectedList]);
+
   function openCreateDialog() {
     setFormMode('create');
     setSelectedList(null);
@@ -157,16 +186,15 @@ export function ContactListsManager() {
     setIsFormDialogOpen(true);
   }
 
-  function openEditDialog(list: EmailList) {
-    setFormMode('edit');
-    setSelectedList(list);
-    form.reset({
-      name: list.name,
-      description: list.description || '',
-      status: list.status || Status372Enum.ACTIVE
-    });
-    setIsFormDialogOpen(true);
-  }
+  const openEditDialog = useCallback(
+    (list: EmailList) => {
+      setFormMode('edit');
+      setSelectedList(list);
+      form.reset(getContactListFormValues(list));
+      setIsFormDialogOpen(true);
+    },
+    [form]
+  );
 
   const columns = useMemo(
     () =>
@@ -175,7 +203,7 @@ export function ContactListsManager() {
         onDelete: setDeleteList,
         disableActions: hasMutationInFlight
       }),
-    [hasMutationInFlight]
+    [hasMutationInFlight, openEditDialog]
   );
 
   const { table } = useDataTable({
@@ -187,6 +215,7 @@ export function ContactListsManager() {
       sorting: []
     }
   });
+  const dialogFormKey = formMode === 'edit' && selectedList ? `edit-${selectedList.id}` : formMode;
 
   return (
     <div className='space-y-4'>
@@ -243,7 +272,7 @@ export function ContactListsManager() {
             </DialogDescription>
           </DialogHeader>
 
-          <form.AppForm>
+          <form.AppForm key={dialogFormKey}>
             <form.Form className='space-y-4 p-0 md:p-0'>
               <FormTextField
                 name='name'
@@ -259,7 +288,7 @@ export function ContactListsManager() {
 
               <FormTextareaField
                 name='description'
-                label='Descricao'
+                label='Descrição'
                 placeholder='Descreva o perfil desta lista'
                 maxLength={1000}
                 rows={4}

@@ -69,7 +69,7 @@ export function ModuleRowActions({
                 </DropdownMenuItem>
               ) : (
                 <DropdownMenuItem
-                  onClick={item.onSelect}
+                  onSelect={item.onSelect}
                   disabled={item.disabled}
                   className={itemClassName}
                 >

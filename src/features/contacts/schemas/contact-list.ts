@@ -7,8 +7,8 @@ export const contactListFormSchema = z.object({
     .string()
     .trim()
     .min(3, 'Informe ao menos 3 caracteres.')
-    .max(255, 'Maximo de 255 caracteres.'),
-  description: z.string().trim().max(1000, 'Maximo de 1000 caracteres.').optional(),
+    .max(255, 'Máximo de 255 caracteres.'),
+  description: z.string().trim().max(1000, 'Máximo de 1000 caracteres.').optional(),
   status: z.nativeEnum(Status372Enum)
 });
 
@@ -19,7 +19,7 @@ export const contactListFieldSchemas = {
     .string()
     .trim()
     .min(3, 'Informe ao menos 3 caracteres.')
-    .max(255, 'Maximo de 255 caracteres.'),
-  description: z.string().trim().max(1000, 'Maximo de 1000 caracteres.'),
+    .max(255, 'Máximo de 255 caracteres.'),
+  description: z.string().trim().max(1000, 'Máximo de 1000 caracteres.'),
   status: z.nativeEnum(Status372Enum)
 };

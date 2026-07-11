@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 
@@ -49,6 +49,15 @@ function normalizeValues(values: SurveyFrameworkFormValues): SurveyFrameworkForm
     name: values.name.trim(),
     description: (values.description || '').trim(),
     is_active: values.is_active
+  };
+}
+
+function getFrameworkFormValues(framework: SurveyFramework): SurveyFrameworkFormValues {
+  return {
+    code: framework.code,
+    name: framework.name,
+    description: framework.description ?? '',
+    is_active: framework.is_active ?? true
   };
 }
 
@@ -140,6 +149,27 @@ export function SurveyFrameworksManager() {
   const { FormTextField, FormTextareaField, FormSwitchField } =
     useFormFields<SurveyFrameworkFormValues>();
 
+  useEffect(() => {
+    if (!isDialogOpen) {
+      if (mode !== 'create' || selectedFramework) {
+        setMode('create');
+        setSelectedFramework(null);
+        form.reset(DEFAULT_VALUES);
+      }
+
+      return;
+    }
+
+    if (mode === 'create') {
+      form.reset(DEFAULT_VALUES);
+      return;
+    }
+
+    if (mode === 'edit' && selectedFramework) {
+      form.reset(getFrameworkFormValues(selectedFramework));
+    }
+  }, [form, isDialogOpen, mode, selectedFramework]);
+
   function openCreateDialog() {
     setMode('create');
     setSelectedFramework(null);
@@ -147,38 +177,39 @@ export function SurveyFrameworksManager() {
     setIsDialogOpen(true);
   }
 
-  function openEditDialog(framework: SurveyFramework) {
-    if (framework.is_seed) {
-      toast.error('Indicador de sistema não pode ser editado.');
-      return;
-    }
-
-    setMode('edit');
-    setSelectedFramework(framework);
-    form.reset({
-      code: framework.code,
-      name: framework.name,
-      description: framework.description || '',
-      is_active: framework.is_active ?? true
-    });
-    setIsDialogOpen(true);
-  }
-
-  async function toggleActive(framework: SurveyFramework) {
-    if (framework.is_seed) {
-      toast.error('Indicador de sistema não pode ser alterado.');
-      return;
-    }
-
-    await updateMutation.mutateAsync({
-      id: framework.id,
-      data: {
-        is_active: !framework.is_active
+  const openEditDialog = useCallback(
+    (framework: SurveyFramework) => {
+      if (framework.is_seed) {
+        toast.error('Indicador de sistema não pode ser editado.');
+        return;
       }
-    });
-  }
 
-  function openDeactivateAsDeleteDialog(framework: SurveyFramework) {
+      setMode('edit');
+      setSelectedFramework(framework);
+      form.reset(getFrameworkFormValues(framework));
+      setIsDialogOpen(true);
+    },
+    [form]
+  );
+
+  const toggleActive = useCallback(
+    async (framework: SurveyFramework) => {
+      if (framework.is_seed) {
+        toast.error('Indicador de sistema não pode ser alterado.');
+        return;
+      }
+
+      await updateMutation.mutateAsync({
+        id: framework.id,
+        data: {
+          is_active: !framework.is_active
+        }
+      });
+    },
+    [updateMutation]
+  );
+
+  const openDeactivateAsDeleteDialog = useCallback((framework: SurveyFramework) => {
     if (framework.is_seed) {
       toast.error('Indicador de sistema não pode ser excluído.');
       return;
@@ -187,7 +218,7 @@ export function SurveyFrameworksManager() {
     setMode('deactivate');
     setSelectedFramework(framework);
     setIsDialogOpen(true);
-  }
+  }, []);
 
   const columns = useMemo(
     () =>
@@ -199,7 +230,7 @@ export function SurveyFrameworksManager() {
         onDeactivateAsDelete: openDeactivateAsDeleteDialog,
         disableActions: hasMutationInFlight
       }),
-    [hasMutationInFlight]
+    [hasMutationInFlight, openDeactivateAsDeleteDialog, openEditDialog, toggleActive]
   );
 
   const { table } = useDataTable({
@@ -213,6 +244,8 @@ export function SurveyFrameworksManager() {
   });
 
   const shouldShowDialogForm = mode !== 'deactivate';
+  const dialogFormKey =
+    mode === 'edit' && selectedFramework ? `edit-${selectedFramework.id}` : mode;
 
   return (
     <div className='space-y-4'>
@@ -277,12 +310,12 @@ export function SurveyFrameworksManager() {
           </DialogHeader>
 
           {shouldShowDialogForm ? (
-            <form.AppForm>
+            <form.AppForm key={dialogFormKey}>
               <form.Form className='space-y-4 p-0 md:p-0'>
                 {mode === 'create' ? (
                   <FormTextField
                     name='code'
-                    label='Codigo'
+                    label='Código'
                     required
                     placeholder='Ex: NPS'
                     maxLength={20}
@@ -293,7 +326,7 @@ export function SurveyFrameworksManager() {
                   />
                 ) : (
                   <div className='space-y-2'>
-                    <p className='text-sm font-medium'>Codigo</p>
+                    <p className='text-sm font-medium'>Código</p>
                     <Input value={selectedFramework?.code ?? ''} disabled readOnly />
                   </div>
                 )}
@@ -302,7 +335,7 @@ export function SurveyFrameworksManager() {
                   name='name'
                   label='Nome'
                   required
-                  placeholder='Nome do framework'
+                  placeholder='Ex: Índice de lealdade'
                   maxLength={120}
                   validators={{
                     onBlur: surveyFrameworkFieldSchemas.name
@@ -312,8 +345,8 @@ export function SurveyFrameworksManager() {
 
                 <FormTextareaField
                   name='description'
-                  label='Descricao'
-                  placeholder='Descreva o objetivo deste framework'
+                  label='Descrição'
+                  placeholder='Descreva o objetivo deste indicador'
                   maxLength={1000}
                   rows={4}
                   validators={{
@@ -329,7 +362,7 @@ export function SurveyFrameworksManager() {
                   <FormSwitchField
                     name='is_active'
                     label='Ativo'
-                    description='Frameworks inativos não ficam disponíveis na criação de formulários.'
+                    description='Indicadores inativos não ficam disponíveis na criação de formulários.'
                     validators={{
                       onBlur: surveyFrameworkFieldSchemas.is_active
                     }}
@@ -350,7 +383,7 @@ export function SurveyFrameworksManager() {
                   >
                     {([canSubmit, isSubmitting]) => (
                       <Button type='submit' disabled={!canSubmit || isSubmitting}>
-                        {mode === 'create' ? 'Criar framework' : 'Salvar alterações'}
+                        {mode === 'create' ? 'Criar indicador' : 'Salvar alterações'}
                       </Button>
                     )}
                   </form.Subscribe>
@@ -361,7 +394,7 @@ export function SurveyFrameworksManager() {
             <div className='space-y-4'>
               <div className='rounded-lg border p-3 text-sm'>
                 <p>
-                  <span className='font-medium'>Framework:</span> {selectedFramework?.name}{' '}
+                  <span className='font-medium'>Indicador:</span> {selectedFramework?.name}{' '}
                   <Badge variant='outline' className='ml-2'>
                     {selectedFramework?.code}
                   </Badge>

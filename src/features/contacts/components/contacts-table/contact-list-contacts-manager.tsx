@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { keepPreviousData, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 
@@ -85,6 +85,15 @@ function normalizeValues(values: ContactFormValues): ContactFormValues {
     email: values.email.trim().toLowerCase(),
     phone: (values.phone || '').trim(),
     status: values.status
+  };
+}
+
+function getContactFormValues(contact: EmailContact): ContactFormValues {
+  return {
+    name: contact.name,
+    email: contact.email,
+    phone: contact.phone ?? '',
+    status: contact.status ?? EmailContactStatusEnum.ACTIVE
   };
 }
 
@@ -195,6 +204,27 @@ export function ContactListContactsManager({ listId }: ContactListContactsManage
 
   const { FormTextField, FormSelectField } = useFormFields<ContactFormValues>();
 
+  useEffect(() => {
+    if (!isFormDialogOpen) {
+      if (formMode !== 'create' || selectedContact) {
+        setFormMode('create');
+        setSelectedContact(null);
+        form.reset(DEFAULT_VALUES);
+      }
+
+      return;
+    }
+
+    if (formMode === 'create') {
+      form.reset(DEFAULT_VALUES);
+      return;
+    }
+
+    if (formMode === 'edit' && selectedContact) {
+      form.reset(getContactFormValues(selectedContact));
+    }
+  }, [form, formMode, isFormDialogOpen, selectedContact]);
+
   function openCreateDialog() {
     setFormMode('create');
     setSelectedContact(null);
@@ -202,17 +232,15 @@ export function ContactListContactsManager({ listId }: ContactListContactsManage
     setIsFormDialogOpen(true);
   }
 
-  function openEditDialog(contact: EmailContact) {
-    setFormMode('edit');
-    setSelectedContact(contact);
-    form.reset({
-      name: contact.name,
-      email: contact.email,
-      phone: contact.phone || '',
-      status: contact.status || EmailContactStatusEnum.ACTIVE
-    });
-    setIsFormDialogOpen(true);
-  }
+  const openEditDialog = useCallback(
+    (contact: EmailContact) => {
+      setFormMode('edit');
+      setSelectedContact(contact);
+      form.reset(getContactFormValues(contact));
+      setIsFormDialogOpen(true);
+    },
+    [form]
+  );
 
   const columns = useMemo(
     () =>
@@ -221,7 +249,7 @@ export function ContactListContactsManager({ listId }: ContactListContactsManage
         onDelete: setDeleteContact,
         disableActions: hasMutationInFlight
       }),
-    [hasMutationInFlight]
+    [hasMutationInFlight, openEditDialog]
   );
 
   const { params } = useModuleTableParams<EmailContact, (typeof CONTACT_FILTER_KEYS)[number]>({
@@ -261,6 +289,8 @@ export function ContactListContactsManager({ listId }: ContactListContactsManage
       columnPinning: { right: ['actions'] }
     }
   });
+  const dialogFormKey =
+    formMode === 'edit' && selectedContact ? `edit-${selectedContact.id}` : formMode;
 
   if (listQuery.isPending || contactsQuery.isPending) {
     return <ModuleDataTableSkeleton columnCount={4} filterCount={0} />;
@@ -336,7 +366,7 @@ export function ContactListContactsManager({ listId }: ContactListContactsManage
             </DialogDescription>
           </DialogHeader>
 
-          <form.AppForm>
+          <form.AppForm key={dialogFormKey}>
             <form.Form className='space-y-4 p-0 md:p-0'>
               <FormTextField
                 name='name'
@@ -352,7 +382,7 @@ export function ContactListContactsManager({ listId }: ContactListContactsManage
 
               <FormTextField
                 name='email'
-                label='Email'
+                label='E-mail'
                 required
                 placeholder='contato@empresa.com'
                 validators={{

@@ -241,7 +241,7 @@ function SurveyFormEditor({ mode, initialForm }: SurveyFormEditorProps) {
       >
         {isEdit && initialForm ? (
           <div className='flex flex-col gap-2 sm:flex-row sm:items-start'>
-            <Alert className='flex-1'>
+            <Alert className='w-full max-w-1/2 flex-1'>
               <Icons.info className='h-4 w-4' />
               <AlertTitle>Status atual: {initialForm.status ?? 'Sem status'}</AlertTitle>
               <AlertDescription>

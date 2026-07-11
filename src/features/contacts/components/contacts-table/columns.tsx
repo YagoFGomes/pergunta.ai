@@ -62,7 +62,7 @@ export function getContactsByListColumns({
       enableColumnFilter: true,
       meta: {
         label: 'Contato',
-        placeholder: 'Buscar email...',
+        placeholder: 'Buscar e-mail...',
         variant: 'text'
       },
       header: ({ column }: { column: Column<EmailContact, unknown> }) => (

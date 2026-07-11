@@ -7,9 +7,9 @@ export const contactFormSchema = z.object({
     .string()
     .trim()
     .min(3, 'Informe ao menos 3 caracteres.')
-    .max(255, 'Maximo de 255 caracteres.'),
-  email: z.string().trim().email('Informe um email valido.'),
-  phone: z.string().trim().max(30, 'Maximo de 30 caracteres.').optional(),
+    .max(255, 'Máximo de 255 caracteres.'),
+  email: z.string().trim().email('Informe um e-mail válido.'),
+  phone: z.string().trim().max(30, 'Máximo de 30 caracteres.').optional(),
   status: z.nativeEnum(EmailContactStatusEnum)
 });
 
@@ -20,8 +20,8 @@ export const contactFieldSchemas = {
     .string()
     .trim()
     .min(3, 'Informe ao menos 3 caracteres.')
-    .max(255, 'Maximo de 255 caracteres.'),
-  email: z.string().trim().email('Informe um email valido.'),
-  phone: z.string().trim().max(30, 'Maximo de 30 caracteres.'),
+    .max(255, 'Máximo de 255 caracteres.'),
+  email: z.string().trim().email('Informe um e-mail válido.'),
+  phone: z.string().trim().max(30, 'Máximo de 30 caracteres.'),
   status: z.nativeEnum(EmailContactStatusEnum)
 };
