@@ -8,23 +8,20 @@ type ModuleFormSectionProps = React.ComponentProps<'section'> & {
   title?: string;
   description?: string;
   columns?: 1 | 2;
-  separated?: boolean;
 };
 
 export function ModuleFormSection({
   title,
   description,
   columns = 2,
-  separated = false,
   className,
   children,
   ...props
 }: ModuleFormSectionProps) {
   return (
     <section className={cn('min-w-0 space-y-4', className)} {...props}>
-      {separated ? <FieldSeparator /> : null}
       {title || description ? (
-        <div className='min-w-0 space-y-1'>
+        <div className='min-w-0 space-y-1 mb-1'>
           {title ? <FieldLegend>{title}</FieldLegend> : null}
           {description ? <FieldDescription>{description}</FieldDescription> : null}
         </div>
