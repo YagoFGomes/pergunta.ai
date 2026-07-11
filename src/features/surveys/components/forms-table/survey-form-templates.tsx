@@ -21,10 +21,13 @@ import { notifyError, notifySuccess } from '@/features/platform/lib/notification
 import { getOrvalResponseData } from '@/features/platform/lib/orval-response';
 import {
   getSurveysFormsListQueryKey,
+  useSurveysFormsList,
   useSurveysFormsTemplatesCloneCreate,
   useSurveysFormsTemplatesList
 } from '@/lib/api/generated/endpoints';
 import type { Form } from '@/lib/api/generated/model/form';
+import type { PaginatedFormList } from '@/lib/api/generated/model/paginatedFormList';
+import { Status37cEnum } from '@/lib/api/generated/model/status37cEnum';
 
 function TemplateCardSkeleton() {
   return (
@@ -107,7 +110,21 @@ export function SurveyFormTemplates() {
   const templatesQuery = useSurveysFormsTemplatesList();
   const templates = getOrvalResponseData<Form[]>(templatesQuery.data) ?? [];
 
-  if (templatesQuery.isPending) {
+  const activeFormsQuery = useSurveysFormsList(
+    { status: Status37cEnum.ACTIVE, page_size: '1' },
+    { query: { staleTime: 30_000 } }
+  );
+  const activeFormsCount =
+    getOrvalResponseData<PaginatedFormList>(activeFormsQuery.data)?.count ?? 0;
+
+  const isLoading = templatesQuery.isPending || activeFormsQuery.isPending;
+
+  // Hide suggestion once the tenant has at least 1 active form
+  if (!isLoading && (activeFormsCount > 0 || templates.length === 0 || templatesQuery.isError)) {
+    return null;
+  }
+
+  if (isLoading) {
     return (
       <div className='space-y-3'>
         <div className='space-y-1'>
@@ -116,8 +133,7 @@ export function SurveyFormTemplates() {
             Comece com um template pronto e personalize conforme sua necessidade.
           </p>
         </div>
-        <div className='grid gap-4 sm:grid-cols-2 lg:grid-cols-3'>
-          <TemplateCardSkeleton />
+        <div className='grid gap-4 grid-cols-1 pb-4'>
           <TemplateCardSkeleton />
         </div>
       </div>
@@ -138,7 +154,7 @@ export function SurveyFormTemplates() {
         </p>
       </div>
 
-      <div className='grid gap-4 sm:grid-cols-2 lg:grid-cols-3'>
+      <div className='grid gap-4 grid-cols-1'>
         {templates.map((template) => (
           <TemplateCard key={template.id} template={template} />
         ))}
