@@ -76,9 +76,9 @@ function TemplateCard({ template }: TemplateCardProps) {
   });
 
   return (
-    <Card className='flex flex-col'>
+    <Card className='flex flex-col max-w-2xl'>
       <CardHeader>
-        <div className='flex items-start justify-between gap-2'>
+        <div className='flex items-start justify-between gap-2 '>
           <CardTitle className='text-base leading-snug'>{template.title}</CardTitle>
           <Badge variant='outline' className='shrink-0 text-xs'>
             {template.question_count} perguntas
