@@ -75,6 +75,7 @@ export function ContactListsManager() {
   const queryClient = useQueryClient();
 
   const [isFormDialogOpen, setIsFormDialogOpen] = useState(false);
+  const [confirmDiscard, setConfirmDiscard] = useState(false);
   const [formMode, setFormMode] = useState<FormMode>('create');
   const [selectedList, setSelectedList] = useState<EmailList | null>(null);
   const [deleteList, setDeleteList] = useState<EmailList | null>(null);
@@ -186,6 +187,11 @@ export function ContactListsManager() {
     setIsFormDialogOpen(true);
   }
 
+  function forceClose() {
+    setConfirmDiscard(false);
+    setIsFormDialogOpen(false);
+  }
+
   const openEditDialog = useCallback(
     (list: EmailList) => {
       setFormMode('edit');
@@ -254,12 +260,13 @@ export function ContactListsManager() {
 
       <Dialog
         open={isFormDialogOpen}
-        onOpenChange={(open) => {
-          if (hasMutationInFlight) {
+        onOpenChange={(nextOpen) => {
+          if (hasMutationInFlight) return;
+          if (!nextOpen) {
+            setConfirmDiscard(true);
             return;
           }
-
-          setIsFormDialogOpen(open);
+          setIsFormDialogOpen(nextOpen);
         }}
       >
         <DialogContent>
@@ -313,7 +320,7 @@ export function ContactListsManager() {
                 <Button
                   type='button'
                   variant='outline'
-                  onClick={() => setIsFormDialogOpen(false)}
+                  onClick={() => setConfirmDiscard(true)}
                   disabled={hasMutationInFlight}
                 >
                   Cancelar
@@ -330,6 +337,21 @@ export function ContactListsManager() {
               </DialogFooter>
             </form.Form>
           </form.AppForm>
+
+          <AlertDialog open={confirmDiscard} onOpenChange={setConfirmDiscard}>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Descartar alterações?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  Os dados preenchidos serão perdidos. Esta ação não pode ser desfeita.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Continuar editando</AlertDialogCancel>
+                <AlertDialogAction onClick={forceClose}>Descartar</AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
         </DialogContent>
       </Dialog>
 

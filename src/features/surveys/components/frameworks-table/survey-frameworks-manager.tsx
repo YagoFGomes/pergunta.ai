@@ -5,6 +5,16 @@ import { useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle
+} from '@/components/ui/alert-dialog';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
@@ -65,6 +75,7 @@ export function SurveyFrameworksManager() {
   const queryClient = useQueryClient();
 
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [confirmDiscard, setConfirmDiscard] = useState(false);
   const [mode, setMode] = useState<Mode>('create');
   const [selectedFramework, setSelectedFramework] = useState<SurveyFramework | null>(null);
 
@@ -177,6 +188,11 @@ export function SurveyFrameworksManager() {
     setIsDialogOpen(true);
   }
 
+  function forceClose() {
+    setConfirmDiscard(false);
+    setIsDialogOpen(false);
+  }
+
   const openEditDialog = useCallback(
     (framework: SurveyFramework) => {
       if (framework.is_seed) {
@@ -283,12 +299,13 @@ export function SurveyFrameworksManager() {
 
       <Dialog
         open={isDialogOpen}
-        onOpenChange={(open) => {
-          if (hasMutationInFlight) {
+        onOpenChange={(nextOpen) => {
+          if (hasMutationInFlight) return;
+          if (!nextOpen && mode !== 'deactivate') {
+            setConfirmDiscard(true);
             return;
           }
-
-          setIsDialogOpen(open);
+          setIsDialogOpen(nextOpen);
         }}
       >
         <DialogContent>
@@ -373,7 +390,7 @@ export function SurveyFrameworksManager() {
                   <Button
                     type='button'
                     variant='outline'
-                    onClick={() => setIsDialogOpen(false)}
+                    onClick={() => setConfirmDiscard(true)}
                     disabled={hasMutationInFlight}
                   >
                     Cancelar
@@ -431,6 +448,21 @@ export function SurveyFrameworksManager() {
               </DialogFooter>
             </div>
           )}
+
+          <AlertDialog open={confirmDiscard} onOpenChange={setConfirmDiscard}>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Descartar alterações?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  Os dados preenchidos serão perdidos. Esta ação não pode ser desfeita.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Continuar editando</AlertDialogCancel>
+                <AlertDialogAction onClick={forceClose}>Descartar</AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
         </DialogContent>
       </Dialog>
     </div>

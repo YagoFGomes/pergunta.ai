@@ -7,6 +7,16 @@ import { Icons } from '@/components/icons';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle
+} from '@/components/ui/alert-dialog';
+import {
   Dialog,
   DialogContent,
   DialogDescription,
@@ -52,6 +62,7 @@ export function SurveyQuestionCreateDialog({
 }: SurveyQuestionCreateDialogProps) {
   const queryClient = useQueryClient();
   const [open, setOpen] = React.useState(false);
+  const [confirmDiscard, setConfirmDiscard] = React.useState(false);
   const [selectedIndicators, setSelectedIndicators] = React.useState<string[]>([]);
 
   const indicatorsQuery = useSurveysFrameworksList(
@@ -72,6 +83,8 @@ export function SurveyQuestionCreateDialog({
           })
         ]);
         notifySuccess('Pergunta criada.');
+        form.reset(DEFAULT_VALUES);
+        setSelectedIndicators([]);
         setOpen(false);
       },
       onError: (error) => {
@@ -101,11 +114,18 @@ export function SurveyQuestionCreateDialog({
 
   function handleOpenChange(nextOpen: boolean) {
     if (!nextOpen) {
-      form.reset(DEFAULT_VALUES);
-      setSelectedIndicators([]);
-      createMutation.reset();
+      setConfirmDiscard(true);
+      return; // intercept — don't actually close
     }
-    setOpen(nextOpen);
+    setOpen(true);
+  }
+
+  function forceClose() {
+    form.reset(DEFAULT_VALUES);
+    setSelectedIndicators([]);
+    createMutation.reset();
+    setConfirmDiscard(false);
+    setOpen(false);
   }
 
   return (
@@ -200,7 +220,7 @@ export function SurveyQuestionCreateDialog({
             <Button
               type='button'
               variant='outline'
-              onClick={() => handleOpenChange(false)}
+              onClick={() => setConfirmDiscard(true)}
               disabled={createMutation.isPending}
             >
               Cancelar
@@ -213,6 +233,21 @@ export function SurveyQuestionCreateDialog({
               Adicionar pergunta
             </Button>
           </DialogFooter>
+
+          <AlertDialog open={confirmDiscard} onOpenChange={setConfirmDiscard}>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Descartar alterações?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  Os dados preenchidos serão perdidos. Esta ação não pode ser desfeita.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Continuar editando</AlertDialogCancel>
+                <AlertDialogAction onClick={forceClose}>Descartar</AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
         </DialogContent>
       </Dialog>
     </>

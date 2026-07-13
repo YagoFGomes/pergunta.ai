@@ -101,6 +101,7 @@ function getContactFormValues(contact: EmailContact): ContactFormValues {
 export function ContactListContactsManager({ listId }: ContactListContactsManagerProps) {
   const queryClient = useQueryClient();
   const [isFormDialogOpen, setIsFormDialogOpen] = useState(false);
+  const [confirmDiscard, setConfirmDiscard] = useState(false);
   const [formMode, setFormMode] = useState<FormMode>('create');
   const [selectedContact, setSelectedContact] = useState<EmailContact | null>(null);
   const [deleteContact, setDeleteContact] = useState<EmailContact | null>(null);
@@ -233,6 +234,11 @@ export function ContactListContactsManager({ listId }: ContactListContactsManage
     setIsFormDialogOpen(true);
   }
 
+  function forceClose() {
+    setConfirmDiscard(false);
+    setIsFormDialogOpen(false);
+  }
+
   const openEditDialog = useCallback(
     (contact: EmailContact) => {
       setFormMode('edit');
@@ -349,12 +355,13 @@ export function ContactListContactsManager({ listId }: ContactListContactsManage
 
       <Dialog
         open={isFormDialogOpen}
-        onOpenChange={(open) => {
-          if (hasMutationInFlight) {
+        onOpenChange={(nextOpen) => {
+          if (hasMutationInFlight) return;
+          if (!nextOpen) {
+            setConfirmDiscard(true);
             return;
           }
-
-          setIsFormDialogOpen(open);
+          setIsFormDialogOpen(nextOpen);
         }}
       >
         <DialogContent>
@@ -418,7 +425,7 @@ export function ContactListContactsManager({ listId }: ContactListContactsManage
                 <Button
                   type='button'
                   variant='outline'
-                  onClick={() => setIsFormDialogOpen(false)}
+                  onClick={() => setConfirmDiscard(true)}
                   disabled={hasMutationInFlight}
                 >
                   Cancelar
@@ -435,6 +442,21 @@ export function ContactListContactsManager({ listId }: ContactListContactsManage
               </DialogFooter>
             </form.Form>
           </form.AppForm>
+
+          <AlertDialog open={confirmDiscard} onOpenChange={setConfirmDiscard}>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Descartar alterações?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  Os dados preenchidos serão perdidos. Esta ação não pode ser desfeita.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Continuar editando</AlertDialogCancel>
+                <AlertDialogAction onClick={forceClose}>Descartar</AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
         </DialogContent>
       </Dialog>
 

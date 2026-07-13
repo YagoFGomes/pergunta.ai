@@ -7,6 +7,16 @@ import * as React from 'react';
 import { Icons } from '@/components/icons';
 import { Button } from '@/components/ui/button';
 import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle
+} from '@/components/ui/alert-dialog';
+import {
   Dialog,
   DialogContent,
   DialogDescription,
@@ -53,6 +63,7 @@ export function SurveyFormCreateDialog({ trigger }: SurveyFormCreateDialogProps)
   const router = useRouter();
   const queryClient = useQueryClient();
   const [open, setOpen] = React.useState(false);
+  const [confirmDiscard, setConfirmDiscard] = React.useState(false);
 
   const createMutation = useSurveysFormsCreate({
     mutation: {
@@ -64,6 +75,7 @@ export function SurveyFormCreateDialog({ trigger }: SurveyFormCreateDialogProps)
         });
 
         notifySuccess('Formulário criado.', 'Agora configure as perguntas da pesquisa.');
+        form.reset(DEFAULT_VALUES);
         setOpen(false);
         router.push(
           createdForm?.id
@@ -91,10 +103,17 @@ export function SurveyFormCreateDialog({ trigger }: SurveyFormCreateDialogProps)
 
   function handleOpenChange(nextOpen: boolean) {
     if (!nextOpen) {
-      form.reset(DEFAULT_VALUES);
-      createMutation.reset();
+      setConfirmDiscard(true);
+      return; // intercept — don't actually close
     }
-    setOpen(nextOpen);
+    setOpen(true);
+  }
+
+  function forceClose() {
+    form.reset(DEFAULT_VALUES);
+    createMutation.reset();
+    setConfirmDiscard(false);
+    setOpen(false);
   }
 
   return (
@@ -146,7 +165,7 @@ export function SurveyFormCreateDialog({ trigger }: SurveyFormCreateDialogProps)
             <Button
               type='button'
               variant='outline'
-              onClick={() => handleOpenChange(false)}
+              onClick={() => setConfirmDiscard(true)}
               disabled={createMutation.isPending}
             >
               Cancelar
@@ -155,6 +174,21 @@ export function SurveyFormCreateDialog({ trigger }: SurveyFormCreateDialogProps)
               Criar formulário
             </Button>
           </DialogFooter>
+
+          <AlertDialog open={confirmDiscard} onOpenChange={setConfirmDiscard}>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Descartar alterações?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  Os dados preenchidos serão perdidos. Esta ação não pode ser desfeita.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Continuar editando</AlertDialogCancel>
+                <AlertDialogAction onClick={forceClose}>Descartar</AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
         </DialogContent>
       </Dialog>
     </>

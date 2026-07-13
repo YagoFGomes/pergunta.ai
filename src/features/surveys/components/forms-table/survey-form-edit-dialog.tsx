@@ -81,6 +81,7 @@ type SurveyFormEditDialogProps = {
 export function SurveyFormEditDialog({ form, open, onOpenChange }: SurveyFormEditDialogProps) {
   const queryClient = useQueryClient();
   const [confirmAction, setConfirmAction] = React.useState<'publish' | 'archive' | null>(null);
+  const [confirmDiscard, setConfirmDiscard] = React.useState(false);
 
   const invalidateQueries = React.useCallback(
     async (updatedId?: string) => {
@@ -156,11 +157,18 @@ export function SurveyFormEditDialog({ form, open, onOpenChange }: SurveyFormEdi
 
   function handleOpenChange(nextOpen: boolean) {
     if (!nextOpen) {
-      tanstackForm.reset(getDefaultValues(form));
-      updateMutation.reset();
-      setConfirmAction(null);
+      setConfirmDiscard(true);
+      return; // intercept — don't actually close
     }
-    onOpenChange(nextOpen);
+    onOpenChange(true);
+  }
+
+  function forceClose() {
+    tanstackForm.reset(getDefaultValues(form));
+    updateMutation.reset();
+    setConfirmAction(null);
+    setConfirmDiscard(false);
+    onOpenChange(false);
   }
 
   const handleConfirmAction = async () => {
@@ -248,7 +256,7 @@ export function SurveyFormEditDialog({ form, open, onOpenChange }: SurveyFormEdi
             <Button
               type='button'
               variant='outline'
-              onClick={() => handleOpenChange(false)}
+              onClick={() => setConfirmDiscard(true)}
               disabled={isPending}
             >
               Cancelar
@@ -262,6 +270,21 @@ export function SurveyFormEditDialog({ form, open, onOpenChange }: SurveyFormEdi
               Salvar alterações
             </Button>
           </DialogFooter>
+
+          <AlertDialog open={confirmDiscard} onOpenChange={setConfirmDiscard}>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Descartar alterações?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  Os dados preenchidos serão perdidos. Esta ação não pode ser desfeita.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Continuar editando</AlertDialogCancel>
+                <AlertDialogAction onClick={forceClose}>Descartar</AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
         </DialogContent>
       </Dialog>
 

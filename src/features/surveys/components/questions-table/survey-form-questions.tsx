@@ -109,6 +109,7 @@ function SurveyQuestionsEmptyState({
 export function SurveyFormQuestions({ formId }: SurveyFormQuestionsProps) {
   const queryClient = useQueryClient();
   const [editQuestion, setEditQuestion] = React.useState<FormQuestion | null>(null);
+  const [confirmDiscardQuestion, setConfirmDiscardQuestion] = React.useState(false);
   const [deleteQuestion, setDeleteQuestion] = React.useState<FormQuestion | null>(null);
   const [manageOptionsQuestion, setManageOptionsQuestion] = React.useState<FormQuestion | null>(
     null
@@ -708,7 +709,15 @@ export function SurveyFormQuestions({ formId }: SurveyFormQuestionsProps) {
         </DialogContent>
       </Dialog>
 
-      <Dialog open={Boolean(editQuestion)} onOpenChange={(open) => !open && setEditQuestion(null)}>
+      <Dialog
+        open={Boolean(editQuestion)}
+        onOpenChange={(nextOpen) => {
+          if (!nextOpen) {
+            setConfirmDiscardQuestion(true);
+            return; // intercept — don't actually close
+          }
+        }}
+      >
         <DialogContent className='sm:max-w-2xl'>
           <DialogHeader>
             <DialogTitle>Editar pergunta</DialogTitle>
@@ -791,7 +800,7 @@ export function SurveyFormQuestions({ formId }: SurveyFormQuestionsProps) {
             <Button
               type='button'
               variant='outline'
-              onClick={() => setEditQuestion(null)}
+              onClick={() => setConfirmDiscardQuestion(true)}
               disabled={updateMutation.isPending}
             >
               Cancelar
@@ -800,6 +809,28 @@ export function SurveyFormQuestions({ formId }: SurveyFormQuestionsProps) {
               Salvar alterações
             </Button>
           </DialogFooter>
+
+          <AlertDialog open={confirmDiscardQuestion} onOpenChange={setConfirmDiscardQuestion}>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Descartar alterações?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  Os dados preenchidos serão perdidos. Esta ação não pode ser desfeita.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Continuar editando</AlertDialogCancel>
+                <AlertDialogAction
+                  onClick={() => {
+                    setConfirmDiscardQuestion(false);
+                    setEditQuestion(null);
+                  }}
+                >
+                  Descartar
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
         </DialogContent>
       </Dialog>
 
