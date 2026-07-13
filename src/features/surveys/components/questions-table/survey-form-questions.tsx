@@ -32,9 +32,7 @@ import { useAppForm, useFormFields } from '@/components/ui/tanstack-form';
 import { ModuleDataTable } from '@/features/platform/components/module-data-table';
 import { ModuleDataTableSkeleton } from '@/features/platform/components/module-data-table-skeleton';
 import { ModuleErrorAlert } from '@/features/platform/components/module-error-alert';
-import { ModuleFormActions } from '@/features/platform/components/module-form-actions';
-import { ModuleFormCard } from '@/features/platform/components/module-form-card';
-import { ModuleFormSection } from '@/features/platform/components/module-form-section';
+
 import { MODULE_TABLE_DEFAULT_DEBOUNCE_MS } from '@/features/platform/lib/module-table';
 import { notifyError, notifySuccess } from '@/features/platform/lib/notifications';
 import { getOrvalResponseData } from '@/features/platform/lib/orval-response';
@@ -44,7 +42,6 @@ import {
   getSurveysFormsQuestionsOptionsListQueryKey,
   getSurveysFormsQuestionsRetrieveQueryKey,
   getSurveysFormsRetrieveQueryKey,
-  useSurveysFormsQuestionsCreate,
   useSurveysFormsQuestionsDestroy,
   useSurveysFormsQuestionsList,
   useSurveysFormsQuestionsOptionsCreate,
@@ -69,8 +66,8 @@ import {
   type SurveyQuestionCreateValues
 } from '../../schemas/survey-question';
 import { getSurveyQuestionsColumns } from './columns';
+import { SurveyQuestionCreateDialog } from './survey-question-create-dialog';
 
-const CREATE_QUESTION_FORM_ID = 'survey-question-create';
 const EDIT_QUESTION_FORM_ID = 'survey-question-edit';
 const QUESTION_OPTION_TYPES: ReadonlySet<QuestionTypeEnum> = new Set([
   QuestionTypeEnum.SINGLE_CHOICE,
@@ -86,7 +83,13 @@ type SurveyFormQuestionsProps = {
   formId: string;
 };
 
-function SurveyQuestionsEmptyState() {
+function SurveyQuestionsEmptyState({
+  formId,
+  isFormArchived
+}: {
+  formId: string;
+  isFormArchived: boolean;
+}) {
   return (
     <div className='flex min-h-[320px] flex-col items-center justify-center gap-4 rounded-lg border border-dashed p-8 text-center'>
       <div className='bg-muted flex size-12 items-center justify-center rounded-full'>
@@ -98,6 +101,7 @@ function SurveyQuestionsEmptyState() {
           Adicione a primeira pergunta para começar a montar este formulário de pesquisa.
         </p>
       </div>
+      <SurveyQuestionCreateDialog formId={formId} isFormArchived={isFormArchived} />
     </div>
   );
 }
@@ -116,7 +120,6 @@ export function SurveyFormQuestions({ formId }: SurveyFormQuestionsProps) {
   const [editOptionLabel, setEditOptionLabel] = React.useState('');
   const [editOptionValue, setEditOptionValue] = React.useState('');
   const [orderedQuestionIds, setOrderedQuestionIds] = React.useState<string[]>([]);
-  const [selectedIndicators, setSelectedIndicators] = React.useState<string[]>([]);
   const [editIndicators, setEditIndicators] = React.useState<string[]>([]);
 
   const formQuery = useSurveysFormsRetrieve(formId, {
@@ -135,21 +138,6 @@ export function SurveyFormQuestions({ formId }: SurveyFormQuestionsProps) {
   const optionsQuery = useSurveysFormsQuestionsOptionsList(formId, selectedQuestionId, {
     query: {
       enabled: Boolean(selectedQuestionId)
-    }
-  });
-
-  const createMutation = useSurveysFormsQuestionsCreate({
-    mutation: {
-      onSuccess: async () => {
-        await Promise.all([
-          queryClient.invalidateQueries({ queryKey: getSurveysFormsQuestionsListQueryKey(formId) }),
-          queryClient.invalidateQueries({ queryKey: getSurveysFormsRetrieveQueryKey(formId) })
-        ]);
-        notifySuccess('Pergunta criada.');
-      },
-      onError: (error) => {
-        notifyError(error, 'Não foi possível criar a pergunta.');
-      }
     }
   });
 
@@ -214,7 +202,7 @@ export function SurveyFormQuestions({ formId }: SurveyFormQuestionsProps) {
         });
         setNewOptionLabel('');
         setNewOptionValue('');
-        notifySuccess('Opcao criada.');
+        notifySuccess('Opção criada.');
       },
       onError: (error) => {
         notifyError(error, 'Não foi possível criar a opção.');
@@ -231,7 +219,7 @@ export function SurveyFormQuestions({ formId }: SurveyFormQuestionsProps) {
           queryKey: getSurveysFormsQuestionsOptionsListQueryKey(formId, selectedQuestionId)
         });
         setEditingOption(null);
-        notifySuccess('Opcao atualizada.');
+        notifySuccess('Opção atualizada.');
       },
       onError: (error) => {
         notifyError(error, 'Não foi possível atualizar a opção.');
@@ -248,7 +236,7 @@ export function SurveyFormQuestions({ formId }: SurveyFormQuestionsProps) {
           queryKey: getSurveysFormsQuestionsOptionsListQueryKey(formId, selectedQuestionId)
         });
         setDeleteOption(null);
-        notifySuccess('Opcao removida.');
+        notifySuccess('Opção removida.');
       },
       onError: (error) => {
         notifyError(error, 'Não foi possível remover a opção.');
@@ -262,30 +250,6 @@ export function SurveyFormQuestions({ formId }: SurveyFormQuestionsProps) {
     const raw = getOrvalResponseData<FormQuestionOption[]>(optionsQuery.data) ?? [];
     return [...raw].sort((a, b) => a.order - b.order);
   }, [optionsQuery.data]);
-
-  const form = useAppForm({
-    defaultValues: {
-      label: '',
-      question_type: surveyQuestionTypeOptions[0].value,
-      is_required: false
-    } as SurveyQuestionCreateValues,
-    validators: {
-      onSubmit: surveyQuestionCreateSchema
-    },
-    onSubmit: async ({ value }) => {
-      await createMutation.mutateAsync({
-        formId,
-        data: {
-          label: value.label.trim(),
-          question_type: value.question_type,
-          is_required: value.is_required,
-          indicators: selectedIndicators
-        } as never
-      });
-      form.reset();
-      setSelectedIndicators([]);
-    }
-  });
 
   const editForm = useAppForm({
     defaultValues: {
@@ -317,7 +281,6 @@ export function SurveyFormQuestions({ formId }: SurveyFormQuestionsProps) {
 
   const isFormArchived = formDetails?.status === Status37cEnum.ARCHIVED;
   const isMutating =
-    createMutation.isPending ||
     updateMutation.isPending ||
     destroyMutation.isPending ||
     reorderMutation.isPending ||
@@ -376,7 +339,7 @@ export function SurveyFormQuestions({ formId }: SurveyFormQuestionsProps) {
     const value = newOptionValue.trim();
 
     if (!label || !value) {
-      notifyError(new Error('Opcao invalida.'), 'Informe label e value da opção.');
+      notifyError(new Error('Opção inválida.'), 'Informe label e value da opção.');
       return;
     }
 
@@ -397,7 +360,7 @@ export function SurveyFormQuestions({ formId }: SurveyFormQuestionsProps) {
     const value = editOptionValue.trim();
 
     if (!label || !value) {
-      notifyError(new Error('Opcao invalida.'), 'Informe label e value da opção.');
+      notifyError(new Error('Opção inválida.'), 'Informe label e value da opção.');
       return;
     }
 
@@ -520,124 +483,8 @@ export function SurveyFormQuestions({ formId }: SurveyFormQuestionsProps) {
 
   return (
     <div className='grid gap-6'>
-      <ModuleFormCard
-        title='Nova pergunta'
-        description='Cadastre perguntas para compor o formulário. Reordenação e opções entram nas próximas tarefas.'
-        footer={
-          <ModuleFormActions
-            mode='create'
-            formId={CREATE_QUESTION_FORM_ID}
-            isPending={createMutation.isPending || isFormArchived}
-            submitLabel='Adicionar pergunta'
-            cancelLabel='Limpar'
-            onCancel={() => form.reset()}
-          />
-        }
-      >
-        <div className='flex min-w-0 flex-wrap items-center gap-2'>
-          <Badge variant='outline' className='max-w-full'>
-            <span className='truncate'>Formulário: {formDetails?.title ?? formId}</span>
-          </Badge>
-          <Badge variant='outline'>Total: {questions.length} perguntas</Badge>
-          {isFormArchived ? <Badge variant='outline'>Formulário arquivado</Badge> : null}
-        </div>
-
-        <form.AppForm>
-          <form.Form id={CREATE_QUESTION_FORM_ID} className='space-y-8 p-0 md:p-0'>
-            <ModuleFormSection
-              title='Conteudo da pergunta'
-              description='Defina o texto e o tipo da resposta esperada.'
-            >
-              <FormTextField
-                name='label'
-                label='Pergunta'
-                required
-                maxLength={255}
-                placeholder='Ex.: Como você avalia o atendimento recebido?'
-                validators={{
-                  onBlur: surveyQuestionCreateFieldSchemas.label
-                }}
-              />
-
-              <FormSelectField
-                name='question_type'
-                label='Tipo'
-                required
-                options={[...surveyQuestionTypeOptions]}
-                placeholder='Selecione um tipo'
-                validators={{
-                  onBlur: surveyQuestionCreateFieldSchemas.question_type
-                }}
-              />
-            </ModuleFormSection>
-
-            <ModuleFormSection
-              title='Regras'
-              description='Marque se o respondente precisa obrigatoriamente responder esta pergunta.'
-              columns={1}
-              separated
-            >
-              <FormSwitchField
-                name='is_required'
-                label='Resposta obrigatória'
-                description='Quando ativado, o envio só será permitido com esta pergunta respondida.'
-                validators={{
-                  onBlur: surveyQuestionCreateFieldSchemas.is_required
-                }}
-              />
-            </ModuleFormSection>
-
-            <ModuleFormSection
-              title='Indicadores'
-              description='Selecione os indicadores de satisfação que esta pergunta vai alimentar (opcional).'
-              columns={1}
-              separated
-            >
-              <div className='flex flex-wrap gap-x-6 gap-y-3'>
-                {indicators.map((indicator) => (
-                  <div key={indicator.id} className='flex items-center gap-2'>
-                    <Checkbox
-                      id={`new-ind-${indicator.code}`}
-                      checked={selectedIndicators.includes(indicator.code)}
-                      onCheckedChange={(checked) =>
-                        setSelectedIndicators((prev) =>
-                          checked
-                            ? [...prev, indicator.code]
-                            : prev.filter((c) => c !== indicator.code)
-                        )
-                      }
-                      disabled={isFormArchived}
-                    />
-                    <Label htmlFor={`new-ind-${indicator.code}`} className='cursor-pointer'>
-                      <span className='font-medium'>{indicator.code}</span>
-                      {indicator.name ? (
-                        <span className='text-muted-foreground ml-1 font-normal text-xs'>
-                          — {indicator.name}
-                        </span>
-                      ) : null}
-                    </Label>
-                  </div>
-                ))}
-                {indicators.length === 0 ? (
-                  <p className='text-muted-foreground text-sm'>
-                    Nenhum indicador ativo disponível.
-                  </p>
-                ) : null}
-              </div>
-            </ModuleFormSection>
-
-            {isFormArchived ? (
-              <ModuleErrorAlert
-                title='Formulário arquivado'
-                message='Não e permitido criar, editar ou remover perguntas em formulário arquivado.'
-              />
-            ) : null}
-          </form.Form>
-        </form.AppForm>
-      </ModuleFormCard>
-
       {questions.length === 0 ? (
-        <SurveyQuestionsEmptyState />
+        <SurveyQuestionsEmptyState formId={formId} isFormArchived={isFormArchived} />
       ) : (
         <ModuleDataTable
           table={table}
@@ -706,44 +553,42 @@ export function SurveyFormQuestions({ formId }: SurveyFormQuestionsProps) {
             />
           ) : (
             <div className='grid gap-4'>
-              <div className='grid gap-3 rounded-md border p-3'>
-                <h4 className='text-sm font-semibold'>Nova opção</h4>
-                <div className='grid gap-2'>
-                  <Label htmlFor='option-label'>Label</Label>
-                  <Input
-                    id='option-label'
-                    placeholder='Ex.: Muito satisfeito'
-                    value={newOptionLabel}
-                    onChange={(event) => setNewOptionLabel(event.target.value)}
-                    disabled={optionCreateMutation.isPending || isFormArchived}
-                  />
-                </div>
-                <div className='grid gap-2'>
-                  <Label htmlFor='option-value'>Value</Label>
-                  <Input
-                    id='option-value'
-                    placeholder='Ex.: very_satisfied'
-                    value={newOptionValue}
-                    onChange={(event) => setNewOptionValue(event.target.value)}
-                    disabled={optionCreateMutation.isPending || isFormArchived}
-                  />
-                </div>
-                <div className='flex justify-end'>
-                  <Button
-                    type='button'
-                    size='sm'
-                    className='w-full sm:w-auto'
-                    onClick={() => void handleCreateOption()}
-                    isLoading={optionCreateMutation.isPending}
-                    disabled={isFormArchived}
-                  >
-                    Adicionar opção
-                  </Button>
-                </div>
+              <h4 className='text-sm font-semibold'>Nova opção</h4>
+              <div className='grid gap-2'>
+                <Label htmlFor='option-label'>Label</Label>
+                <Input
+                  id='option-label'
+                  placeholder='Ex.: Muito satisfeito'
+                  value={newOptionLabel}
+                  onChange={(event) => setNewOptionLabel(event.target.value)}
+                  disabled={optionCreateMutation.isPending || isFormArchived}
+                />
+              </div>
+              <div className='grid gap-2'>
+                <Label htmlFor='option-value'>Value</Label>
+                <Input
+                  id='option-value'
+                  placeholder='Ex.: very_satisfied'
+                  value={newOptionValue}
+                  onChange={(event) => setNewOptionValue(event.target.value)}
+                  disabled={optionCreateMutation.isPending || isFormArchived}
+                />
+              </div>
+              <div className='flex justify-end'>
+                <Button
+                  type='button'
+                  size='sm'
+                  className='w-full sm:w-auto'
+                  onClick={() => void handleCreateOption()}
+                  isLoading={optionCreateMutation.isPending}
+                  disabled={isFormArchived}
+                >
+                  Adicionar opção
+                </Button>
               </div>
 
               {editingOption ? (
-                <div className='grid gap-3 rounded-md border p-3'>
+                <div className='grid gap-3 '>
                   <h4 className='text-sm font-semibold'>Editar opção</h4>
                   <div className='grid gap-2'>
                     <Label htmlFor='edit-option-label'>Label</Label>
@@ -841,7 +686,7 @@ export function SurveyFormQuestions({ formId }: SurveyFormQuestionsProps) {
               {isFormArchived ? (
                 <ModuleErrorAlert
                   title='Formulário arquivado'
-                  message='Não e permitido criar, editar ou remover opções em formulário arquivado.'
+                  message='Não é permitido criar, editar ou remover opções em formulário arquivado.'
                 />
               ) : null}
             </div>
@@ -864,7 +709,7 @@ export function SurveyFormQuestions({ formId }: SurveyFormQuestionsProps) {
       </Dialog>
 
       <Dialog open={Boolean(editQuestion)} onOpenChange={(open) => !open && setEditQuestion(null)}>
-        <DialogContent>
+        <DialogContent className='sm:max-w-2xl'>
           <DialogHeader>
             <DialogTitle>Editar pergunta</DialogTitle>
             <DialogDescription>
@@ -894,50 +739,53 @@ export function SurveyFormQuestions({ formId }: SurveyFormQuestionsProps) {
                 }}
               />
 
-              <FormSwitchField
-                name='is_required'
-                label='Resposta obrigatória'
-                validators={{
-                  onBlur: surveyQuestionCreateFieldSchemas.is_required
-                }}
-              />
+              <div className='flex items-end pb-1'>
+                <FormSwitchField
+                  name='is_required'
+                  label='Resposta obrigatória?'
+                  validators={{
+                    onBlur: surveyQuestionCreateFieldSchemas.is_required
+                  }}
+                />
+              </div>
             </editForm.Form>
           </editForm.AppForm>
 
-          <div className='space-y-2 px-1'>
-            <p className='text-sm font-medium'>Indicadores</p>
-            <p className='text-muted-foreground text-xs'>
-              Quais indicadores de satisfação esta pergunta alimenta.
-            </p>
-            <div className='flex flex-wrap gap-x-6 gap-y-3 pt-1'>
-              {indicators.map((indicator) => (
-                <div key={indicator.id} className='flex items-center gap-2'>
-                  <Checkbox
-                    id={`edit-ind-${indicator.code}`}
-                    checked={editIndicators.includes(indicator.code)}
-                    onCheckedChange={(checked) =>
-                      setEditIndicators((prev) =>
-                        checked
-                          ? [...prev, indicator.code]
-                          : prev.filter((c) => c !== indicator.code)
-                      )
-                    }
-                  />
-                  <Label htmlFor={`edit-ind-${indicator.code}`} className='cursor-pointer'>
+          {indicators.length > 0 ? (
+            <div className='space-y-2'>
+              <p className='text-md font-medium'>Indicadores</p>
+              <p className='text-muted-foreground text-xs'>
+                Quais indicadores de satisfação esta pergunta alimenta.
+              </p>
+              <div className='grid grid-cols-2 gap-2'>
+                {indicators.map((indicator) => (
+                  <Label
+                    key={indicator.id}
+                    htmlFor={`edit-ind-${indicator.code}`}
+                    className='flex cursor-pointer items-center gap-2 rounded-md border px-3 py-2'
+                  >
+                    <Checkbox
+                      id={`edit-ind-${indicator.code}`}
+                      checked={editIndicators.includes(indicator.code)}
+                      onCheckedChange={(checked) =>
+                        setEditIndicators((prev) =>
+                          checked
+                            ? [...prev, indicator.code]
+                            : prev.filter((c) => c !== indicator.code)
+                        )
+                      }
+                    />
                     <span className='font-medium'>{indicator.code}</span>
                     {indicator.name ? (
-                      <span className='text-muted-foreground ml-1 font-normal text-xs'>
+                      <span className='text-muted-foreground truncate font-normal text-xs'>
                         — {indicator.name}
                       </span>
                     ) : null}
                   </Label>
-                </div>
-              ))}
-              {indicators.length === 0 ? (
-                <p className='text-muted-foreground text-sm'>Nenhum indicador disponível.</p>
-              ) : null}
+                ))}
+              </div>
             </div>
-          </div>
+          ) : null}
 
           <DialogFooter>
             <Button

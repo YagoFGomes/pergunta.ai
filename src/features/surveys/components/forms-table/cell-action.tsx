@@ -34,6 +34,7 @@ import {
 } from '@/lib/api/generated/endpoints';
 import type { Form } from '@/lib/api/generated/model/form';
 import { Status37cEnum } from '@/lib/api/generated/model/status37cEnum';
+import { SurveyFormEditDialog } from './survey-form-edit-dialog';
 
 type SurveyFormCellActionProps = {
   data: Form;
@@ -43,6 +44,7 @@ export function SurveyFormCellAction({ data }: SurveyFormCellActionProps) {
   const router = useRouter();
   const queryClient = useQueryClient();
   const [confirmAction, setConfirmAction] = useState<'publish' | 'archive' | null>(null);
+  const [editOpen, setEditOpen] = useState(false);
 
   const invalidateQueries = async (id?: string) => {
     await Promise.all([
@@ -94,6 +96,8 @@ export function SurveyFormCellAction({ data }: SurveyFormCellActionProps) {
 
   return (
     <>
+      <SurveyFormEditDialog form={data} open={editOpen} onOpenChange={setEditOpen} />
+
       <DropdownMenu modal={false}>
         <DropdownMenuTrigger asChild>
           <Button variant='ghost' className='h-8 w-8 p-0' disabled={isPending}>
@@ -103,7 +107,7 @@ export function SurveyFormCellAction({ data }: SurveyFormCellActionProps) {
         </DropdownMenuTrigger>
         <DropdownMenuContent align='end'>
           <DropdownMenuLabel>Ações</DropdownMenuLabel>
-          <DropdownMenuItem onClick={() => router.push(`/dashboard/surveys/forms/${data.id}`)}>
+          <DropdownMenuItem onClick={() => setEditOpen(true)}>
             <Icons.edit className='mr-2 h-4 w-4' />
             Editar
           </DropdownMenuItem>

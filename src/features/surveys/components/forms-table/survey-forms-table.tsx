@@ -1,11 +1,10 @@
 'use client';
 
 import { keepPreviousData } from '@tanstack/react-query';
-import Link from 'next/link';
 import * as React from 'react';
 
 import { Icons } from '@/components/icons';
-import { Button, buttonVariants } from '@/components/ui/button';
+import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { ModuleDataTable } from '@/features/platform/components/module-data-table';
 import { ModuleDataTableSkeleton } from '@/features/platform/components/module-data-table-skeleton';
@@ -23,9 +22,8 @@ import type { PaginatedFormList } from '@/lib/api/generated/model/paginatedFormL
 import { Status37cEnum } from '@/lib/api/generated/model/status37cEnum';
 import type { SurveyFramework } from '@/lib/api/generated/model/surveyFramework';
 import type { SurveysFormsListParams } from '@/lib/api/generated/model/surveysFormsListParams';
-import { cn } from '@/lib/utils';
-
 import { getSurveyFormsColumns } from './columns';
+import { SurveyFormCreateDialog } from './survey-form-create-dialog';
 import { buildSurveyFrameworkOptions, SURVEY_FORM_STATUS_FILTER_VALUE } from './options';
 
 const FORM_FILTER_KEYS = ['status', 'framework'] as const;
@@ -53,13 +51,7 @@ function SurveyFormsEmptyState() {
           próximas tarefas do fluxo de surveys.
         </p>
       </div>
-      <Link
-        href='/dashboard/surveys/forms/new'
-        className={cn(buttonVariants(), 'text-xs md:text-sm')}
-      >
-        <Icons.add className='mr-2 h-4 w-4' />
-        Novo formulário
-      </Link>
+      <SurveyFormCreateDialog />
     </div>
   );
 }

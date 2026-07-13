@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { Icons } from '@/components/icons';
 import PageContainer from '@/components/layout/page-container';
 import { buttonVariants } from '@/components/ui/button';
+import { SurveyQuestionCreateDialog } from '@/features/surveys/components/questions-table/survey-question-create-dialog';
 import { SurveyFormQuestions } from '@/features/surveys/components/questions-table/survey-form-questions';
 import { cn } from '@/lib/utils';
 
@@ -23,6 +24,7 @@ export default async function SurveyQuestionsPage({ params }: SurveyQuestionsPag
       pageDescription='Liste e crie perguntas associadas a este formulário.'
       pageHeaderAction={
         <div className='flex flex-wrap items-center justify-end gap-2'>
+          <SurveyQuestionCreateDialog formId={id} />
           <Link
             href={`/dashboard/surveys/forms/${id}`}
             className={cn(buttonVariants({ variant: 'outline' }), 'text-xs md:text-sm')}

@@ -32,6 +32,7 @@ import { ModuleDataTableSkeleton } from '@/features/platform/components/module-d
 import { ModuleErrorAlert } from '@/features/platform/components/module-error-alert';
 import { useModuleTableParams } from '@/features/platform/hooks/use-module-table-params';
 import { MODULE_TABLE_DEFAULT_DEBOUNCE_MS } from '@/features/platform/lib/module-table';
+import { notifyError } from '@/features/platform/lib/notifications';
 import { getOrvalResponseData } from '@/features/platform/lib/orval-response';
 import { useDataTable } from '@/hooks/use-data-table';
 import {
@@ -155,8 +156,8 @@ export function ContactListContactsManager({ listId }: ContactListContactsManage
         toast.success('Contato removido com sucesso.');
         setDeleteContact(null);
       },
-      onError: () => {
-        toast.error('Não foi possível remover o contato.');
+      onError: (error) => {
+        notifyError(error, 'Não foi possível remover o contato.');
       }
     }
   });
