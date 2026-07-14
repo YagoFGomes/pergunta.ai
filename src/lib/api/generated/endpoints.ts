@@ -6735,6 +6735,105 @@ export const useEmailTemplatesDestroy = <TError = unknown, TContext = unknown>(
 };
 
 /**
+ * Creates a full copy of the global seed template in the current tenant. The clone is immediately ACTIVE and editable by tenant admins.
+ * @summary Clone global email template to tenant
+ */
+export type emailTemplatesCloneCreateResponse200 = {
+  data: EmailTemplate;
+  status: 200;
+};
+
+export type emailTemplatesCloneCreateResponseSuccess = emailTemplatesCloneCreateResponse200 & {
+  headers: Headers;
+};
+
+export type emailTemplatesCloneCreateResponse = emailTemplatesCloneCreateResponseSuccess;
+
+export const getEmailTemplatesCloneCreateUrl = (id: string) => {
+  return `/api/email-templates/${id}/clone/`;
+};
+
+export const emailTemplatesCloneCreate = async (
+  id: string,
+  emailTemplate: NonReadonly<EmailTemplate>,
+  options?: RequestInit
+): Promise<emailTemplatesCloneCreateResponse> => {
+  return customFetch<emailTemplatesCloneCreateResponse>(getEmailTemplatesCloneCreateUrl(id), {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(emailTemplate)
+  });
+};
+
+export const getEmailTemplatesCloneCreateMutationOptions = <
+  TError = unknown,
+  TContext = unknown
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof emailTemplatesCloneCreate>>,
+    TError,
+    { id: string; data: NonReadonly<EmailTemplate> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof emailTemplatesCloneCreate>>,
+  TError,
+  { id: string; data: NonReadonly<EmailTemplate> },
+  TContext
+> => {
+  const mutationKey = ['emailTemplatesCloneCreate'];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof emailTemplatesCloneCreate>>,
+    { id: string; data: NonReadonly<EmailTemplate> }
+  > = (props) => {
+    const { id, data } = props ?? {};
+
+    return emailTemplatesCloneCreate(id, data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type EmailTemplatesCloneCreateMutationResult = NonNullable<
+  Awaited<ReturnType<typeof emailTemplatesCloneCreate>>
+>;
+export type EmailTemplatesCloneCreateMutationBody = NonReadonly<EmailTemplate>;
+export type EmailTemplatesCloneCreateMutationError = unknown;
+
+/**
+ * @summary Clone global email template to tenant
+ */
+export const useEmailTemplatesCloneCreate = <TError = unknown, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof emailTemplatesCloneCreate>>,
+      TError,
+      { id: string; data: NonReadonly<EmailTemplate> },
+      TContext
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseMutationResult<
+  Awaited<ReturnType<typeof emailTemplatesCloneCreate>>,
+  TError,
+  { id: string; data: NonReadonly<EmailTemplate> },
+  TContext
+> => {
+  const mutationOptions = getEmailTemplatesCloneCreateMutationOptions(options);
+
+  return useMutation(mutationOptions, queryClient);
+};
+
+/**
  * @summary Preview email template
  */
 export type emailTemplatesPreviewCreateResponse200 = {
@@ -6831,6 +6930,259 @@ export const useEmailTemplatesPreviewCreate = <TError = unknown, TContext = unkn
 
   return useMutation(mutationOptions, queryClient);
 };
+
+/**
+ * Returns all global seed templates available for cloning into the current tenant.
+ * @summary List global email templates
+ */
+export type emailTemplatesGlobalListResponse200 = {
+  data: EmailTemplate[];
+  status: 200;
+};
+
+export type emailTemplatesGlobalListResponseSuccess = emailTemplatesGlobalListResponse200 & {
+  headers: Headers;
+};
+
+export type emailTemplatesGlobalListResponse = emailTemplatesGlobalListResponseSuccess;
+
+export const getEmailTemplatesGlobalListUrl = () => {
+  return `/api/email-templates/global/`;
+};
+
+export const emailTemplatesGlobalList = async (
+  options?: RequestInit
+): Promise<emailTemplatesGlobalListResponse> => {
+  return customFetch<emailTemplatesGlobalListResponse>(getEmailTemplatesGlobalListUrl(), {
+    ...options,
+    method: 'GET'
+  });
+};
+
+export const getEmailTemplatesGlobalListInfiniteQueryKey = () => {
+  return ['infinite', `/api/email-templates/global/`] as const;
+};
+
+export const getEmailTemplatesGlobalListQueryKey = () => {
+  return [`/api/email-templates/global/`] as const;
+};
+
+export const getEmailTemplatesGlobalListInfiniteQueryOptions = <
+  TData = InfiniteData<Awaited<ReturnType<typeof emailTemplatesGlobalList>>>,
+  TError = unknown
+>(options?: {
+  query?: Partial<
+    UseInfiniteQueryOptions<Awaited<ReturnType<typeof emailTemplatesGlobalList>>, TError, TData>
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getEmailTemplatesGlobalListInfiniteQueryKey();
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof emailTemplatesGlobalList>>> = ({
+    signal
+  }) => emailTemplatesGlobalList({ signal, ...requestOptions });
+
+  return { queryKey, queryFn, ...queryOptions } as UseInfiniteQueryOptions<
+    Awaited<ReturnType<typeof emailTemplatesGlobalList>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type EmailTemplatesGlobalListInfiniteQueryResult = NonNullable<
+  Awaited<ReturnType<typeof emailTemplatesGlobalList>>
+>;
+export type EmailTemplatesGlobalListInfiniteQueryError = unknown;
+
+export function useEmailTemplatesGlobalListInfinite<
+  TData = InfiniteData<Awaited<ReturnType<typeof emailTemplatesGlobalList>>>,
+  TError = unknown
+>(
+  options: {
+    query: Partial<
+      UseInfiniteQueryOptions<Awaited<ReturnType<typeof emailTemplatesGlobalList>>, TError, TData>
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof emailTemplatesGlobalList>>,
+          TError,
+          Awaited<ReturnType<typeof emailTemplatesGlobalList>>
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): DefinedUseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useEmailTemplatesGlobalListInfinite<
+  TData = InfiniteData<Awaited<ReturnType<typeof emailTemplatesGlobalList>>>,
+  TError = unknown
+>(
+  options?: {
+    query?: Partial<
+      UseInfiniteQueryOptions<Awaited<ReturnType<typeof emailTemplatesGlobalList>>, TError, TData>
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof emailTemplatesGlobalList>>,
+          TError,
+          Awaited<ReturnType<typeof emailTemplatesGlobalList>>
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useEmailTemplatesGlobalListInfinite<
+  TData = InfiniteData<Awaited<ReturnType<typeof emailTemplatesGlobalList>>>,
+  TError = unknown
+>(
+  options?: {
+    query?: Partial<
+      UseInfiniteQueryOptions<Awaited<ReturnType<typeof emailTemplatesGlobalList>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+/**
+ * @summary List global email templates
+ */
+
+export function useEmailTemplatesGlobalListInfinite<
+  TData = InfiniteData<Awaited<ReturnType<typeof emailTemplatesGlobalList>>>,
+  TError = unknown
+>(
+  options?: {
+    query?: Partial<
+      UseInfiniteQueryOptions<Awaited<ReturnType<typeof emailTemplatesGlobalList>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+  const queryOptions = getEmailTemplatesGlobalListInfiniteQueryOptions(options);
+
+  const query = useInfiniteQuery(queryOptions, queryClient) as UseInfiniteQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  query.queryKey = queryOptions.queryKey;
+
+  return query;
+}
+
+export const getEmailTemplatesGlobalListQueryOptions = <
+  TData = Awaited<ReturnType<typeof emailTemplatesGlobalList>>,
+  TError = unknown
+>(options?: {
+  query?: Partial<
+    UseQueryOptions<Awaited<ReturnType<typeof emailTemplatesGlobalList>>, TError, TData>
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getEmailTemplatesGlobalListQueryKey();
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof emailTemplatesGlobalList>>> = ({
+    signal
+  }) => emailTemplatesGlobalList({ signal, ...requestOptions });
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof emailTemplatesGlobalList>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type EmailTemplatesGlobalListQueryResult = NonNullable<
+  Awaited<ReturnType<typeof emailTemplatesGlobalList>>
+>;
+export type EmailTemplatesGlobalListQueryError = unknown;
+
+export function useEmailTemplatesGlobalList<
+  TData = Awaited<ReturnType<typeof emailTemplatesGlobalList>>,
+  TError = unknown
+>(
+  options: {
+    query: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof emailTemplatesGlobalList>>, TError, TData>
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof emailTemplatesGlobalList>>,
+          TError,
+          Awaited<ReturnType<typeof emailTemplatesGlobalList>>
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useEmailTemplatesGlobalList<
+  TData = Awaited<ReturnType<typeof emailTemplatesGlobalList>>,
+  TError = unknown
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof emailTemplatesGlobalList>>, TError, TData>
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof emailTemplatesGlobalList>>,
+          TError,
+          Awaited<ReturnType<typeof emailTemplatesGlobalList>>
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useEmailTemplatesGlobalList<
+  TData = Awaited<ReturnType<typeof emailTemplatesGlobalList>>,
+  TError = unknown
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof emailTemplatesGlobalList>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+/**
+ * @summary List global email templates
+ */
+
+export function useEmailTemplatesGlobalList<
+  TData = Awaited<ReturnType<typeof emailTemplatesGlobalList>>,
+  TError = unknown
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof emailTemplatesGlobalList>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+  queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+  const queryOptions = getEmailTemplatesGlobalListQueryOptions(options);
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+  };
+
+  query.queryKey = queryOptions.queryKey;
+
+  return query;
+}
 
 /**
  * Authenticates user and returns JWT access/refresh tokens. Access token may include tenant_id claim.

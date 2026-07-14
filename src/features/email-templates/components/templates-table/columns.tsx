@@ -1,6 +1,5 @@
 'use client';
 
-import Link from 'next/link';
 import type { Column, ColumnDef } from '@tanstack/react-table';
 
 import { Icons } from '@/components/icons';

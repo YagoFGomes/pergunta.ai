@@ -53,6 +53,8 @@ import {
   type EmailTemplateFormValues
 } from '@/features/email-templates/schemas/email-template';
 
+import { EmailTemplateSeedDialog } from '@/features/email-templates/components/email-template-seed-templates';
+
 import { getEmailTemplatesColumns } from './columns';
 
 const EMAIL_TEMPLATE_FILTER_KEYS = ['search', 'status', 'template_type'] as const;
@@ -77,6 +79,7 @@ function normalizeSingleFilter(value: unknown) {
 export function EmailTemplatesManager() {
   const queryClient = useQueryClient();
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
+  const [isSeedDialogOpen, setIsSeedDialogOpen] = useState(false);
   const [deleteTemplate, setDeleteTemplate] = useState<EmailTemplate | null>(null);
 
   const createMutation = useEmailTemplatesCreate({
@@ -220,9 +223,18 @@ export function EmailTemplatesManager() {
               Consulte os templates disponíveis para vincular nas campanhas.
             </p>
           </div>
-          <Button onClick={openCreateDialog} disabled={hasMutationInFlight}>
-            Novo template
-          </Button>
+          <div className='flex flex-wrap gap-2'>
+            <Button
+              variant='outline'
+              onClick={() => setIsSeedDialogOpen(true)}
+              disabled={hasMutationInFlight}
+            >
+              <Icons.page className='mr-2 h-4 w-4' />A partir de modelo
+            </Button>
+            <Button onClick={openCreateDialog} disabled={hasMutationInFlight}>
+              Novo template
+            </Button>
+          </div>
         </div>
       </div>
 
@@ -334,6 +346,8 @@ export function EmailTemplatesManager() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      <EmailTemplateSeedDialog open={isSeedDialogOpen} onOpenChange={setIsSeedDialogOpen} />
     </div>
   );
 }
