@@ -306,6 +306,28 @@ export const thankYouDesign = {
   }
 };
 
+/** Design inicial para templates criados do zero — imagem, texto, botão, rodapé */
+export const defaultStarterDesign = {
+  schemaVersion: 16,
+  body: {
+    rows: [
+      bannerRow('#FFFFFF', 'Sua imagem aqui'),
+      headingRow('<p><strong>Título do e-mail</strong></p>'),
+      bodyTextRow(
+        '<p>Escreva aqui o conteúdo principal do seu e-mail. ' +
+          'Você pode usar variáveis dinâmicas como {{contact_name}} ' +
+          'para personalizar a mensagem para cada destinatário.</p>'
+      ),
+      buttonRow('Clique aqui'),
+      footerRow(
+        '<p>Você está recebendo este e-mail porque é cliente. ' +
+          '<a href="{{unsubscribe_link}}">Cancelar inscrição</a></p>'
+      )
+    ],
+    values: BASE_BODY_VALUES
+  }
+};
+
 /** Map slug → design para lookup rápido */
 export const DESIGN_BY_SLUG: Record<string, unknown> = {
   welcome: welcomeDesign,

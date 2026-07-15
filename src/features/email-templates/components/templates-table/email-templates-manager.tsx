@@ -1,8 +1,8 @@
 'use client';
 
 import { keepPreviousData, useQueryClient } from '@tanstack/react-query';
+import { useRouter } from 'next/navigation';
 import { useMemo, useState } from 'react';
-import { toast } from 'sonner';
 
 import { Icons } from '@/components/icons';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
@@ -18,22 +18,12 @@ import {
 } from '@/components/ui/alert-dialog';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle
-} from '@/components/ui/dialog';
-import { useAppForm } from '@/components/ui/tanstack-form';
-import { EmailTemplateFormFields } from '@/features/email-templates/components/email-template-form-fields';
 import { ModuleDataTable } from '@/features/platform/components/module-data-table';
 import { ModuleDataTableSkeleton } from '@/features/platform/components/module-data-table-skeleton';
 import { ModuleErrorAlert } from '@/features/platform/components/module-error-alert';
 import { useModuleTableParams } from '@/features/platform/hooks/use-module-table-params';
 import { MODULE_TABLE_DEFAULT_DEBOUNCE_MS } from '@/features/platform/lib/module-table';
-import { notifyError } from '@/features/platform/lib/notifications';
+import { notifyError, notifySuccess } from '@/features/platform/lib/notifications';
 import { getOrvalResponseData } from '@/features/platform/lib/orval-response';
 import { useDataTable } from '@/hooks/use-data-table';
 import {
@@ -46,12 +36,7 @@ import type { EmailTemplate } from '@/lib/api/generated/model/emailTemplate';
 import type { EmailTemplatesListParams } from '@/lib/api/generated/model/emailTemplatesListParams';
 import { EmailTemplateStatusEnum } from '@/lib/api/generated/model/emailTemplateStatusEnum';
 import { TemplateTypeEnum } from '@/lib/api/generated/model/templateTypeEnum';
-import {
-  emailTemplateFormSchema,
-  getMissingRequiredVariableDeclarations,
-  normalizeEmailTemplateValues,
-  type EmailTemplateFormValues
-} from '@/features/email-templates/schemas/email-template';
+import { defaultStarterDesign } from '@/features/email-templates/constants/email-template-designs';
 
 import { EmailTemplateSeedDialog } from '@/features/email-templates/components/email-template-seed-templates';
 
@@ -59,35 +44,25 @@ import { getEmailTemplatesColumns } from './columns';
 
 const EMAIL_TEMPLATE_FILTER_KEYS = ['search', 'status', 'template_type'] as const;
 
-const DEFAULT_TEMPLATE_VALUES: EmailTemplateFormValues = {
-  name: '',
-  slug: '',
-  template_type: TemplateTypeEnum.WELCOME,
-  subject: '',
-  html_content: '<p>Ola {{ contact_name }}</p>',
-  plain_text_content: '',
-  requiredVariablesText: 'contact_name',
-  language: 'pt-BR',
-  status: EmailTemplateStatusEnum.ACTIVE
-};
-
 function normalizeSingleFilter(value: unknown) {
   if (Array.isArray(value)) return value[0];
   return typeof value === 'string' && value.length > 0 ? value : undefined;
 }
 
 export function EmailTemplatesManager() {
+  const router = useRouter();
   const queryClient = useQueryClient();
-  const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [isSeedDialogOpen, setIsSeedDialogOpen] = useState(false);
   const [deleteTemplate, setDeleteTemplate] = useState<EmailTemplate | null>(null);
 
   const createMutation = useEmailTemplatesCreate({
     mutation: {
-      onSuccess: async () => {
+      onSuccess: async (response) => {
+        const created = getOrvalResponseData<EmailTemplate>(response);
         await queryClient.invalidateQueries({ queryKey: getEmailTemplatesListQueryKey() });
-        toast.success('Template criado com sucesso.');
-        setIsCreateDialogOpen(false);
+        if (created?.id) {
+          router.push(`/dashboard/email-templates/${created.id}/edit`);
+        }
       },
       onError: (error) => {
         notifyError(error, 'Não foi possível criar o template.');
@@ -99,7 +74,7 @@ export function EmailTemplatesManager() {
     mutation: {
       onSuccess: async () => {
         await queryClient.invalidateQueries({ queryKey: getEmailTemplatesListQueryKey() });
-        toast.success('Template excluido com sucesso.');
+        notifySuccess('Template excluído com sucesso.');
         setDeleteTemplate(null);
       },
       onError: (error) => {
@@ -151,33 +126,22 @@ export function EmailTemplatesManager() {
   const templates = getOrvalResponseData<EmailTemplate[]>(templatesQuery.data) ?? [];
   const hasFilters = Boolean(params.search || params.status || params.template_type);
 
-  const form = useAppForm({
-    defaultValues: DEFAULT_TEMPLATE_VALUES,
-    onSubmit: async ({ value }) => {
-      const parsed = emailTemplateFormSchema.safeParse(value);
-
-      if (!parsed.success) {
-        toast.error(parsed.error.issues[0]?.message ?? 'Revise os campos do template.');
-        return;
+  function handleCreateNew() {
+    const timestamp = Date.now();
+    void createMutation.mutateAsync({
+      data: {
+        name: 'Novo Template',
+        slug: `novo-template-${timestamp}`,
+        template_type: TemplateTypeEnum.WELCOME,
+        subject: 'Assunto do e-mail',
+        html_content: '<p>Seu template aqui</p>',
+        plain_text_content: '',
+        required_variables: ['contact_name', 'survey_link'],
+        design_json: defaultStarterDesign as never,
+        language: 'pt-BR',
+        status: EmailTemplateStatusEnum.DRAFT as never
       }
-
-      const normalized = normalizeEmailTemplateValues(parsed.data, { isDefault: false });
-      const missingVariables = getMissingRequiredVariableDeclarations(normalized);
-
-      if (missingVariables.length > 0) {
-        toast.error(`Declare as variáveis usadas no template: ${missingVariables.join(', ')}.`);
-        return;
-      }
-
-      await createMutation.mutateAsync({
-        data: normalized
-      });
-    }
-  });
-
-  function openCreateDialog() {
-    form.reset(DEFAULT_TEMPLATE_VALUES);
-    setIsCreateDialogOpen(true);
+    });
   }
 
   const { table } = useDataTable({
@@ -231,7 +195,11 @@ export function EmailTemplatesManager() {
             >
               <Icons.page className='mr-2 h-4 w-4' />A partir de modelo
             </Button>
-            <Button onClick={openCreateDialog} disabled={hasMutationInFlight}>
+            <Button
+              onClick={handleCreateNew}
+              isLoading={createMutation.isPending}
+              disabled={hasMutationInFlight}
+            >
               Novo template
             </Button>
           </div>
@@ -261,55 +229,6 @@ export function EmailTemplatesManager() {
           </>
         }
       />
-
-      <Dialog
-        open={isCreateDialogOpen}
-        onOpenChange={(open) => {
-          if (hasMutationInFlight) {
-            return;
-          }
-
-          setIsCreateDialogOpen(open);
-        }}
-      >
-        <DialogContent className='max-h-[90vh] overflow-y-auto sm:max-w-3xl'>
-          <DialogHeader>
-            <DialogTitle>Novo template</DialogTitle>
-            <DialogDescription>
-              Configure o conteúdo e as variáveis obrigatórias do template.
-            </DialogDescription>
-          </DialogHeader>
-
-          <form.AppForm>
-            <form.Form className='space-y-4 p-0 md:p-0'>
-              <EmailTemplateFormFields disabled={hasMutationInFlight} />
-
-              <DialogFooter>
-                <Button
-                  type='button'
-                  variant='outline'
-                  onClick={() => setIsCreateDialogOpen(false)}
-                  disabled={hasMutationInFlight}
-                >
-                  Cancelar
-                </Button>
-                <form.Subscribe
-                  selector={(state) => [state.canSubmit, state.isSubmitting] as const}
-                >
-                  {([canSubmit, isSubmitting]) => (
-                    <Button
-                      type='submit'
-                      disabled={!canSubmit || isSubmitting || hasMutationInFlight}
-                    >
-                      Criar template
-                    </Button>
-                  )}
-                </form.Subscribe>
-              </DialogFooter>
-            </form.Form>
-          </form.AppForm>
-        </DialogContent>
-      </Dialog>
 
       <AlertDialog
         open={Boolean(deleteTemplate)}
