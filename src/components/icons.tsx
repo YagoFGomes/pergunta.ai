@@ -27,6 +27,7 @@ import {
   IconClock,
   IconCode,
   IconCommand,
+  IconCopy,
   IconCreditCard,
   IconDeviceLaptop,
   IconDots,
@@ -163,6 +164,7 @@ export const Icons = {
   // Actions
   add: IconPlus,
   edit: IconEdit,
+  copy: IconCopy,
   upload: IconUpload,
   share: IconShare,
   login: IconLogin,

@@ -5,7 +5,7 @@
  * API documentation for the Django Continuous Integration project with tenant-aware access rules.
  * OpenAPI spec version: 1.0.0
  */
-import type { Status372Enum } from './status372Enum';
+import type { EmailListStatusEnum } from './emailListStatusEnum';
 
 export interface EmailList {
   readonly id: string;
@@ -15,7 +15,7 @@ export interface EmailList {
   name: string;
   description?: string;
   readonly contact_count: number;
-  status?: Status372Enum;
+  status?: EmailListStatusEnum;
   readonly created_at: string;
   readonly updated_at: string;
 }

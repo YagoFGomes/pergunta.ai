@@ -7,7 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { DataTableColumnHeader } from '@/components/ui/table/data-table-column-header';
 import { ModuleRowActions } from '@/features/platform/components/module-row-actions';
 import type { EmailTemplate } from '@/lib/api/generated/model/emailTemplate';
-import { Status372Enum } from '@/lib/api/generated/model/status372Enum';
+import { EmailTemplateStatusEnum } from '@/lib/api/generated/model/emailTemplateStatusEnum';
 import { cn } from '@/lib/utils';
 
 import {
@@ -33,7 +33,7 @@ function formatDate(value?: string) {
 }
 
 function getStatusClassName(status?: EmailTemplate['status']) {
-  if (status === Status372Enum.ACTIVE || !status) {
+  if (status === EmailTemplateStatusEnum.ACTIVE || !status) {
     return 'border-emerald-500/30 text-emerald-700';
   }
 

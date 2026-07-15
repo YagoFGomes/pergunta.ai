@@ -44,7 +44,7 @@ import {
 } from '@/lib/api/generated/endpoints';
 import type { EmailTemplate } from '@/lib/api/generated/model/emailTemplate';
 import type { EmailTemplatesListParams } from '@/lib/api/generated/model/emailTemplatesListParams';
-import { Status372Enum } from '@/lib/api/generated/model/status372Enum';
+import { EmailTemplateStatusEnum } from '@/lib/api/generated/model/emailTemplateStatusEnum';
 import { TemplateTypeEnum } from '@/lib/api/generated/model/templateTypeEnum';
 import {
   emailTemplateFormSchema,
@@ -68,7 +68,7 @@ const DEFAULT_TEMPLATE_VALUES: EmailTemplateFormValues = {
   plain_text_content: '',
   requiredVariablesText: 'contact_name',
   language: 'pt-BR',
-  status: Status372Enum.ACTIVE
+  status: EmailTemplateStatusEnum.ACTIVE
 };
 
 function normalizeSingleFilter(value: unknown) {

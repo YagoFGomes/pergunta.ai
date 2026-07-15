@@ -55,7 +55,7 @@ import type { Campaign } from '@/lib/api/generated/model/campaign';
 import type { CampaignStep } from '@/lib/api/generated/model/campaignStep';
 import type { EmailTemplate } from '@/lib/api/generated/model/emailTemplate';
 import { SendConditionEnum } from '@/lib/api/generated/model/sendConditionEnum';
-import { Status372Enum } from '@/lib/api/generated/model/status372Enum';
+import { EmailTemplateStatusEnum } from '@/lib/api/generated/model/emailTemplateStatusEnum';
 import { StepTypeEnum } from '@/lib/api/generated/model/stepTypeEnum';
 
 import {
@@ -122,7 +122,7 @@ export function CampaignStepsManager({ campaignId }: CampaignStepsManagerProps) 
   const campaignQuery = useCampaignsRetrieve(campaignId);
   const stepsQuery = useCampaignsStepsList(campaignId);
   const templatesQuery = useEmailTemplatesList(
-    { status: Status372Enum.ACTIVE },
+    { status: EmailTemplateStatusEnum.ACTIVE },
     { query: { staleTime: 60_000 } }
   );
 

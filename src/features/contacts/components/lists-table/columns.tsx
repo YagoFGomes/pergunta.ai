@@ -7,7 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { DataTableColumnHeader } from '@/components/ui/table/data-table-column-header';
 import { ModuleRowActions } from '@/features/platform/components/module-row-actions';
 import type { EmailList } from '@/lib/api/generated/model/emailList';
-import { Status372Enum } from '@/lib/api/generated/model/status372Enum';
+import { EmailListStatusEnum } from '@/lib/api/generated/model/emailListStatusEnum';
 import { cn } from '@/lib/utils';
 
 const dateFormatter = new Intl.DateTimeFormat('pt-BR', {
@@ -26,11 +26,11 @@ function formatDate(value?: string) {
 }
 
 function getStatusLabel(status?: EmailList['status']) {
-  return status === Status372Enum.ACTIVE ? 'Ativa' : 'Inativa';
+  return status === EmailListStatusEnum.ACTIVE ? 'Ativa' : 'Inativa';
 }
 
 function getStatusClassName(status?: EmailList['status']) {
-  if (status === Status372Enum.ACTIVE) return 'border-emerald-500/30 text-emerald-700';
+  if (status === EmailListStatusEnum.ACTIVE) return 'border-emerald-500/30 text-emerald-700';
   return 'text-muted-foreground';
 }
 

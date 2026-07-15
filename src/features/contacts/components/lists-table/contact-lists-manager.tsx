@@ -36,7 +36,7 @@ import {
   useContactsListsPartialUpdate
 } from '@/lib/api/generated/endpoints';
 import type { EmailList } from '@/lib/api/generated/model/emailList';
-import { Status372Enum } from '@/lib/api/generated/model/status372Enum';
+import { EmailListStatusEnum } from '@/lib/api/generated/model/emailListStatusEnum';
 import { getOrvalResponseData } from '@/features/platform/lib/orval-response';
 
 import { contactListFieldSchemas, type ContactListFormValues } from '../../schemas/contact-list';
@@ -45,14 +45,14 @@ import { getContactListsColumns } from './columns';
 type FormMode = 'create' | 'edit';
 
 const STATUS_OPTIONS = [
-  { label: 'Ativa', value: Status372Enum.ACTIVE },
-  { label: 'Inativa', value: Status372Enum.INACTIVE }
+  { label: 'Ativa', value: EmailListStatusEnum.ACTIVE },
+  { label: 'Inativa', value: EmailListStatusEnum.INACTIVE }
 ] as const;
 
 const DEFAULT_VALUES: ContactListFormValues = {
   name: '',
   description: '',
-  status: Status372Enum.ACTIVE
+  status: EmailListStatusEnum.ACTIVE
 };
 
 function normalizeValues(values: ContactListFormValues): ContactListFormValues {
@@ -67,7 +67,7 @@ function getContactListFormValues(list: EmailList): ContactListFormValues {
   return {
     name: list.name,
     description: list.description ?? '',
-    status: list.status ?? Status372Enum.ACTIVE
+    status: list.status ?? EmailListStatusEnum.ACTIVE
   };
 }
 

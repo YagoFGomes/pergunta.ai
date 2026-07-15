@@ -1,6 +1,6 @@
 import * as z from 'zod';
 
-import { Status372Enum } from '@/lib/api/generated/model/status372Enum';
+import { EmailListStatusEnum } from '@/lib/api/generated/model/emailListStatusEnum';
 
 export const contactListFormSchema = z.object({
   name: z
@@ -9,7 +9,7 @@ export const contactListFormSchema = z.object({
     .min(3, 'Informe ao menos 3 caracteres.')
     .max(255, 'Máximo de 255 caracteres.'),
   description: z.string().trim().max(1000, 'Máximo de 1000 caracteres.').optional(),
-  status: z.nativeEnum(Status372Enum)
+  status: z.nativeEnum(EmailListStatusEnum)
 });
 
 export type ContactListFormValues = z.infer<typeof contactListFormSchema>;
@@ -21,5 +21,5 @@ export const contactListFieldSchemas = {
     .min(3, 'Informe ao menos 3 caracteres.')
     .max(255, 'Máximo de 255 caracteres.'),
   description: z.string().trim().max(1000, 'Máximo de 1000 caracteres.'),
-  status: z.nativeEnum(Status372Enum)
+  status: z.nativeEnum(EmailListStatusEnum)
 };

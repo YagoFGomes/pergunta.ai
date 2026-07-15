@@ -1,7 +1,7 @@
 import * as z from 'zod';
 
 import type { EmailTemplate } from '@/lib/api/generated/model/emailTemplate';
-import { Status372Enum } from '@/lib/api/generated/model/status372Enum';
+import { EmailTemplateStatusEnum } from '@/lib/api/generated/model/emailTemplateStatusEnum';
 import { TemplateTypeEnum } from '@/lib/api/generated/model/templateTypeEnum';
 
 const slugRegex = /^[-a-zA-Z0-9_]+$/;
@@ -45,7 +45,7 @@ export const emailTemplateFormSchema = z.object({
       { message: 'Remova variáveis duplicadas.' }
     ),
   language: z.string().trim().min(2, 'Informe o idioma.').max(10, 'Maximo de 10 caracteres.'),
-  status: z.nativeEnum(Status372Enum)
+  status: z.nativeEnum(EmailTemplateStatusEnum)
 });
 
 export type EmailTemplateFormValues = z.infer<typeof emailTemplateFormSchema>;
@@ -61,7 +61,7 @@ export type EmailTemplatePayload = {
   plain_text_content: string;
   required_variables: string[];
   language: string;
-  status: Status372Enum;
+  status: EmailTemplateStatusEnum;
   is_default?: boolean;
 };
 
@@ -106,7 +106,7 @@ export function getEmailTemplateFormValues(template: EmailTemplate): EmailTempla
       ? template.required_variables.join(', ')
       : '',
     language: template.language ?? 'pt-BR',
-    status: template.status ?? Status372Enum.ACTIVE
+    status: template.status ?? EmailTemplateStatusEnum.ACTIVE
   };
 }
 

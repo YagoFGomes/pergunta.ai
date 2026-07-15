@@ -7,14 +7,16 @@
  */
 
 /**
- * * `ACTIVE` - Active
-* `INACTIVE` - Inactive
+ * * `DRAFT` - Draft
+ * `ACTIVE` - Active
+ * `INACTIVE` - Inactive
  */
-export type Status372Enum = typeof Status372Enum[keyof typeof Status372Enum];
-
+export type EmailTemplateStatusEnum =
+  (typeof EmailTemplateStatusEnum)[keyof typeof EmailTemplateStatusEnum];
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
-export const Status372Enum = {
+export const EmailTemplateStatusEnum = {
+  DRAFT: 'DRAFT',
   ACTIVE: 'ACTIVE',
-  INACTIVE: 'INACTIVE',
+  INACTIVE: 'INACTIVE'
 } as const;

@@ -1,11 +1,11 @@
 import { Icons } from '@/components/icons';
-import { Status372Enum } from '@/lib/api/generated/model/status372Enum';
+import { EmailTemplateStatusEnum } from '@/lib/api/generated/model/emailTemplateStatusEnum';
 import { TemplateTypeEnum } from '@/lib/api/generated/model/templateTypeEnum';
 import type { Option } from '@/types/data-table';
 
 export const EMAIL_TEMPLATE_STATUS_OPTIONS = [
-  { label: 'Ativo', value: Status372Enum.ACTIVE, icon: Icons.circleCheck },
-  { label: 'Inativo', value: Status372Enum.INACTIVE, icon: Icons.slash }
+  { label: 'Ativo', value: EmailTemplateStatusEnum.ACTIVE, icon: Icons.circleCheck },
+  { label: 'Inativo', value: EmailTemplateStatusEnum.INACTIVE, icon: Icons.slash }
 ] satisfies Option[];
 
 export const EMAIL_TEMPLATE_TYPE_OPTIONS = [

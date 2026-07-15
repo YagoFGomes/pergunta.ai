@@ -6,7 +6,8 @@
  * OpenAPI spec version: 1.0.0
  */
 import type { TemplateTypeEnum } from './templateTypeEnum';
-import type { Status372Enum } from './status372Enum';
+import type { PatchedEmailTemplateDesignJson } from './patchedEmailTemplateDesignJson';
+import type { EmailTemplateStatusEnum } from './emailTemplateStatusEnum';
 
 export interface PatchedEmailTemplate {
   readonly id?: string;
@@ -26,10 +27,12 @@ export interface PatchedEmailTemplate {
   html_content?: string;
   plain_text_content?: string;
   required_variables?: unknown;
+  /** @nullable */
+  design_json?: PatchedEmailTemplateDesignJson;
   is_default?: boolean;
   /** @maxLength 10 */
   language?: string;
-  status?: Status372Enum;
+  status?: EmailTemplateStatusEnum;
   readonly created_at?: string;
   readonly updated_at?: string;
 }
