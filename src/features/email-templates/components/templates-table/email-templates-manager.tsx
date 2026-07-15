@@ -139,7 +139,7 @@ export function EmailTemplatesManager() {
         required_variables: ['contact_name', 'survey_link'],
         design_json: defaultStarterDesign as never,
         language: 'pt-BR',
-        status: EmailTemplateStatusEnum.DRAFT as never
+        status: EmailTemplateStatusEnum.INACTIVE as never
       }
     });
   }
