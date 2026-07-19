@@ -192,7 +192,7 @@ export function SurveyFormEditDialog({ form, open, onOpenChange }: SurveyFormEdi
             <DialogDescription>Atualize o título e a descrição do formulário.</DialogDescription>
           </DialogHeader>
 
-          <div className='flex flex-col gap-2 sm:flex-row sm:items-start'>
+          <div className='flex flex-col gap-4 items-start'>
             <Alert className='flex-1'>
               <Icons.info className='h-4 w-4' />
               <AlertTitle>Status: {form.status ?? 'Sem status'}</AlertTitle>
