@@ -33,11 +33,7 @@ import type { Form } from '@/lib/api/generated/model/form';
 import { SendConditionEnum } from '@/lib/api/generated/model/sendConditionEnum';
 import { StepTypeEnum } from '@/lib/api/generated/model/stepTypeEnum';
 import { cn } from '@/lib/utils';
-import {
-  DELIVERY_CHANNEL_OPTIONS,
-  SEND_CONDITION_OPTIONS,
-  STEP_TYPE_OPTIONS
-} from '../lib/campaign-utils';
+import { SEND_CONDITION_OPTIONS, STEP_TYPE_OPTIONS } from '../lib/campaign-utils';
 import {
   campaignWizardSchema,
   getCollectionItems,
@@ -129,6 +125,10 @@ function getFormLabel(form: Form) {
   return `${form.title}${form.framework_code ? ` (${form.framework_code})` : ''} - ${form.status ?? 'DRAFT'}`;
 }
 
+function isArchivedForm(form: Form) {
+  return String(form.status ?? '').toUpperCase() === 'ARCHIVED';
+}
+
 function ResourcePreview({
   title,
   description,
@@ -148,7 +148,7 @@ function ResourcePreview({
           {description ? <CardDescription>{description}</CardDescription> : null}
         </div>
         {actions ? (
-          <div className='flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:flex-wrap sm:justify-end [&>*]:w-full sm:[&>*]:w-auto'>
+          <div className='flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:flex-wrap sm:justify-end *:w-full sm:*:w-auto'>
             {actions}
           </div>
         ) : null}
@@ -176,18 +176,19 @@ export function CampaignCreateWizard() {
   const templates = getCollectionItems(
     getOrvalResponseData<EmailTemplate[] | { results?: EmailTemplate[] }>(templatesQuery.data)
   );
+  const availableForms = useMemo(() => forms.filter((form) => !isArchivedForm(form)), [forms]);
 
   const prerequisites = useMemo(
     () => ({
-      forms: forms.length > 0,
-      lists: values.delivery_channel === DeliveryChannelEnum.WEBHOOK || lists.length > 0,
-      templates: values.delivery_channel === DeliveryChannelEnum.WEBHOOK || templates.length > 0
+      forms: availableForms.length > 0,
+      lists: lists.length > 0,
+      templates: templates.length > 0
     }),
-    [forms.length, lists.length, templates.length, values.delivery_channel]
+    [availableForms.length, lists.length, templates.length]
   );
   const selectedForm = useMemo(
-    () => forms.find((form) => form.id === values.form),
-    [forms, values.form]
+    () => availableForms.find((form) => form.id === values.form),
+    [availableForms, values.form]
   );
   const selectedList = useMemo(
     () => lists.find((list) => list.id === values.email_list),
@@ -222,16 +223,12 @@ export function CampaignCreateWizard() {
       }
     }
 
-    if (step === 1 && values.delivery_channel === DeliveryChannelEnum.EMAIL && !values.email_list) {
+    if (step === 1 && !values.email_list) {
       toast.error('Selecione uma lista de contatos.');
       return false;
     }
 
-    if (
-      step === 2 &&
-      values.delivery_channel === DeliveryChannelEnum.EMAIL &&
-      !values.email_template
-    ) {
+    if (step === 2 && !values.email_template) {
       toast.error('Selecione um template de email.');
       return false;
     }
@@ -253,15 +250,9 @@ export function CampaignCreateWizard() {
           name: parsed.data.name.trim(),
           description: parsed.data.description?.trim() ?? '',
           form: parsed.data.form,
-          delivery_channel: parsed.data.delivery_channel,
-          email_list:
-            parsed.data.delivery_channel === DeliveryChannelEnum.EMAIL
-              ? parsed.data.email_list
-              : null,
-          webhook_url:
-            parsed.data.delivery_channel === DeliveryChannelEnum.WEBHOOK
-              ? parsed.data.webhook_url
-              : '',
+          delivery_channel: DeliveryChannelEnum.EMAIL,
+          email_list: parsed.data.email_list,
+          webhook_url: '',
           timezone: parsed.data.timezone
         }
       });
@@ -272,10 +263,7 @@ export function CampaignCreateWizard() {
         throw new Error('Campanha criada sem id retornado.');
       }
 
-      if (
-        parsed.data.delivery_channel === DeliveryChannelEnum.EMAIL &&
-        parsed.data.email_template
-      ) {
+      if (parsed.data.email_template) {
         await createStepMutation.mutateAsync({
           campaignId: campaign.id,
           data: {
@@ -357,7 +345,7 @@ export function CampaignCreateWizard() {
       ) : null}
 
       {step === 0 ? (
-        <div className='grid gap-4 md:grid-cols-2'>
+        <div className='space-y-4'>
           <Field label='Nome'>
             <Input
               value={values.name}
@@ -369,7 +357,7 @@ export function CampaignCreateWizard() {
           <Field label='Formulário'>
             <NativeSelect value={values.form} onChange={(value) => updateValue('form', value)}>
               <option value=''>Selecione um formulário</option>
-              {forms.map((form) => (
+              {availableForms.map((form) => (
                 <option key={form.id} value={form.id}>
                   {getFormLabel(form)}
                 </option>
@@ -385,18 +373,7 @@ export function CampaignCreateWizard() {
             />
           </Field>
           <Field label='Canal de entrega'>
-            <NativeSelect
-              value={values.delivery_channel}
-              onChange={(value) =>
-                updateValue('delivery_channel', value as CampaignWizardValues['delivery_channel'])
-              }
-            >
-              {DELIVERY_CHANNEL_OPTIONS.map((option) => (
-                <option key={option.value} value={option.value}>
-                  {option.label}
-                </option>
-              ))}
-            </NativeSelect>
+            <Input value='Email' disabled readOnly />
           </Field>
           {selectedForm ? (
             <ResourcePreview
@@ -432,30 +409,20 @@ export function CampaignCreateWizard() {
       ) : null}
 
       {step === 1 ? (
-        <div className='grid gap-4 md:grid-cols-2'>
-          {values.delivery_channel === DeliveryChannelEnum.EMAIL ? (
-            <Field label='Lista de contatos'>
-              <NativeSelect
-                value={values.email_list ?? ''}
-                onChange={(value) => updateValue('email_list', value)}
-              >
-                <option value=''>Selecione uma lista</option>
-                {lists.map((list) => (
-                  <option key={list.id} value={list.id}>
-                    {list.name} ({list.contact_count} contatos) - {list.status ?? 'ACTIVE'}
-                  </option>
-                ))}
-              </NativeSelect>
-            </Field>
-          ) : (
-            <Field label='URL do webhook'>
-              <Input
-                value={values.webhook_url ?? ''}
-                onChange={(event) => updateValue('webhook_url', event.target.value)}
-                placeholder='https://api.exemplo.com/webhooks/survey'
-              />
-            </Field>
-          )}
+        <div className='space-y-4'>
+          <Field label='Lista de contatos'>
+            <NativeSelect
+              value={values.email_list ?? ''}
+              onChange={(value) => updateValue('email_list', value)}
+            >
+              <option value=''>Selecione uma lista</option>
+              {lists.map((list) => (
+                <option key={list.id} value={list.id}>
+                  {list.name} ({list.contact_count} contatos) - {list.status ?? 'ACTIVE'}
+                </option>
+              ))}
+            </NativeSelect>
+          </Field>
           <div className='rounded-md border p-4'>
             <h3 className='font-medium'>Resumo do público</h3>
             <p className='text-muted-foreground mt-1 text-sm'>
@@ -508,12 +475,11 @@ export function CampaignCreateWizard() {
       ) : null}
 
       {step === 2 ? (
-        <div className='grid gap-4 md:grid-cols-2'>
+        <div className='space-y-4'>
           <Field label='Template de email'>
             <NativeSelect
               value={values.email_template ?? ''}
               onChange={(value) => updateValue('email_template', value)}
-              disabled={values.delivery_channel === DeliveryChannelEnum.WEBHOOK}
             >
               <option value=''>Selecione um template</option>
               {templates.map((template) => (
@@ -529,7 +495,6 @@ export function CampaignCreateWizard() {
               onChange={(value) =>
                 updateValue('step_type', value as CampaignWizardValues['step_type'])
               }
-              disabled={values.delivery_channel === DeliveryChannelEnum.WEBHOOK}
             >
               {STEP_TYPE_OPTIONS.map((option) => (
                 <option key={option.value} value={option.value}>
@@ -544,7 +509,6 @@ export function CampaignCreateWizard() {
               min={0}
               value={values.delay_days}
               onChange={(event) => updateValue('delay_days', Number(event.target.value))}
-              disabled={values.delivery_channel === DeliveryChannelEnum.WEBHOOK}
             />
           </Field>
           <Field label='Condicao de envio'>
@@ -553,7 +517,6 @@ export function CampaignCreateWizard() {
               onChange={(value) =>
                 updateValue('send_condition', value as CampaignWizardValues['send_condition'])
               }
-              disabled={values.delivery_channel === DeliveryChannelEnum.WEBHOOK}
             >
               {SEND_CONDITION_OPTIONS.map((option) => (
                 <option key={option.value} value={option.value}>
@@ -596,7 +559,7 @@ export function CampaignCreateWizard() {
       ) : null}
 
       {step === 3 ? (
-        <div className='grid gap-4 md:grid-cols-3'>
+        <div className='space-y-4'>
           <Field label='Data de início' description='Opcional. Se vazio, a campanha fica rascunho.'>
             <Input
               type='date'
@@ -622,14 +585,14 @@ export function CampaignCreateWizard() {
       ) : null}
 
       {step === 4 ? (
-        <div className='grid gap-3 rounded-md border p-4 text-sm md:grid-cols-2'>
+        <div className='space-y-3 rounded-md border p-4 text-sm'>
           <div>
             <span className='text-muted-foreground block'>Campanha</span>
             <span className='font-medium'>{values.name || '-'}</span>
           </div>
           <div>
             <span className='text-muted-foreground block'>Canal</span>
-            <Badge variant='outline'>{values.delivery_channel}</Badge>
+            <Badge variant='outline'>{DeliveryChannelEnum.EMAIL}</Badge>
           </div>
           <div>
             <span className='text-muted-foreground block'>Formulário</span>
