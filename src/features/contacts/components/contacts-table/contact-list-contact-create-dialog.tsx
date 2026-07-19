@@ -1,5 +1,7 @@
 'use client';
 
+import Link from 'next/link';
+
 import { useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import { toast } from 'sonner';
@@ -152,6 +154,12 @@ export function ContactListContactCreateDialog({ listId }: ContactListContactCre
               />
 
               <DialogFooter>
+                <Button type='button' variant='ghost' className='mr-auto' asChild>
+                  <Link href='/dashboard/contacts/lists'>
+                    <Icons.chevronLeft className='mr-2 h-4 w-4' />
+                    Voltar para listas
+                  </Link>
+                </Button>
                 <Button
                   type='button'
                   variant='outline'

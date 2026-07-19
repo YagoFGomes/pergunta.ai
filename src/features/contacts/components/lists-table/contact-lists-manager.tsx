@@ -145,6 +145,11 @@ export function ContactListsManager() {
         return;
       }
 
+      if (selectedList.contact_count < 1 && normalized.status === EmailListStatusEnum.ACTIVE) {
+        toast.error('Uma lista só pode ser ativada depois de ter ao menos 1 contato.');
+        return;
+      }
+
       await updateMutation.mutateAsync({
         id: selectedList.id,
         data: {
@@ -306,6 +311,12 @@ export function ContactListsManager() {
                 }}
                 disabled={hasMutationInFlight}
               />
+
+              {formMode === 'edit' && selectedList && selectedList.contact_count < 1 ? (
+                <p className='text-muted-foreground text-xs'>
+                  Esta lista ainda não pode ser ativada porque não possui contatos cadastrados.
+                </p>
+              ) : null}
 
               <DialogFooter>
                 <Button

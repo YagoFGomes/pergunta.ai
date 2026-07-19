@@ -70,8 +70,12 @@ export function getContactsByListColumns({
       ),
       cell: ({ row }) => (
         <div className='flex min-w-55 flex-col gap-1'>
-          <span className='font-medium'>{row.original.name}</span>
-          <span className='text-muted-foreground text-xs'>{row.original.email}</span>
+          <span className='truncate font-medium' title={row.original.name}>
+            {row.original.name}
+          </span>
+          <span className='text-muted-foreground truncate text-xs' title={row.original.email}>
+            {row.original.email}
+          </span>
         </div>
       )
     },

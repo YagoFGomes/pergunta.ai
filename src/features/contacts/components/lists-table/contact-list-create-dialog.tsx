@@ -4,6 +4,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 import { toast } from 'sonner';
+import { z } from 'zod';
 
 import {
   AlertDialog,
@@ -28,8 +29,11 @@ import {
 import { useAppForm, useFormFields } from '@/components/ui/tanstack-form';
 import {
   getContactsListsListQueryKey,
-  useContactsListsCreate
+  useContactsListsContactsCreate,
+  useContactsListsCreate,
+  useContactsListsPartialUpdate
 } from '@/lib/api/generated/endpoints';
+import { EmailContactStatusEnum } from '@/lib/api/generated/model/emailContactStatusEnum';
 import type { EmailList } from '@/lib/api/generated/model/emailList';
 import { EmailListStatusEnum } from '@/lib/api/generated/model/emailListStatusEnum';
 import { getOrvalResponseData } from '@/features/platform/lib/orval-response';
@@ -41,19 +45,62 @@ const STATUS_OPTIONS = [
   { label: 'Inativa', value: EmailListStatusEnum.INACTIVE }
 ] as const;
 
-const DEFAULT_VALUES: ContactListFormValues = {
+type ContactListCreateValues = ContactListFormValues & {
+  contactsInput: string;
+};
+
+const DEFAULT_VALUES: ContactListCreateValues = {
   name: '',
   description: '',
-  status: EmailListStatusEnum.ACTIVE
+  status: EmailListStatusEnum.INACTIVE,
+  contactsInput: ''
 };
 
 const CONTACT_LIST_REDIRECT_DELAY_MS = 2000;
 
-function normalizeValues(values: ContactListFormValues): ContactListFormValues {
+const contactsInputSchema = z.string().trim().max(20_000, 'Máximo de 20000 caracteres.');
+
+type ParsedContactInput = {
+  name: string;
+  email: string;
+};
+
+function parseContactsInput(value: string): ParsedContactInput[] {
+  const normalizedLines = value
+    .split(/\r?\n/)
+    .map((line) => line.trim())
+    .filter(Boolean);
+
+  return normalizedLines.map((line, index) => {
+    const parts = line.split(/[;,\t]+/).map((part) => part.trim());
+
+    if (parts.length < 2) {
+      throw new Error(`Linha ${index + 1}: informe nome e e-mail separados por vírgula.`);
+    }
+
+    const [name, email] = parts;
+
+    if (name.length < 3) {
+      throw new Error(`Linha ${index + 1}: o nome deve ter ao menos 3 caracteres.`);
+    }
+
+    if (!z.string().email().safeParse(email).success) {
+      throw new Error(`Linha ${index + 1}: informe um e-mail válido.`);
+    }
+
+    return {
+      name,
+      email: email.toLowerCase()
+    };
+  });
+}
+
+function normalizeValues(values: ContactListCreateValues): ContactListCreateValues {
   return {
     name: values.name.trim(),
     description: (values.description || '').trim(),
-    status: values.status
+    status: values.status,
+    contactsInput: values.contactsInput.trim()
   };
 }
 
@@ -72,48 +119,81 @@ export function ContactListCreateDialog() {
     };
   }, []);
 
-  const createMutation = useContactsListsCreate({
-    mutation: {
-      onSuccess: async (response) => {
-        const createdList = getOrvalResponseData<EmailList>(response);
+  const createMutation = useContactsListsCreate();
+  const createContactMutation = useContactsListsContactsCreate();
+  const activateListMutation = useContactsListsPartialUpdate();
 
-        await queryClient.invalidateQueries({ queryKey: getContactsListsListQueryKey() });
-        toast.success('Lista criada com sucesso. Redirecionando...');
-        form.reset(DEFAULT_VALUES);
-        setOpen(false);
-
-        if (createdList?.id) {
-          const targetPath = `/dashboard/contacts/lists/${createdList.id}/contacts`;
-          void router.prefetch(targetPath);
-
-          redirectTimeoutRef.current = window.setTimeout(() => {
-            router.push(targetPath);
-          }, CONTACT_LIST_REDIRECT_DELAY_MS);
-        }
-      },
-      onError: () => {
-        toast.error('Não foi possível criar a lista.');
-      }
-    }
-  });
+  const isPending =
+    createMutation.isPending || createContactMutation.isPending || activateListMutation.isPending;
 
   const form = useAppForm({
     defaultValues: DEFAULT_VALUES,
     onSubmit: async ({ value }) => {
       const normalized = normalizeValues(value);
 
-      await createMutation.mutateAsync({
-        data: {
-          name: normalized.name,
-          description: normalized.description,
-          status: normalized.status
+      const contacts = normalized.contactsInput ? parseContactsInput(normalized.contactsInput) : [];
+      const shouldCreateInitialContacts = contacts.length > 0;
+
+      if (normalized.status === EmailListStatusEnum.ACTIVE && !shouldCreateInitialContacts) {
+        toast.error('Uma lista ativa precisa ser criada com ao menos 1 contato.');
+        return;
+      }
+
+      try {
+        const createResponse = await createMutation.mutateAsync({
+          data: {
+            name: normalized.name,
+            description: normalized.description,
+            status: EmailListStatusEnum.INACTIVE
+          }
+        });
+
+        const createdList = getOrvalResponseData<EmailList>(createResponse);
+
+        if (!createdList?.id) {
+          throw new Error('Lista criada sem identificador retornado.');
         }
-      });
+
+        for (const contact of contacts) {
+          await createContactMutation.mutateAsync({
+            listId: createdList.id,
+            data: {
+              name: contact.name,
+              email: contact.email,
+              status: EmailContactStatusEnum.ACTIVE,
+              consent: true
+            }
+          });
+        }
+
+        if (normalized.status === EmailListStatusEnum.ACTIVE) {
+          await activateListMutation.mutateAsync({
+            id: createdList.id,
+            data: {
+              status: EmailListStatusEnum.ACTIVE
+            }
+          });
+        }
+
+        await queryClient.invalidateQueries({ queryKey: getContactsListsListQueryKey() });
+        toast.success('Lista criada com sucesso. Redirecionando...');
+        form.reset(DEFAULT_VALUES);
+        setOpen(false);
+
+        const targetPath = `/dashboard/contacts/lists/${createdList.id}/contacts`;
+        void router.prefetch(targetPath);
+
+        redirectTimeoutRef.current = window.setTimeout(() => {
+          router.push(targetPath);
+        }, CONTACT_LIST_REDIRECT_DELAY_MS);
+      } catch {
+        toast.error('Não foi possível criar a lista.');
+      }
     }
   });
 
   const { FormTextField, FormTextareaField, FormSelectField } =
-    useFormFields<ContactListFormValues>();
+    useFormFields<ContactListCreateValues>();
 
   function handleOpenChange(nextOpen: boolean) {
     if (!nextOpen) {
@@ -127,6 +207,8 @@ export function ContactListCreateDialog() {
   function forceClose() {
     form.reset(DEFAULT_VALUES);
     createMutation.reset();
+    createContactMutation.reset();
+    activateListMutation.reset();
     setConfirmDiscard(false);
     setOpen(false);
   }
@@ -158,7 +240,7 @@ export function ContactListCreateDialog() {
                 validators={{
                   onBlur: contactListFieldSchemas.name
                 }}
-                disabled={createMutation.isPending}
+                disabled={isPending}
               />
 
               <FormTextareaField
@@ -170,7 +252,7 @@ export function ContactListCreateDialog() {
                 validators={{
                   onBlur: contactListFieldSchemas.description
                 }}
-                disabled={createMutation.isPending}
+                disabled={isPending}
               />
 
               <FormSelectField
@@ -181,7 +263,26 @@ export function ContactListCreateDialog() {
                 validators={{
                   onBlur: contactListFieldSchemas.status
                 }}
-                disabled={createMutation.isPending}
+                disabled={isPending}
+              />
+
+              <div className='space-y-1'>
+                <p className='text-sm font-medium'>Contatos opcionais</p>
+                <p className='text-muted-foreground text-xs'>
+                  Cole um contato por linha no formato Nome, email. Você também pode usar ponto e
+                  vírgula ou tab entre as colunas.
+                </p>
+              </div>
+
+              <FormTextareaField
+                name='contactsInput'
+                label='Contatos'
+                placeholder={'Maria Souza, maria@empresa.com\nJoão Lima, joao@empresa.com'}
+                rows={6}
+                validators={{
+                  onBlur: contactsInputSchema
+                }}
+                disabled={isPending}
               />
 
               <DialogFooter>
@@ -189,7 +290,7 @@ export function ContactListCreateDialog() {
                   type='button'
                   variant='outline'
                   onClick={() => setConfirmDiscard(true)}
-                  disabled={createMutation.isPending}
+                  disabled={isPending}
                 >
                   Cancelar
                 </Button>

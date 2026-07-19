@@ -1,5 +1,9 @@
 'use client';
 
+import Link from 'next/link';
+
+import { Icons } from '@/components/icons';
+import { Button } from '@/components/ui/button';
 import PageContainer from '@/components/layout/page-container';
 import { ModuleErrorAlert } from '@/features/platform/components/module-error-alert';
 import { getOrvalResponseData } from '@/features/platform/lib/orval-response';
@@ -29,7 +33,17 @@ export function ContactListContactsPageContent({ listId }: ContactListContactsPa
       pageTitle={pageTitle}
       pageDescription={pageDescription}
       isLoading={listQuery.isPending}
-      pageHeaderAction={<ContactListContactCreateDialog listId={listId} />}
+      pageHeaderAction={
+        <div className='flex items-center gap-2'>
+          <Button asChild variant='outline' size='sm' className='text-xs md:text-sm'>
+            <Link href='/dashboard/contacts/lists'>
+              <Icons.chevronLeft className='mr-2 h-4 w-4' />
+              Voltar para listas
+            </Link>
+          </Button>
+          <ContactListContactCreateDialog listId={listId} />
+        </div>
+      }
     >
       {listQuery.isError ? (
         <ModuleErrorAlert
