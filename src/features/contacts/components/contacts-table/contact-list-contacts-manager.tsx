@@ -39,15 +39,12 @@ import {
   getContactsListsContactsListQueryKey,
   getContactsListsListQueryKey,
   getContactsListsRetrieveQueryKey,
-  useContactsListsContactsCreate,
   useContactsListsContactsDestroy,
   useContactsListsContactsList,
-  useContactsListsContactsPartialUpdate,
-  useContactsListsRetrieve
+  useContactsListsContactsPartialUpdate
 } from '@/lib/api/generated/endpoints';
 import type { EmailContact } from '@/lib/api/generated/model/emailContact';
 import { EmailContactStatusEnum } from '@/lib/api/generated/model/emailContactStatusEnum';
-import type { EmailList } from '@/lib/api/generated/model/emailList';
 import type { ContactsListsContactsListParams } from '@/lib/api/generated/model/contactsListsContactsListParams';
 import type { Option } from '@/types/data-table';
 import { contactFieldSchemas, type ContactFormValues } from '../../schemas/contact';
@@ -57,8 +54,6 @@ import { getContactsByListColumns } from './columns';
 type ContactListContactsManagerProps = {
   listId: string;
 };
-
-type FormMode = 'create' | 'edit';
 
 const STATUS_OPTIONS: Option[] = [
   { label: 'Ativo', value: EmailContactStatusEnum.ACTIVE },
@@ -80,15 +75,6 @@ function normalizeSingleFilter(value: unknown) {
   return typeof value === 'string' && value.length > 0 ? value : undefined;
 }
 
-function normalizeValues(values: ContactFormValues): ContactFormValues {
-  return {
-    name: values.name.trim(),
-    email: values.email.trim().toLowerCase(),
-    phone: (values.phone || '').trim(),
-    status: values.status
-  };
-}
-
 function getContactFormValues(contact: EmailContact): ContactFormValues {
   return {
     name: contact.name,
@@ -102,32 +88,8 @@ export function ContactListContactsManager({ listId }: ContactListContactsManage
   const queryClient = useQueryClient();
   const [isFormDialogOpen, setIsFormDialogOpen] = useState(false);
   const [confirmDiscard, setConfirmDiscard] = useState(false);
-  const [formMode, setFormMode] = useState<FormMode>('create');
   const [selectedContact, setSelectedContact] = useState<EmailContact | null>(null);
   const [deleteContact, setDeleteContact] = useState<EmailContact | null>(null);
-
-  const listQuery = useContactsListsRetrieve(listId, {
-    query: {
-      staleTime: 30_000
-    }
-  });
-
-  const createMutation = useContactsListsContactsCreate({
-    mutation: {
-      onSuccess: async () => {
-        await Promise.all([
-          queryClient.invalidateQueries({ queryKey: getContactsListsContactsListQueryKey(listId) }),
-          queryClient.invalidateQueries({ queryKey: getContactsListsRetrieveQueryKey(listId) }),
-          queryClient.invalidateQueries({ queryKey: getContactsListsListQueryKey() })
-        ]);
-        toast.success('Contato criado com sucesso.');
-        setIsFormDialogOpen(false);
-      },
-      onError: () => {
-        toast.error('Não foi possível criar o contato.');
-      }
-    }
-  });
 
   const updateMutation = useContactsListsContactsPartialUpdate({
     mutation: {
@@ -163,33 +125,21 @@ export function ContactListContactsManager({ listId }: ContactListContactsManage
     }
   });
 
-  const hasMutationInFlight =
-    createMutation.isPending || updateMutation.isPending || destroyMutation.isPending;
-
-  const listData = getOrvalResponseData<EmailList>(listQuery.data);
+  const hasMutationInFlight = updateMutation.isPending || destroyMutation.isPending;
 
   const form = useAppForm({
     defaultValues: DEFAULT_VALUES,
     onSubmit: async ({ value }) => {
-      const normalized = normalizeValues(value);
-
-      if (formMode === 'create') {
-        await createMutation.mutateAsync({
-          listId,
-          data: {
-            name: normalized.name,
-            email: normalized.email,
-            phone: normalized.phone,
-            status: normalized.status,
-            consent: true
-          }
-        });
-        return;
-      }
-
       if (!selectedContact) {
         return;
       }
+
+      const normalized = {
+        name: value.name.trim(),
+        email: value.email.trim().toLowerCase(),
+        phone: (value.phone || '').trim(),
+        status: value.status
+      };
 
       await updateMutation.mutateAsync({
         listId,
@@ -208,8 +158,7 @@ export function ContactListContactsManager({ listId }: ContactListContactsManage
 
   useEffect(() => {
     if (!isFormDialogOpen) {
-      if (formMode !== 'create' || selectedContact) {
-        setFormMode('create');
+      if (selectedContact) {
         setSelectedContact(null);
         form.reset(DEFAULT_VALUES);
       }
@@ -217,22 +166,10 @@ export function ContactListContactsManager({ listId }: ContactListContactsManage
       return;
     }
 
-    if (formMode === 'create') {
-      form.reset(DEFAULT_VALUES);
-      return;
-    }
-
-    if (formMode === 'edit' && selectedContact) {
+    if (selectedContact) {
       form.reset(getContactFormValues(selectedContact));
     }
-  }, [form, formMode, isFormDialogOpen, selectedContact]);
-
-  function openCreateDialog() {
-    setFormMode('create');
-    setSelectedContact(null);
-    form.reset(DEFAULT_VALUES);
-    setIsFormDialogOpen(true);
-  }
+  }, [form, isFormDialogOpen, selectedContact]);
 
   function forceClose() {
     setConfirmDiscard(false);
@@ -241,7 +178,6 @@ export function ContactListContactsManager({ listId }: ContactListContactsManage
 
   const openEditDialog = useCallback(
     (contact: EmailContact) => {
-      setFormMode('edit');
       setSelectedContact(contact);
       form.reset(getContactFormValues(contact));
       setIsFormDialogOpen(true);
@@ -296,18 +232,17 @@ export function ContactListContactsManager({ listId }: ContactListContactsManage
       columnPinning: { right: ['actions'] }
     }
   });
-  const dialogFormKey =
-    formMode === 'edit' && selectedContact ? `edit-${selectedContact.id}` : formMode;
+  const dialogFormKey = selectedContact ? `edit-${selectedContact.id}` : 'edit';
 
-  if (listQuery.isPending || contactsQuery.isPending) {
+  if (contactsQuery.isPending) {
     return <ModuleDataTableSkeleton columnCount={4} filterCount={0} />;
   }
 
-  if (listQuery.isError || contactsQuery.isError) {
+  if (contactsQuery.isError) {
     return (
       <div className='grid gap-4'>
         <ModuleErrorAlert
-          error={listQuery.error ?? contactsQuery.error}
+          error={contactsQuery.error}
           title='Erro ao carregar contatos da lista'
           fallbackMessage='Não foi possível carregar os contatos desta lista.'
         />
@@ -317,27 +252,6 @@ export function ContactListContactsManager({ listId }: ContactListContactsManage
 
   return (
     <div className='space-y-4'>
-      <div className='flex flex-wrap items-center justify-between gap-2'>
-        <div className='space-y-1'>
-          <h2 className='text-xl font-semibold'>Contatos da lista</h2>
-          <p className='text-muted-foreground text-sm'>
-            {listData?.name
-              ? `Lista ${listData.name}: contatos disponíveis para campanhas.`
-              : 'Contatos vinculados a esta lista.'}
-          </p>
-        </div>
-        <Button onClick={openCreateDialog}>Novo contato</Button>
-      </div>
-
-      {contacts.length === 0 && !hasFilters ? (
-        <Alert>
-          <AlertTitle>Nenhum contato cadastrado</AlertTitle>
-          <AlertDescription>
-            Esta lista ainda não possui contatos. Crie o primeiro contato para habilitar campanhas.
-          </AlertDescription>
-        </Alert>
-      ) : null}
-
       <ModuleDataTable
         table={table}
         toolbarChildren={
@@ -366,12 +280,8 @@ export function ContactListContactsManager({ listId }: ContactListContactsManage
       >
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>{formMode === 'create' ? 'Novo contato' : 'Editar contato'}</DialogTitle>
-            <DialogDescription>
-              {formMode === 'create'
-                ? 'Preencha os dados para cadastrar um contato nesta lista.'
-                : 'Atualize os dados do contato selecionado.'}
-            </DialogDescription>
+            <DialogTitle>Editar contato</DialogTitle>
+            <DialogDescription>Atualize os dados do contato selecionado.</DialogDescription>
           </DialogHeader>
 
           <form.AppForm key={dialogFormKey}>
@@ -435,7 +345,7 @@ export function ContactListContactsManager({ listId }: ContactListContactsManage
                 >
                   {([canSubmit, isSubmitting]) => (
                     <Button type='submit' disabled={!canSubmit || isSubmitting}>
-                      {formMode === 'create' ? 'Criar contato' : 'Salvar alterações'}
+                      Salvar alterações
                     </Button>
                   )}
                 </form.Subscribe>

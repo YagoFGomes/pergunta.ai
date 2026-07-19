@@ -226,16 +226,6 @@ export function ContactListsManager() {
 
   return (
     <div className='space-y-4'>
-      <div className='flex flex-wrap items-center justify-between gap-2'>
-        <div className='space-y-1'>
-          <h2 className='text-xl font-semibold'>Listas de contatos</h2>
-          <p className='text-muted-foreground text-sm'>
-            Organize seus destinatários em listas para vincular nas campanhas.
-          </p>
-        </div>
-        <Button onClick={openCreateDialog}>Nova lista</Button>
-      </div>
-
       {listsQuery.isError ? (
         <Alert variant='destructive'>
           <AlertTitle>Erro ao carregar listas</AlertTitle>
