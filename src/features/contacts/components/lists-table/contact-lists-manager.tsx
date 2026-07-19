@@ -218,7 +218,8 @@ export function ContactListsManager() {
     pageCount: 1,
     shallow: false,
     initialState: {
-      sorting: []
+      sorting: [],
+      columnPinning: { right: ['actions'] }
     }
   });
   const dialogFormKey = formMode === 'edit' && selectedList ? `edit-${selectedList.id}` : formMode;

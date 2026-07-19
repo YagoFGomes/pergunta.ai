@@ -255,7 +255,8 @@ export function SurveyFrameworksManager() {
     pageCount: 1,
     shallow: false,
     initialState: {
-      sorting: []
+      sorting: [],
+      columnPinning: { right: ['actions'] }
     }
   });
 
