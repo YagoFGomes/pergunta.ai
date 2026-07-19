@@ -3,7 +3,6 @@
 import PageContainer from '@/components/layout/page-container';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useAuth } from '@/features/auth/context';
-import { workspacesInfoContent } from '@/config/infoconfig';
 
 export default function WorkspacesPage() {
   const { user } = useAuth();
@@ -12,7 +11,6 @@ export default function WorkspacesPage() {
     <PageContainer
       pageTitle='Workspaces'
       pageDescription='Manage your workspaces and switch between them'
-      infoContent={workspacesInfoContent}
     >
       <Card>
         <CardHeader>
