@@ -106,26 +106,9 @@ export default function SignInViewPage() {
             'inset-x-0 inset-y-[0%] h-full skew-y-12'
           )}
         />
-        <div className='text-sidebar-foreground relative z-20 mt-auto'>
-          <blockquote className='space-y-2'>
-            <p className='text-lg'>
-              &ldquo;This starter template has saved me countless hours of work and helped me
-              deliver projects to my clients faster than ever before.&rdquo;
-            </p>
-            <footer className='text-sidebar-foreground/70 text-sm'>Random Dude</footer>
-          </blockquote>
-        </div>
       </div>
       <div className='flex h-full items-center justify-center p-4 lg:p-8'>
         <div className='flex w-full max-w-md flex-col items-center justify-center space-y-6'>
-          <Link
-            className={cn(buttonVariants({ variant: 'outline' }), 'inline-flex items-center gap-2')}
-            target='_blank'
-            href='https://github.com/kiranism/next-shadcn-dashboard-starter'
-          >
-            <Icons.github className='size-4' />
-            <span>View on GitHub</span>
-          </Link>
           <form
             className='w-full space-y-4 rounded-2xl border bg-card p-6 shadow-sm'
             onSubmit={handleSubmit}
@@ -172,7 +155,7 @@ export default function SignInViewPage() {
           </form>
 
           <p className='text-muted-foreground text-center text-sm'>
-            Don&após;t have an account?{' '}
+            Dont have an account?{' '}
             <Link href='/auth/sign-up' className='hover:text-primary underline underline-offset-4'>
               Sign up
             </Link>

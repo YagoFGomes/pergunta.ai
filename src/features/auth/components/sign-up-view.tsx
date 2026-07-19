@@ -386,7 +386,7 @@ export default function SignUpViewPage() {
 
                   <div className='flex items-center justify-between gap-3 pt-2'>
                     <form.StepButton
-                      label='â† Back'
+                      label='Back'
                       disabled={isFirstStep}
                       handleMovement={() => handleCancelOrBack({})}
                       variant='ghost'
@@ -404,10 +404,10 @@ export default function SignUpViewPage() {
                         >
                           Skip for now
                         </Button>
-                        <form.SubmitButton>Continue â†’</form.SubmitButton>
+                        <form.SubmitButton>Continue</form.SubmitButton>
                       </div>
                     ) : (
-                      <form.StepButton label='Next â†’' handleMovement={handleNext} />
+                      <form.StepButton label='Continue' handleMovement={handleNext} />
                     )}
                   </div>
                 </div>
