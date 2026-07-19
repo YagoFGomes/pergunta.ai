@@ -31,7 +31,6 @@ import { ModuleDataTable } from '@/features/platform/components/module-data-tabl
 import { useDataTable } from '@/hooks/use-data-table';
 import {
   getSurveysFrameworksListQueryKey,
-  useSurveysFrameworksCreate,
   useSurveysFrameworksList,
   useSurveysFrameworksPartialUpdate
 } from '@/lib/api/generated/endpoints';
@@ -44,7 +43,7 @@ import {
 
 import { getSurveyFrameworksColumns } from './columns';
 
-type Mode = 'create' | 'edit' | 'deactivate';
+type Mode = 'edit' | 'deactivate';
 
 const DEFAULT_VALUES: SurveyFrameworkFormValues = {
   code: '',
@@ -76,24 +75,11 @@ export function SurveyFrameworksManager() {
 
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [confirmDiscard, setConfirmDiscard] = useState(false);
-  const [mode, setMode] = useState<Mode>('create');
+  const [mode, setMode] = useState<Mode>('edit');
   const [selectedFramework, setSelectedFramework] = useState<SurveyFramework | null>(null);
 
   const listQuery = useSurveysFrameworksList();
   const frameworks = getOrvalResponseData<SurveyFramework[]>(listQuery.data) ?? [];
-
-  const createMutation = useSurveysFrameworksCreate({
-    mutation: {
-      onSuccess: () => {
-        toast.success('Indicador criado com sucesso.');
-        void queryClient.invalidateQueries({ queryKey: getSurveysFrameworksListQueryKey() });
-        setIsDialogOpen(false);
-      },
-      onError: () => {
-        toast.error('Não foi possível criar o indicador.');
-      }
-    }
-  });
 
   const updateMutation = useSurveysFrameworksPartialUpdate({
     mutation: {
@@ -126,18 +112,6 @@ export function SurveyFrameworksManager() {
     onSubmit: async ({ value }) => {
       const normalized = normalizeValues(value);
 
-      if (mode === 'create') {
-        await createMutation.mutateAsync({
-          data: {
-            code: normalized.code,
-            name: normalized.name,
-            description: normalized.description,
-            is_active: normalized.is_active
-          }
-        });
-        return;
-      }
-
       if (!selectedFramework) {
         return;
       }
@@ -154,16 +128,15 @@ export function SurveyFrameworksManager() {
     }
   });
 
-  const hasMutationInFlight =
-    createMutation.isPending || updateMutation.isPending || deactivateMutation.isPending;
+  const hasMutationInFlight = updateMutation.isPending || deactivateMutation.isPending;
 
   const { FormTextField, FormTextareaField, FormSwitchField } =
     useFormFields<SurveyFrameworkFormValues>();
 
   useEffect(() => {
     if (!isDialogOpen) {
-      if (mode !== 'create' || selectedFramework) {
-        setMode('create');
+      if (mode !== 'edit' || selectedFramework) {
+        setMode('edit');
         setSelectedFramework(null);
         form.reset(DEFAULT_VALUES);
       }
@@ -171,22 +144,10 @@ export function SurveyFrameworksManager() {
       return;
     }
 
-    if (mode === 'create') {
-      form.reset(DEFAULT_VALUES);
-      return;
-    }
-
     if (mode === 'edit' && selectedFramework) {
       form.reset(getFrameworkFormValues(selectedFramework));
     }
   }, [form, isDialogOpen, mode, selectedFramework]);
-
-  function openCreateDialog() {
-    setMode('create');
-    setSelectedFramework(null);
-    form.reset(DEFAULT_VALUES);
-    setIsDialogOpen(true);
-  }
 
   function forceClose() {
     setConfirmDiscard(false);
@@ -266,17 +227,6 @@ export function SurveyFrameworksManager() {
 
   return (
     <div className='space-y-4'>
-      <div className='flex flex-wrap items-center justify-between gap-2'>
-        <div className='space-y-1'>
-          <h2 className='text-xl font-semibold'>Indicadores de Satisfação</h2>
-          <p className='text-muted-foreground text-sm'>
-            NPS, CSI e CXI são indicadores do sistema. Você também pode criar indicadores
-            customizados.
-          </p>
-        </div>
-        <Button onClick={openCreateDialog}>Novo indicador</Button>
-      </div>
-
       {listQuery.isError ? (
         <Alert variant='destructive'>
           <AlertTitle>Erro ao carregar indicadores</AlertTitle>
@@ -311,43 +261,21 @@ export function SurveyFrameworksManager() {
       >
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>
-              {mode === 'create'
-                ? 'Novo indicador'
-                : mode === 'edit'
-                  ? 'Editar indicador'
-                  : 'Excluir indicador'}
-            </DialogTitle>
+            <DialogTitle>{mode === 'edit' ? 'Editar indicador' : 'Excluir indicador'}</DialogTitle>
             <DialogDescription>
-              {mode === 'create'
-                ? 'Preencha os dados para criar um indicador customizado.'
-                : mode === 'edit'
-                  ? 'Atualize os dados do indicador selecionado.'
-                  : 'A API não possui endpoint DELETE para indicadores. Esta ação vai desativar o registro.'}
+              {mode === 'edit'
+                ? 'Atualize os dados do indicador selecionado.'
+                : 'A API não possui endpoint DELETE para indicadores. Esta ação vai desativar o registro.'}
             </DialogDescription>
           </DialogHeader>
 
           {shouldShowDialogForm ? (
             <form.AppForm key={dialogFormKey}>
               <form.Form className='space-y-4 p-0 md:p-0'>
-                {mode === 'create' ? (
-                  <FormTextField
-                    name='code'
-                    label='Código'
-                    required
-                    placeholder='Ex: NPS'
-                    maxLength={20}
-                    validators={{
-                      onBlur: surveyFrameworkFieldSchemas.code
-                    }}
-                    disabled={hasMutationInFlight}
-                  />
-                ) : (
-                  <div className='space-y-2'>
-                    <p className='text-sm font-medium'>Código</p>
-                    <Input value={selectedFramework?.code ?? ''} disabled readOnly />
-                  </div>
-                )}
+                <div className='space-y-2'>
+                  <p className='text-sm font-medium'>Código</p>
+                  <Input value={selectedFramework?.code ?? ''} disabled readOnly />
+                </div>
 
                 <FormTextField
                   name='name'
@@ -401,7 +329,7 @@ export function SurveyFrameworksManager() {
                   >
                     {([canSubmit, isSubmitting]) => (
                       <Button type='submit' disabled={!canSubmit || isSubmitting}>
-                        {mode === 'create' ? 'Criar indicador' : 'Salvar alterações'}
+                        Salvar alterações
                       </Button>
                     )}
                   </form.Subscribe>

@@ -1,4 +1,5 @@
 import PageContainer from '@/components/layout/page-container';
+import { SurveyFrameworkCreateDialog } from '@/features/surveys/components/frameworks-table/survey-framework-create-dialog';
 import { SurveyFrameworksManager } from '@/features/surveys/components/frameworks-table/survey-frameworks-manager';
 
 export const metadata = {
@@ -10,6 +11,7 @@ export default function SurveyFrameworksPage() {
     <PageContainer
       pageTitle='Indicadores de Satisfação'
       pageDescription='Indicadores do sistema (NPS, CSI, CXI) e indicadores customizados do seu tenant.'
+      pageHeaderAction={<SurveyFrameworkCreateDialog />}
     >
       <SurveyFrameworksManager />
     </PageContainer>
