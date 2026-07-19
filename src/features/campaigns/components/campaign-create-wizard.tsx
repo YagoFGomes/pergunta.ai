@@ -33,6 +33,11 @@ import type { Form } from '@/lib/api/generated/model/form';
 import { SendConditionEnum } from '@/lib/api/generated/model/sendConditionEnum';
 import { StepTypeEnum } from '@/lib/api/generated/model/stepTypeEnum';
 import { cn } from '@/lib/utils';
+import {
+  isValidContactList,
+  isValidEmailTemplate,
+  isValidSurveyForm
+} from '../lib/campaign-setup-progress';
 import { SEND_CONDITION_OPTIONS, STEP_TYPE_OPTIONS } from '../lib/campaign-utils';
 import {
   campaignWizardSchema,
@@ -125,10 +130,6 @@ function getFormLabel(form: Form) {
   return `${form.title}${form.framework_code ? ` (${form.framework_code})` : ''} - ${form.status ?? 'DRAFT'}`;
 }
 
-function isArchivedForm(form: Form) {
-  return String(form.status ?? '').toUpperCase() === 'ARCHIVED';
-}
-
 function ResourcePreview({
   title,
   description,
@@ -176,27 +177,29 @@ export function CampaignCreateWizard() {
   const templates = getCollectionItems(
     getOrvalResponseData<EmailTemplate[] | { results?: EmailTemplate[] }>(templatesQuery.data)
   );
-  const availableForms = useMemo(() => forms.filter((form) => !isArchivedForm(form)), [forms]);
+  const availableForms = useMemo(() => forms.filter(isValidSurveyForm), [forms]);
+  const availableLists = useMemo(() => lists.filter(isValidContactList), [lists]);
+  const availableTemplates = useMemo(() => templates.filter(isValidEmailTemplate), [templates]);
 
   const prerequisites = useMemo(
     () => ({
       forms: availableForms.length > 0,
-      lists: lists.length > 0,
-      templates: templates.length > 0
+      lists: availableLists.length > 0,
+      templates: availableTemplates.length > 0
     }),
-    [availableForms.length, lists.length, templates.length]
+    [availableForms.length, availableLists.length, availableTemplates.length]
   );
   const selectedForm = useMemo(
     () => availableForms.find((form) => form.id === values.form),
     [availableForms, values.form]
   );
   const selectedList = useMemo(
-    () => lists.find((list) => list.id === values.email_list),
-    [lists, values.email_list]
+    () => availableLists.find((list) => list.id === values.email_list),
+    [availableLists, values.email_list]
   );
   const selectedTemplate = useMemo(
-    () => templates.find((template) => template.id === values.email_template),
-    [templates, values.email_template]
+    () => availableTemplates.find((template) => template.id === values.email_template),
+    [availableTemplates, values.email_template]
   );
 
   const createMutation = useCampaignsCreate();
@@ -416,7 +419,7 @@ export function CampaignCreateWizard() {
               onChange={(value) => updateValue('email_list', value)}
             >
               <option value=''>Selecione uma lista</option>
-              {lists.map((list) => (
+              {availableLists.map((list) => (
                 <option key={list.id} value={list.id}>
                   {list.name} ({list.contact_count} contatos) - {list.status ?? 'ACTIVE'}
                 </option>
@@ -482,7 +485,7 @@ export function CampaignCreateWizard() {
               onChange={(value) => updateValue('email_template', value)}
             >
               <option value=''>Selecione um template</option>
-              {templates.map((template) => (
+              {availableTemplates.map((template) => (
                 <option key={template.id} value={template.id}>
                   {template.name} - {template.subject} - {template.status ?? 'ACTIVE'}
                 </option>
@@ -617,7 +620,7 @@ export function CampaignCreateWizard() {
         </div>
       ) : null}
 
-      <div className='flex flex-col-reverse gap-2 border-t pt-4 sm:flex-row sm:justify-between [&_button]:w-full sm:[&_button]:w-auto'>
+      <div className='flex flex-col-reverse gap-2 border-t pt-4 sm:flex-row sm:justify-between [&_button]:w-full sm:[&_button]:w-auto lg:sticky lg:bottom-0 lg:z-10 lg:-mx-6 lg:bg-card/95 lg:px-6 lg:pb-6 lg:backdrop-blur'>
         <Button
           type='button'
           variant='outline'

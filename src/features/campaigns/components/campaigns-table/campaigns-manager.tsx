@@ -1,7 +1,6 @@
 'use client';
 
 import { keepPreviousData, useQueryClient } from '@tanstack/react-query';
-import Link from 'next/link';
 import { useMemo, useState } from 'react';
 import { toast } from 'sonner';
 
@@ -18,7 +17,7 @@ import {
 } from '@/components/ui/alert-dialog';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
-import { Button, buttonVariants } from '@/components/ui/button';
+import { Button } from '@/components/ui/button';
 import { ModuleDataTable } from '@/features/platform/components/module-data-table';
 import { ModuleDataTableSkeleton } from '@/features/platform/components/module-data-table-skeleton';
 import { ModuleErrorAlert } from '@/features/platform/components/module-error-alert';
@@ -34,13 +33,13 @@ import {
 } from '@/lib/api/generated/endpoints';
 import type { Campaign } from '@/lib/api/generated/model/campaign';
 import type { CampaignsListParams } from '@/lib/api/generated/model/campaignsListParams';
-import { cn } from '@/lib/utils';
 
 import {
   getCollectionCount,
   getCollectionItems,
   type MaybePaginatedCampaigns
 } from '../../schemas/campaign';
+import { CampaignSetupRoadmap } from './campaign-setup-roadmap';
 import { getCampaignsColumns } from './columns';
 
 const CAMPAIGN_FILTER_KEYS = ['search', 'status'] as const;
@@ -48,26 +47,6 @@ const CAMPAIGN_FILTER_KEYS = ['search', 'status'] as const;
 function normalizeSingleFilter(value: unknown) {
   if (Array.isArray(value)) return value[0];
   return typeof value === 'string' && value.length > 0 ? value : undefined;
-}
-
-function CampaignsEmptyState() {
-  return (
-    <div className='flex min-h-[360px] flex-col items-center justify-center gap-4 rounded-lg border border-dashed p-8 text-center'>
-      <div className='bg-muted flex size-12 items-center justify-center rounded-full'>
-        <Icons.send className='text-muted-foreground size-6' />
-      </div>
-      <div className='space-y-1'>
-        <h2 className='text-lg font-semibold'>Nenhuma campanha criada</h2>
-        <p className='text-muted-foreground max-w-md text-sm'>
-          Crie uma campanha vinculando formulário, lista de contatos e template de email.
-        </p>
-      </div>
-      <Link href='/dashboard/campaigns/new' className={cn(buttonVariants(), 'text-xs md:text-sm')}>
-        <Icons.add className='mr-2 h-4 w-4' />
-        Nova campanha
-      </Link>
-    </div>
-  );
 }
 
 export function CampaignsManager() {
@@ -157,33 +136,40 @@ export function CampaignsManager() {
     );
   }
 
-  if (totalItems === 0 && !hasFilters) {
-    return <CampaignsEmptyState />;
-  }
-
   return (
     <div className='space-y-4'>
-      {campaigns.length === 0 && hasFilters ? (
-        <Alert>
-          <AlertTitle>Nenhuma campanha encontrada</AlertTitle>
-          <AlertDescription>Ajuste os filtros para visualizar outras campanhas.</AlertDescription>
-        </Alert>
-      ) : null}
-
-      <ModuleDataTable
-        table={table}
-        toolbarChildren={
-          <>
-            {campaignsQuery.isFetching ? (
-              <Badge variant='outline' className='gap-1'>
-                <Icons.spinner className='h-3 w-3 animate-spin' />
-                Atualizando
-              </Badge>
-            ) : null}
-            <Badge variant='outline'>{totalItems} campanhas</Badge>
-          </>
-        }
+      <CampaignSetupRoadmap
+        existingCampaignCount={totalItems}
+        isCampaignCountFiltered={hasFilters}
       />
+
+      {totalItems === 0 && !hasFilters ? null : (
+        <>
+          {campaigns.length === 0 && hasFilters ? (
+            <Alert>
+              <AlertTitle>Nenhuma campanha encontrada</AlertTitle>
+              <AlertDescription>
+                Ajuste os filtros para visualizar outras campanhas.
+              </AlertDescription>
+            </Alert>
+          ) : null}
+
+          <ModuleDataTable
+            table={table}
+            toolbarChildren={
+              <>
+                {campaignsQuery.isFetching ? (
+                  <Badge variant='outline' className='gap-1'>
+                    <Icons.spinner className='h-3 w-3 animate-spin' />
+                    Atualizando
+                  </Badge>
+                ) : null}
+                <Badge variant='outline'>{totalItems} campanhas</Badge>
+              </>
+            }
+          />
+        </>
+      )}
 
       <AlertDialog
         open={Boolean(deleteCampaign)}

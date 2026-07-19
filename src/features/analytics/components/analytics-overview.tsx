@@ -236,10 +236,7 @@ export function AnalyticsOverview() {
           </p>
         </div>
         <div className='flex flex-wrap justify-center gap-2'>
-          <Link
-            href='/dashboard/campaigns/new'
-            className={cn(buttonVariants(), 'text-xs md:text-sm')}
-          >
+          <Link href='/dashboard/campaigns' className={cn(buttonVariants(), 'text-xs md:text-sm')}>
             <Icons.add className='mr-2 h-4 w-4' />
             Nova campanha
           </Link>
