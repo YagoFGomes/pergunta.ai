@@ -26,7 +26,7 @@ function formatDate(value?: string) {
 }
 
 function getStatusLabel(status?: EmailContact['status']) {
-  if (status === EmailContactStatusEnum.UNSUBSCRIBED) return 'Descadastrado';
+  if (status === EmailContactStatusEnum.UNSUBSCRIBED) return 'Inativo';
   if (status === EmailContactStatusEnum.BOUNCED) return 'Bounced';
   return 'Ativo';
 }
@@ -69,20 +69,11 @@ export function getContactsByListColumns({
         <DataTableColumnHeader column={column} title='Contato' />
       ),
       cell: ({ row }) => (
-        <div className='flex min-w-[220px] flex-col gap-1'>
+        <div className='flex min-w-55 flex-col gap-1'>
           <span className='font-medium'>{row.original.name}</span>
           <span className='text-muted-foreground text-xs'>{row.original.email}</span>
         </div>
       )
-    },
-    {
-      id: 'phone',
-      accessorKey: 'phone',
-      enableSorting: false,
-      header: ({ column }: { column: Column<EmailContact, unknown> }) => (
-        <DataTableColumnHeader column={column} title='Telefone' />
-      ),
-      cell: ({ row }) => <span className='text-sm'>{row.original.phone || '-'}</span>
     },
     {
       id: 'status',
@@ -94,7 +85,7 @@ export function getContactsByListColumns({
         variant: 'select',
         options: [
           { label: 'Ativo', value: EmailContactStatusEnum.ACTIVE },
-          { label: 'Descadastrado', value: EmailContactStatusEnum.UNSUBSCRIBED },
+          { label: 'Inativo', value: EmailContactStatusEnum.UNSUBSCRIBED },
           { label: 'Bounced', value: EmailContactStatusEnum.BOUNCED }
         ]
       },

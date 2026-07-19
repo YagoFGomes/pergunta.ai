@@ -32,23 +32,15 @@ import {
   useContactsListsContactsCreate
 } from '@/lib/api/generated/endpoints';
 import { EmailContactStatusEnum } from '@/lib/api/generated/model/emailContactStatusEnum';
-import type { Option } from '@/types/data-table';
 import { contactFieldSchemas, type ContactFormValues } from '../../schemas/contact';
 
 type ContactListContactCreateDialogProps = {
   listId: string;
 };
 
-const STATUS_OPTIONS: Option[] = [
-  { label: 'Ativo', value: EmailContactStatusEnum.ACTIVE },
-  { label: 'Descadastrado', value: EmailContactStatusEnum.UNSUBSCRIBED },
-  { label: 'Bounced', value: EmailContactStatusEnum.BOUNCED }
-];
-
 const DEFAULT_VALUES: ContactFormValues = {
   name: '',
   email: '',
-  phone: '',
   status: EmailContactStatusEnum.ACTIVE
 };
 
@@ -56,7 +48,6 @@ function normalizeValues(values: ContactFormValues): ContactFormValues {
   return {
     name: values.name.trim(),
     email: values.email.trim().toLowerCase(),
-    phone: (values.phone || '').trim(),
     status: values.status
   };
 }
@@ -94,15 +85,14 @@ export function ContactListContactCreateDialog({ listId }: ContactListContactCre
         data: {
           name: normalized.name,
           email: normalized.email,
-          phone: normalized.phone,
-          status: normalized.status,
+          status: EmailContactStatusEnum.ACTIVE,
           consent: true
         }
       });
     }
   });
 
-  const { FormTextField, FormSelectField } = useFormFields<ContactFormValues>();
+  const { FormTextField } = useFormFields<ContactFormValues>();
 
   function handleOpenChange(nextOpen: boolean) {
     if (!nextOpen) {
@@ -157,28 +147,6 @@ export function ContactListContactCreateDialog({ listId }: ContactListContactCre
                 placeholder='contato@empresa.com'
                 validators={{
                   onBlur: contactFieldSchemas.email
-                }}
-                disabled={createMutation.isPending}
-              />
-
-              <FormTextField
-                name='phone'
-                label='Telefone'
-                placeholder='(11) 99999-9999'
-                maxLength={30}
-                validators={{
-                  onBlur: contactFieldSchemas.phone
-                }}
-                disabled={createMutation.isPending}
-              />
-
-              <FormSelectField
-                name='status'
-                label='Status'
-                required
-                options={STATUS_OPTIONS}
-                validators={{
-                  onBlur: contactFieldSchemas.status
                 }}
                 disabled={createMutation.isPending}
               />

@@ -57,14 +57,12 @@ type ContactListContactsManagerProps = {
 
 const STATUS_OPTIONS: Option[] = [
   { label: 'Ativo', value: EmailContactStatusEnum.ACTIVE },
-  { label: 'Descadastrado', value: EmailContactStatusEnum.UNSUBSCRIBED },
-  { label: 'Bounced', value: EmailContactStatusEnum.BOUNCED }
+  { label: 'Inativo', value: EmailContactStatusEnum.UNSUBSCRIBED }
 ];
 
 const DEFAULT_VALUES: ContactFormValues = {
   name: '',
   email: '',
-  phone: '',
   status: EmailContactStatusEnum.ACTIVE
 };
 
@@ -79,7 +77,6 @@ function getContactFormValues(contact: EmailContact): ContactFormValues {
   return {
     name: contact.name,
     email: contact.email,
-    phone: contact.phone ?? '',
     status: contact.status ?? EmailContactStatusEnum.ACTIVE
   };
 }
@@ -137,7 +134,6 @@ export function ContactListContactsManager({ listId }: ContactListContactsManage
       const normalized = {
         name: value.name.trim(),
         email: value.email.trim().toLowerCase(),
-        phone: (value.phone || '').trim(),
         status: value.status
       };
 
@@ -147,7 +143,6 @@ export function ContactListContactsManager({ listId }: ContactListContactsManage
         data: {
           name: normalized.name,
           email: normalized.email,
-          phone: normalized.phone,
           status: normalized.status
         }
       });
@@ -305,17 +300,6 @@ export function ContactListContactsManager({ listId }: ContactListContactsManage
                 placeholder='contato@empresa.com'
                 validators={{
                   onBlur: contactFieldSchemas.email
-                }}
-                disabled={hasMutationInFlight}
-              />
-
-              <FormTextField
-                name='phone'
-                label='Telefone'
-                placeholder='(11) 99999-9999'
-                maxLength={30}
-                validators={{
-                  onBlur: contactFieldSchemas.phone
                 }}
                 disabled={hasMutationInFlight}
               />
