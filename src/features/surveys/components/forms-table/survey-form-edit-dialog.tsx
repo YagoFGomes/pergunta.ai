@@ -114,7 +114,6 @@ export function SurveyFormEditDialog({ form, open, onOpenChange }: SurveyFormEdi
       onSuccess: async (response) => {
         const updated = getOrvalResponseData<Form>(response);
         await invalidateQueries(updated?.id);
-        notifySuccess('Formulário publicado.');
         setConfirmAction(null);
         onOpenChange(false);
       },
@@ -182,6 +181,7 @@ export function SurveyFormEditDialog({ form, open, onOpenChange }: SurveyFormEdi
 
   const isDraft = form.status === Status37cEnum.DRAFT;
   const isActive = form.status === Status37cEnum.ACTIVE;
+  const isArchivable = isDraft || isActive;
 
   return (
     <>
@@ -201,7 +201,7 @@ export function SurveyFormEditDialog({ form, open, onOpenChange }: SurveyFormEdi
                 {formatDateTime(form.updated_at)}.
               </AlertDescription>
             </Alert>
-            {(isDraft || isActive) && (
+            {(isDraft || isArchivable) && (
               <div className='flex shrink-0 gap-2'>
                 {isDraft && (
                   <Button
@@ -215,7 +215,7 @@ export function SurveyFormEditDialog({ form, open, onOpenChange }: SurveyFormEdi
                     Publicar
                   </Button>
                 )}
-                {isActive && (
+                {isArchivable && (
                   <Button
                     type='button'
                     variant='outline'

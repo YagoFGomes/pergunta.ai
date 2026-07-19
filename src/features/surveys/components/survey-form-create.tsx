@@ -155,7 +155,6 @@ function SurveyFormEditor({ mode, initialForm }: SurveyFormEditorProps) {
             queryKey: getSurveysFormsRetrieveQueryKey(updated?.id ?? initialForm?.id)
           })
         ]);
-        notifySuccess('Formulário publicado.');
       },
       onError: (error) => {
         notifyError(error, 'Não foi possível publicar o formulário.');
@@ -262,7 +261,8 @@ function SurveyFormEditor({ mode, initialForm }: SurveyFormEditorProps) {
                   Publicar
                 </Button>
               )}
-              {initialForm.status === Status37cEnum.ACTIVE && (
+              {(initialForm.status === Status37cEnum.ACTIVE ||
+                initialForm.status === Status37cEnum.DRAFT) && (
                 <Button
                   type='button'
                   variant='outline'

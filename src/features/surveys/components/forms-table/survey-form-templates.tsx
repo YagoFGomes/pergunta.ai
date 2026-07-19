@@ -21,7 +21,9 @@ import { notifyError, notifySuccess } from '@/features/platform/lib/notification
 import { getOrvalResponseData } from '@/features/platform/lib/orval-response';
 import {
   getSurveysFormsListQueryKey,
+  getSurveysFormsRetrieveQueryKey,
   useSurveysFormsList,
+  useSurveysFormsPublishCreate,
   useSurveysFormsTemplatesCloneCreate,
   useSurveysFormsTemplatesList
 } from '@/lib/api/generated/endpoints';
@@ -53,6 +55,23 @@ function TemplateCard({ template }: TemplateCardProps) {
   const router = useRouter();
   const queryClient = useQueryClient();
 
+  const publishMutation = useSurveysFormsPublishCreate({
+    mutation: {
+      onSuccess: async (response) => {
+        const updated = getOrvalResponseData<Form>(response);
+        await Promise.all([
+          queryClient.invalidateQueries({ queryKey: getSurveysFormsListQueryKey() }),
+          queryClient.invalidateQueries({
+            queryKey: getSurveysFormsRetrieveQueryKey(updated?.id)
+          })
+        ]);
+      },
+      onError: (error) => {
+        notifyError(error, 'Não foi possível ativar o formulário clonado.');
+      }
+    }
+  });
+
   const cloneMutation = useSurveysFormsTemplatesCloneCreate({
     mutation: {
       onSuccess: async (response) => {
@@ -60,9 +79,13 @@ function TemplateCard({ template }: TemplateCardProps) {
 
         await queryClient.invalidateQueries({ queryKey: getSurveysFormsListQueryKey() });
 
+        if (cloned?.id) {
+          await publishMutation.mutateAsync({ id: cloned.id, data: cloned as never });
+        }
+
         notifySuccess(
           'Formulário criado a partir do template!',
-          'Agora você pode editar e publicar seu formulário.'
+          'Agora você pode editar as perguntas do seu formulário.'
         );
 
         if (cloned?.id) {
@@ -95,10 +118,12 @@ function TemplateCard({ template }: TemplateCardProps) {
         <Button
           className='w-full'
           onClick={() => cloneMutation.mutate({ id: template.id, data: template as never })}
-          isLoading={cloneMutation.isPending}
-          disabled={cloneMutation.isPending}
+          isLoading={cloneMutation.isPending || publishMutation.isPending}
+          disabled={cloneMutation.isPending || publishMutation.isPending}
         >
-          {!cloneMutation.isPending && <Icons.add className='mr-2 h-4 w-4' />}
+          {!cloneMutation.isPending && !publishMutation.isPending && (
+            <Icons.add className='mr-2 h-4 w-4' />
+          )}
           Usar este template
         </Button>
       </CardFooter>

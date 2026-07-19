@@ -58,7 +58,6 @@ export function SurveyFormCellAction({ data }: SurveyFormCellActionProps) {
       onSuccess: async (response) => {
         const updated = getOrvalResponseData<Form>(response);
         await invalidateQueries(updated?.id);
-        notifySuccess('Formulário publicado.');
       },
       onError: (error) => {
         notifyError(error, 'Não foi possível publicar o formulário.');
@@ -93,6 +92,7 @@ export function SurveyFormCellAction({ data }: SurveyFormCellActionProps) {
 
   const isDraft = data.status === Status37cEnum.DRAFT;
   const isActive = data.status === Status37cEnum.ACTIVE;
+  const isArchivable = isDraft || isActive;
 
   return (
     <>
@@ -118,7 +118,7 @@ export function SurveyFormCellAction({ data }: SurveyFormCellActionProps) {
             Perguntas
           </DropdownMenuItem>
 
-          {(isDraft || isActive) && <DropdownMenuSeparator />}
+          {(isDraft || isArchivable) && <DropdownMenuSeparator />}
 
           {isDraft && (
             <DropdownMenuItem onClick={() => setConfirmAction('publish')}>
@@ -126,7 +126,7 @@ export function SurveyFormCellAction({ data }: SurveyFormCellActionProps) {
               Publicar
             </DropdownMenuItem>
           )}
-          {isActive && (
+          {isArchivable && (
             <DropdownMenuItem
               className='text-destructive focus:text-destructive'
               onClick={() => setConfirmAction('archive')}
