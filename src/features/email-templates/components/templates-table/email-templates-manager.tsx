@@ -49,6 +49,41 @@ function normalizeSingleFilter(value: unknown) {
   return typeof value === 'string' && value.length > 0 ? value : undefined;
 }
 
+type EmailTemplatesEmptyStateProps = {
+  onOpenSeedTemplates: () => void;
+  onCreateFromScratch: () => void;
+  isDisabled: boolean;
+};
+
+function EmailTemplatesEmptyState({
+  onOpenSeedTemplates,
+  onCreateFromScratch,
+  isDisabled
+}: EmailTemplatesEmptyStateProps) {
+  return (
+    <div className='flex min-h-90 flex-col items-center justify-center gap-4 rounded-lg border border-dashed p-8 text-center'>
+      <div className='bg-muted flex size-12 items-center justify-center rounded-full'>
+        <Icons.page className='text-muted-foreground size-6' />
+      </div>
+      <div className='space-y-1'>
+        <h2 className='text-lg font-semibold'>Nenhum template criado</h2>
+        <p className='text-muted-foreground max-w-md text-sm'>
+          Comece com um modelo pronto para o convite da pesquisa ou crie um template do zero para
+          personalizar seus envios.
+        </p>
+      </div>
+      <div className='flex w-full max-w-md flex-col gap-2 sm:w-auto sm:flex-row'>
+        <Button variant='outline' onClick={onOpenSeedTemplates} disabled={isDisabled}>
+          <Icons.page className='mr-2 h-4 w-4' />A partir de modelo
+        </Button>
+        <Button onClick={onCreateFromScratch} isLoading={isDisabled} disabled={isDisabled}>
+          Novo template
+        </Button>
+      </div>
+    </div>
+  );
+}
+
 export function EmailTemplatesManager() {
   const router = useRouter();
   const queryClient = useQueryClient();
@@ -177,6 +212,47 @@ export function EmailTemplatesManager() {
     );
   }
 
+  if (templates.length === 0 && !hasFilters) {
+    return (
+      <div className='flex flex-1 flex-col px-4 pt-2 pb-4 md:px-6 md:pt-4'>
+        <div className='space-y-1'>
+          <div className='flex flex-wrap items-center justify-between gap-2'>
+            <div className='space-y-1'>
+              <h2 className='text-xl font-semibold'>Templates de email</h2>
+              <p className='text-muted-foreground text-sm'>
+                Consulte os templates disponíveis para vincular nas campanhas.
+              </p>
+            </div>
+            <div className='flex flex-wrap gap-2'>
+              <Button
+                variant='outline'
+                onClick={() => setIsSeedDialogOpen(true)}
+                disabled={hasMutationInFlight}
+              >
+                <Icons.page className='mr-2 h-4 w-4' />A partir de modelo
+              </Button>
+              <Button
+                onClick={handleCreateNew}
+                isLoading={createMutation.isPending}
+                disabled={hasMutationInFlight}
+              >
+                Novo template
+              </Button>
+            </div>
+          </div>
+        </div>
+
+        <EmailTemplatesEmptyState
+          onOpenSeedTemplates={() => setIsSeedDialogOpen(true)}
+          onCreateFromScratch={handleCreateNew}
+          isDisabled={hasMutationInFlight}
+        />
+
+        <EmailTemplateSeedDialog open={isSeedDialogOpen} onOpenChange={setIsSeedDialogOpen} />
+      </div>
+    );
+  }
+
   return (
     <div className='flex flex-1 flex-col px-4 pt-2 pb-4 md:px-6 md:pt-4'>
       <div className='space-y-1'>
@@ -205,15 +281,6 @@ export function EmailTemplatesManager() {
           </div>
         </div>
       </div>
-
-      {templates.length === 0 && !hasFilters ? (
-        <Alert>
-          <AlertTitle>Nenhum template encontrado</AlertTitle>
-          <AlertDescription>
-            Crie templates para personalizar os envios de campanhas.
-          </AlertDescription>
-        </Alert>
-      ) : null}
 
       <ModuleDataTable
         table={table}
